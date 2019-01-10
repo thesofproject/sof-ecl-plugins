@@ -1,0 +1,7 @@
+!*.so*
+!*.xml
+!.classpath
+!.project
+!.settings
+!icons
+*.class
