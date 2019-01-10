@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+         <category
+				id = "org.sofproject.ui.new"
+				name = "Sound Open Firmware">
+         </category>
+         <wizard
+               category="org.sofproject.ui.new"
+               class="org.sofproject.ui.wizards.NewDutWizard"
+               icon="icons/sof-icon.png"
+               id="org.sofproject.ui.new.dut"
+               name="New DUT"
+               project="true">
+         	<description>Create new Device Under Test</description>
+         	<selection class="org.eclipse.core.resources.IResource"/>
+         </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.sofproject.ui.views"
+            name="Sound Open Firmware">
+      </category>
+      <view
+            category="org.sofproject.ui.views"
+            class="org.sofproject.ui.views.BinFileStructViewPart"
+            id="org.sofproject.ui.views.BinFileStructView"
+            name="Binary File Viewer"
+            restorable="true">
+      </view>
+      <view
+            category="org.sofproject.ui.views"
+            class="org.sofproject.ui.views.SofNodeConnectionsViewPart"
+            id="org.sofproject.ui.views.SofNodeConnectionsView"
+            name="Sof Node Connections"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="icons/sof-logo-18x18.png"
+            id="org.sofproject.ui.projectNature"
+            natureId="org.sofproject.core.sofnature">
+      </image>
+   </extension>
+</plugin>
