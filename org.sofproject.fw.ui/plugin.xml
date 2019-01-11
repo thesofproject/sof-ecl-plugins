@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.sofproject.fw.ui.editor.FwBinEditor"
+            default="false"
+            extensions="bin"
+            id="org.sofproject.fw.ui.editor"
+            name="Fw Binary Editor">
+      </editor>
+   </extension>
+
+</plugin>
