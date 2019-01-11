@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SOF Project - ALSA Topology
+Bundle-SymbolicName: org.sofproject.alsa.topo
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: org.sofproject.alsa.topo
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: org.sofproject.alsa.topo.model
+Require-Bundle: org.sofproject.core
+Bundle-Vendor: Intel Corporation
