@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.sofproject.alsa.topo.ui.editor.AlsaTopoEditor"
+            default="false"
+            extensions="tplg"
+            id="org.sofproject.alsa.topo.ui.editor"
+            name="Alsa Topology Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.sofproject.alsa.topo.ui.editor.AlsaTopoEditor"
+            class="org.sofproject.alsa.topo.ui.editor.AlsaTopoEditorToOutlineAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.views.contentoutline.IContentOutlinePage">
+         </adapter>
+      </factory>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.sofproject.alsa.topo.ui.graph.AlsaTopoZestGraphBuilder$BinFileNode"
+            class="org.sofproject.alsa.topo.ui.properties.PropertySourceAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.views.properties.IPropertySource">
+         </adapter>
+      </factory>
+   </extension>
+
+</plugin>
