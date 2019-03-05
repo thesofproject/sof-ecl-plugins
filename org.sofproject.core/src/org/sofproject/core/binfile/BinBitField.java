@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,36 +31,38 @@ package org.sofproject.core.binfile;
 
 import java.nio.ByteBuffer;
 
-public class BinInteger extends BinContainer {
+public class BinBitField extends BinItem {
 
 	private int value;
+	private int low;
+	private int high;
 	private boolean hexDispOnly;
 
-	public BinInteger(String name) {
-		this(name, false);
+	public BinBitField(String name, int high, int low) {
+		this(name, high, low, false);
 	}
 
-	public BinInteger(String name, boolean hexDispOnly) {
+	public BinBitField(String name, int high, int low, boolean hexDispOnly) {
 		super(name);
+		this.high = high;
+		this.low = low;
 		this.hexDispOnly = hexDispOnly;
 	}
 
 	@Override
 	public BinItem read(ByteBuffer bb) {
-		super.read(bb);
-		value = bb.getInt();
-		// pass value (and file offset) to the child bin fields if any
-		for (BinItem item : children) {
-			item.setOffset(getOffset());
-			if (item instanceof BinBitField) {
-				((BinBitField) item).setValue(value);
-			}
-		}
+		// does not read anything, bits are extracted from the parent value
 		return this;
 	}
 
 	public Integer getValue() {
 		return new Integer(value);
+	}
+
+	public void setValue(int parentValue) {
+		if (high < 31)
+			parentValue = parentValue & ((1 << (high + 1)) - 1);
+		value = parentValue >> low;
 	}
 
 	@Override

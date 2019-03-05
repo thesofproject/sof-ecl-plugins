@@ -35,7 +35,7 @@ import java.util.List;
 
 public class BinContainer extends BinItem {
 
-	List<BinItem> children = new ArrayList<>();
+	protected List<BinItem> children = new ArrayList<>();
 
 	int dispSize = -1;
 	
