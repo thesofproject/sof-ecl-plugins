@@ -43,7 +43,7 @@ public class BinStructCseManifestHeader extends BinStruct {
 		super("header");
 		addChildItem(new BinSigInteger("signature"));
 		addChildItem(new BinInteger("number_of_modules"));
-		addChildItem(new BinShort("ver"));
+		addChildItem(new BinShort("ver", true));
 	}
 
 	@Override

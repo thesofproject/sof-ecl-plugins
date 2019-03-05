@@ -36,7 +36,7 @@ public class BinStructSegmentDesc extends BinStruct {
 	public BinStructSegmentDesc() {
 		super("segment_desc");
 		addChildItem(new BinInteger("flags")); //TODO: parse bits
-		addChildItem(new BinInteger("v_base_addr"));
+		addChildItem(new BinInteger("v_base_addr", true));
 		addChildItem(new BinInteger("file_offset"));
 	}
 }
