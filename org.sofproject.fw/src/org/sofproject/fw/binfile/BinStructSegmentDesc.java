@@ -29,13 +29,25 @@
 
 package org.sofproject.fw.binfile;
 
+import org.sofproject.core.binfile.BinBitField;
 import org.sofproject.core.binfile.BinInteger;
 import org.sofproject.core.binfile.BinStruct;
 
 public class BinStructSegmentDesc extends BinStruct {
 	public BinStructSegmentDesc() {
 		super("segment_desc");
-		addChildItem(new BinInteger("flags")); //TODO: parse bits
+		BinInteger flags = new BinInteger("flags");
+		flags.addChildItem(new BinBitField("contents", 0, 0));
+		flags.addChildItem(new BinBitField("alloc", 1, 1));
+		flags.addChildItem(new BinBitField("load", 2, 2));
+		flags.addChildItem(new BinBitField("readonly", 3, 3));
+		flags.addChildItem(new BinBitField("code", 4, 4));
+		flags.addChildItem(new BinBitField("data", 5, 5));
+		// rsvd 7-6
+		flags.addChildItem(new BinBitField("type", 11, 8));
+		// rsvd 15-12
+		flags.addChildItem(new BinBitField("length", 31, 16));
+		addChildItem(flags);
 		addChildItem(new BinInteger("v_base_addr", true));
 		addChildItem(new BinInteger("file_offset"));
 	}
