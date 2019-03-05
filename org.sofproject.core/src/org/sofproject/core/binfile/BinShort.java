@@ -34,9 +34,15 @@ import java.nio.ByteBuffer;
 public class BinShort extends BinItem {
 
 	private short value;
-	
+	private boolean hexDispOnly;
+
 	public BinShort(String name) {
+		this(name, false);
+	}
+
+	public BinShort(String name, boolean hexDispOnly) {
 		super(name);
+		this.hexDispOnly = hexDispOnly;
 	}
 	
 	@Override
@@ -52,7 +58,10 @@ public class BinShort extends BinItem {
 
 	@Override
 	public String getValueString() {
-		return String.format("%d (0x%04x)", value, value);
+		if (hexDispOnly)
+			return String.format("0x%04x", value);
+		else
+			return String.format("%d (0x%x)", value, value);
 	}
 
 	@Override

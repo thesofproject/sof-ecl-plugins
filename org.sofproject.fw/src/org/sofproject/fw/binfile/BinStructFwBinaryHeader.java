@@ -53,9 +53,9 @@ public class BinStructFwBinaryHeader extends BinStruct {
 		addChildItem(new BinShort("hotfix_version"));
 		addChildItem(new BinShort("build_version"));
 		addChildItem(new BinInteger("num_module_entries"));
-		addChildItem(new BinInteger("hw_buf_base_addr"));
+		addChildItem(new BinInteger("hw_buf_base_addr", true));
 		addChildItem(new BinInteger("hw_buf_length"));
-		addChildItem(new BinInteger("load_offset"));
+		addChildItem(new BinInteger("load_offset", true));
 	}
 
 	@Override

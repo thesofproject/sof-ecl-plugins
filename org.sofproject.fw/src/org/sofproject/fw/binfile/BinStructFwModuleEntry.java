@@ -45,10 +45,10 @@ public class BinStructFwModuleEntry extends BinStruct {
 		addChildItem(new BinByteArray("uuid", 16)); //TODO: format as uuid
 		addChildItem(new BinInteger("type")); //TODO: parse bits
 		addChildItem(new BinByteArray("hash", 32));
-		addChildItem(new BinInteger("entry_point"));
+		addChildItem(new BinInteger("entry_point", true));
 		addChildItem(new BinShort("cfg_offset"));
 		addChildItem(new BinShort("cfg_count"));
-		addChildItem(new BinInteger("affinity_mask"));
+		addChildItem(new BinInteger("affinity_mask", true));
 		addChildItem(new BinShort("instance_max_count"));
 		addChildItem(new BinShort("instance_stack_size"));
 		addChildItem(new BinArray<BinStructSegmentDesc>(BinStructSegmentDesc.class, "segments", 3));

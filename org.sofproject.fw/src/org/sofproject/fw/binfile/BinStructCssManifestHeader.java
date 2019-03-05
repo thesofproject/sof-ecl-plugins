@@ -45,9 +45,9 @@ public class BinStructCssManifestHeader extends BinStruct {
 		super("css manifest header");
 		addChildItem(new BinInteger("type"));
 		addChildItem(new BinInteger("header_len_dw"));
-		addChildItem(new BinInteger("ver"));
+		addChildItem(new BinInteger("ver", true));
 		addChildItem(new BinInteger("css_mod_id"));
-		addChildItem(new BinInteger("mod_vendor"));
+		addChildItem(new BinInteger("mod_vendor", true));
 		addChildItem(new BinDateBdl("date"));
 		addChildItem(new BinInteger("size"));
 		addChildItem(new BinSigInteger("header_id"));
