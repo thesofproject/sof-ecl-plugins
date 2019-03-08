@@ -6,7 +6,7 @@
       <editor
             class="org.sofproject.fw.ui.editor.FwBinEditor"
             default="false"
-            extensions="bin"
+            extensions="bin, ri"
             id="org.sofproject.fw.ui.editor"
             name="Fw Binary Editor">
       </editor>
