@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,19 +27,42 @@
  *
  */
 
-package org.sofproject.fw.ui.editor;
+package org.sofproject.fw.ui.parts;
 
-import org.eclipse.gef.common.adapt.AdapterKey;
-import org.eclipse.gef.zest.fx.ZestFxModule;
-import org.sofproject.fw.ui.parts.FwBinPartsFactory;
+import java.util.Map;
 
-import com.google.inject.multibindings.MapBinder;
+import org.eclipse.gef.mvc.fx.parts.IContentPart;
+import org.eclipse.gef.zest.fx.parts.NodePart;
+import org.eclipse.gef.zest.fx.parts.ZestFxContentPartFactory;
+import org.sofproject.fw.ui.graph.FwBinZestGraphBuilder.FwMemoryMapNode;
 
-public class FwBinModule extends ZestFxModule {
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+
+import javafx.scene.Node;
+
+public class FwBinPartsFactory extends ZestFxContentPartFactory {
+	@Inject
+	private Injector injector;
 
 	@Override
-	protected void bindIContentPartFactoryAsContentViewerAdapter(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
-		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(FwBinPartsFactory.class);
-	}
+	public IContentPart<? extends Node> createContentPart(Object content, Map<Object, Object> contextMap) {
+		NodePart part = null;
+		
+		if (content == null) {
+			throw new IllegalArgumentException("null content");
+		}
 
+		if (content instanceof FwMemoryMapNode) {
+			part = new FwMemoryMapPart();
+		}
+		else if (content instanceof org.eclipse.gef.graph.Node) {
+			part = new FwBinNodePart();
+		}
+		if (part != null) {
+			injector.injectMembers(part);
+			return part;
+		}
+		return super.createContentPart(content, contextMap);
+	}
 }

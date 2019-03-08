@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,19 +27,39 @@
  *
  */
 
-package org.sofproject.fw.ui.editor;
+package org.sofproject.fw.ui.resources;
 
-import org.eclipse.gef.common.adapt.AdapterKey;
-import org.eclipse.gef.zest.fx.ZestFxModule;
-import org.sofproject.fw.ui.parts.FwBinPartsFactory;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 
-import com.google.inject.multibindings.MapBinder;
+public class FwBinResources {
 
-public class FwBinModule extends ZestFxModule {
+	private static Font boldFont;
+	private static Font mediumFont;
+	private static Font smallFont;
 
-	@Override
-	protected void bindIContentPartFactoryAsContentViewerAdapter(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
-		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(FwBinPartsFactory.class);
+	public static Font getGraphBoldFont() {
+		if (boldFont == null) {
+			Font def = Font.getDefault();
+			boldFont = Font.font(def.getFamily(), FontWeight.BOLD, def.getSize() - 1);
+		}
+		return boldFont;
 	}
 
+	public static Font getGraphSmallFont() {
+		if (smallFont == null) {
+			Font def = Font.getDefault();
+			smallFont = Font.font(def.getFamily(), FontPosture.ITALIC, def.getSize() - 3);
+		}
+		return smallFont;
+	}
+
+	public static Font getGraphMediumFont() {
+		if (mediumFont == null) {
+			Font def = Font.getDefault();
+			mediumFont = Font.font(def.getFamily(), def.getSize() - 2);
+		}
+		return mediumFont;
+	}
 }
