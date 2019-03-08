@@ -117,7 +117,7 @@ public class AlsaTopoNode extends AlsaTopoItem {
 		return attributes.keySet();
 	}
 
-	public Set<String> getAttributes(String group) {
+	public Set<String> getAttributeNamesFromGroup(String group) {
 		return attributes.get(group).keySet();
 	}
 

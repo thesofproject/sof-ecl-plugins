@@ -50,7 +50,7 @@ public class AlsaTplgPropertySource implements IPropertySource {
 		properties = new ArrayList<IPropertyDescriptor>();
 		topoNode = AlsaTopoZestGraphBuilder.getModelNode(item);
 		for (String group : topoNode.getAttributeGroups()) {
-			for (String attr : topoNode.getAttributes(group)) {
+			for (String attr : topoNode.getAttributeNamesFromGroup(group)) {
 				PropertyDescriptor pd = new PropertyDescriptor(new Pair<String, String>(group, attr), attr);
 				pd.setCategory(group);
 				properties.add(pd);
