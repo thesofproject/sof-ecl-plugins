@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,19 +27,52 @@
  *
  */
 
-package org.sofproject.fw.ui.editor;
+package org.sofproject.fw.ui.parts;
 
-import org.eclipse.gef.common.adapt.AdapterKey;
-import org.eclipse.gef.zest.fx.ZestFxModule;
-import org.sofproject.fw.ui.parts.FwBinPartsFactory;
+import org.eclipse.gef.zest.fx.parts.NodePart;
+import org.sofproject.fw.ui.visuals.FwBinNodeVisual;
 
-import com.google.inject.multibindings.MapBinder;
+import javafx.scene.Group;
+import javafx.scene.text.Text;
 
-public class FwBinModule extends ZestFxModule {
+public class FwBinNodePart extends NodePart {
+
+	public static final String COLOR_ATTR = "fw-bin-node-color";
+	public static final String BORDER_COLOR_ATTR = "fw-bin-node-border-color";
+	public static final String BORDER_WIDTH_ATTR = "fw-bin-node-border-width";
+	
+	/**
+	 * X (column) position in the grid. 
+	 */
+	public static final String X_POS_ATTR = "fw-bin-node-x-pos";
+	
+	/**
+	 * Y (row) position in the grid.
+	 */
+	public static final String Y_POS_ATTR = "fw-bin-node-y-pos";
+
+	/**
+	 * Attribute holds a reference to FwBinBlock instance.
+	 */
+	public static final String MODEL_ITEM_ATTR = "fw-bin-node-model-item";
+	
+	/**
+	 * Attribute holds a reference to the source BinStruct instance,
+	 * the FwBinBlock was built from.
+	 */
+	public static final String BIN_ITEM_ATTR = "fw-bin-node-bin-item";
+	
+	Text label;
 
 	@Override
-	protected void bindIContentPartFactoryAsContentViewerAdapter(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
-		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(FwBinPartsFactory.class);
+	protected Group doCreateVisual() {
+		label = new Text("?"); // TODO:
+		return new Group(new FwBinNodeVisual(getContent()));
+	}
+
+	@Override
+	protected Text getLabelText() {
+		return label;
 	}
 
 }

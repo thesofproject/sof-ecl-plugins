@@ -33,27 +33,88 @@ import java.io.IOException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.gef.graph.Graph;
 import org.eclipse.gef.mvc.fx.ui.MvcFxUiModule;
+import org.eclipse.gef.mvc.fx.ui.actions.FitToViewportAction;
+import org.eclipse.gef.mvc.fx.ui.actions.FitToViewportActionGroup;
+import org.eclipse.gef.mvc.fx.ui.actions.ScrollActionGroup;
+import org.eclipse.gef.mvc.fx.ui.actions.ZoomActionGroup;
 import org.eclipse.gef.mvc.fx.ui.parts.AbstractFXEditor;
+import org.eclipse.gef.mvc.fx.viewer.IViewer;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.sofproject.core.binfile.BinFile;
 import org.sofproject.fw.model.FwBinFactory;
 import org.sofproject.fw.model.FwBinGraph;
+import org.sofproject.fw.ui.graph.FwBinZestGraphBuilder;
 import org.sofproject.ui.editor.IBinFileEditor;
+import org.sofproject.ui.properties.SofPropertySheetPage;
 
 import com.google.inject.Guice;
 import com.google.inject.util.Modules;
 
 public class FwBinEditor extends AbstractFXEditor implements IBinFileEditor {
 
-	private FwBinGraph fwBinModel;
-	
+	private ZoomActionGroup zoomAg;
+	private FitToViewportActionGroup fitToViewportAg;
+	private ScrollActionGroup scrollAg;
+
+	private FwBinGraph fwBinModel = null;
+	private Graph zestGraph;
+
 	public FwBinEditor() {
 		super(Guice.createInjector(Modules.override(new FwBinModule()).with(new MvcFxUiModule())));
 
+	}
+
+	@Override
+	public void createPartControl(Composite parent) {
+		super.createPartControl(parent);
+
+		IViewer viewer = getContentViewer();
+		IActionBars actionBars = getEditorSite().getActionBars();
+
+		zoomAg = new ZoomActionGroup(new FitToViewportAction());
+		viewer.setAdapter(zoomAg);
+		zoomAg.fillActionBars(actionBars);
+
+		fitToViewportAg = new FitToViewportActionGroup();
+		viewer.setAdapter(fitToViewportAg);
+		fitToViewportAg.fillActionBars(actionBars);
+
+		scrollAg = new ScrollActionGroup();
+		viewer.setAdapter(scrollAg);
+		scrollAg.fillActionBars(actionBars);
+
+		// IToolBarManager mgr = actionBars.getToolBarManager();
+		// mgr.add(new Separator());
+		// mgr.add(new Separator());
+	}
+
+	@Override
+	public void dispose() {
+		IViewer viewer = getContentViewer();
+		if (zoomAg != null) {
+			viewer.unsetAdapter(zoomAg);
+			zoomAg.dispose();
+			zoomAg = null;
+		}
+		if (scrollAg != null) {
+			viewer.unsetAdapter(scrollAg);
+			scrollAg.dispose();
+			scrollAg = null;
+		}
+		if (fitToViewportAg != null) {
+			viewer.unsetAdapter(fitToViewportAg);
+			fitToViewportAg.dispose();
+			fitToViewportAg = null;
+		}
+		super.dispose();
 	}
 
 	@Override
@@ -95,8 +156,7 @@ public class FwBinEditor extends AbstractFXEditor implements IBinFileEditor {
 		if (input instanceof IFileEditorInput) {
 			IFileEditorInput fileInput = (IFileEditorInput) input;
 			try {
-				fwBinModel = FwBinFactory.readBinary(fileInput.getName(),
-						fileInput.getFile().getContents().available(),
+				fwBinModel = FwBinFactory.readBinary(fileInput.getName(), fileInput.getFile().getContents().available(),
 						fileInput.getFile().getContents());
 			} catch (CoreException | IOException e) {
 				// TODO Auto-generated catch block
@@ -105,10 +165,18 @@ public class FwBinEditor extends AbstractFXEditor implements IBinFileEditor {
 		}
 
 		if (fwBinModel != null) {
-			// TODO: graph
-//			zestGraph = new FwBinZestGraphBuilder().build(fwBinModel);
+			zestGraph = new FwBinZestGraphBuilder().build(fwBinModel);
 		}
-//		getContentViewer().getContents().setAll(zestGraph);
+		getContentViewer().getContents().setAll(zestGraph);
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Object getAdapter(final Class key) {
+		if (key == IPropertySheetPage.class) {
+			return new SofPropertySheetPage();
+		}
+		return super.getAdapter(key);
 	}
 
 	@Override

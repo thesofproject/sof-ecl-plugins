@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,19 +27,32 @@
  *
  */
 
-package org.sofproject.fw.ui.editor;
+package org.sofproject.fw.model;
 
-import org.eclipse.gef.common.adapt.AdapterKey;
-import org.eclipse.gef.zest.fx.ZestFxModule;
-import org.sofproject.fw.ui.parts.FwBinPartsFactory;
+public class FwBinConnection extends FwBinItem {
 
-import com.google.inject.multibindings.MapBinder;
+	private FwBinBlock src;
+	private FwBinBlock tgt;
 
-public class FwBinModule extends ZestFxModule {
-
-	@Override
-	protected void bindIContentPartFactoryAsContentViewerAdapter(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
-		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(FwBinPartsFactory.class);
+	public FwBinConnection(FwBinBlock src, FwBinBlock tgt) {
+		super("");
+		this.src = src;
+		this.tgt = tgt;
+		src.addOutConn(this);
+		tgt.addInConn(this);
+		setName(src.getName() + ".." + tgt.getName());
 	}
 
+	public FwBinBlock getSrc() {
+		return src;
+	}
+
+	public FwBinBlock getTgt() {
+		return tgt;
+	}
+
+	@Override
+	public String toString() {
+		return getName();
+	}
 }
