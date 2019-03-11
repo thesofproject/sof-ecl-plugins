@@ -83,6 +83,7 @@ public class NewDutWizard extends Wizard implements INewWizard {
 	protected void createConnection(IProgressMonitor monitor) throws CoreException {
 		IProject project = SofNodeProject.create(connPage.getProjectName(),
 				connPage.getLocationPath(), connPage.getAddress(), connPage.getRemoteResPath(),
+				connPage.getSrcProjName(),
 				monitor);
 		IWorkingSet[] workingSets = connPage.getSelectedWorkingSets();
 		PlatformUI.getWorkbench().getWorkingSetManager().addToWorkingSets(project, workingSets);

@@ -44,6 +44,7 @@ public class NewConnectionCreationPage extends WizardNewProjectCreationPage {
 
 	private Text addr;
 	private Text remoteResPath;
+	private Text srcProjName; // name of the project with the source code
 
 	private Listener confModifyListener = e -> {
 		boolean valid = validatePage();
@@ -89,6 +90,19 @@ public class NewConnectionCreationPage extends WizardNewProjectCreationPage {
 		remoteResPath.setLayoutData(data);
 		remoteResPath.setText(ISofNodeConst.SOF_PROJ_DEFAULT_REMOTE_PATH);
 		remoteResPath.addListener(SWT.Modify, confModifyListener);
+
+		Composite srcProjGroup = new Composite(control, SWT.NONE);
+		layout = new GridLayout();
+		layout.numColumns = 2;
+		srcProjGroup.setLayout(layout);
+		srcProjGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		new Label(srcProjGroup, SWT.NONE).setText("Source Code Project Name");
+		data = new GridData(GridData.FILL_HORIZONTAL);
+		data.grabExcessHorizontalSpace = true;
+		srcProjName = new Text(srcProjGroup, SWT.BORDER);
+		srcProjName.setLayoutData(data);
+		srcProjName.setText(ISofNodeConst.SOF_PROJ_DEFAULT_SRC_PROJ);
+		srcProjName.addListener(SWT.Modify, confModifyListener);
 	}
 
 	@Override
@@ -104,5 +118,9 @@ public class NewConnectionCreationPage extends WizardNewProjectCreationPage {
 
 	public String getRemoteResPath() {
 		return remoteResPath.getText();
+	}
+
+	public String getSrcProjName() {
+		return srcProjName.getText();
 	}
 }

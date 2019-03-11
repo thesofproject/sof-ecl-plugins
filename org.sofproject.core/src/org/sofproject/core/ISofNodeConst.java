@@ -30,44 +30,45 @@
 package org.sofproject.core;
 
 public interface ISofNodeConst {
-	
+
 	/**
-	 * ID of the 'sof-node' project. 
+	 * ID of the 'sof-node' project.
 	 */
 	String SOF_NODE_CORE_ID = "org.sofproject.core";
-	
+
 	/**
 	 * ID of the 'sof-node' project nature.
 	 */
 	String SOF_NODE_NATURE_ID = SOF_NODE_CORE_ID + ".sofnature";
-	
+
 	/**
 	 * Default name for local project directory to keep a copy of fw binary files.
 	 */
 	String BIN_FOLDER = "fw-bin";
-	
+
 	/**
-	 * Default name for local project directory to keep a copy of topology binary files. 
+	 * Default name for local project directory to keep a copy of topology binary
+	 * files.
 	 */
 	String TPLG_FOLDER = "topology";
-	
+
 	/**
-	 * Extension used to distinguish remote fw binary files. 
+	 * Extension used to distinguish remote fw binary files.
 	 */
 	String FW_BIN_FILE_EXT = "bin";
-	
+
 	/**
 	 * Extension used to distinguish remote topology binary files.
 	 */
 	String TPLG_FILE_EXT = "tplg";
-	
+
 	/**
 	 * Custom project property to store address of the node.
 	 */
 	String SOF_PROJ_PROP_NODE_ADDRESS = "nodeAddress";
-	
+
 	/**
-	 * Custom project property to store path to the remote files. 
+	 * Custom project property to store path to the remote files.
 	 */
 	String SOF_PROJ_PROP_REMOTE_RES_PATH = "remoteResPath";
 
@@ -75,4 +76,14 @@ public interface ISofNodeConst {
 	 * Default path to the remote files.
 	 */
 	String SOF_PROJ_DEFAULT_REMOTE_PATH = "/lib/firmware/intel";
+
+	/**
+	 * Custom project property to store name of the project with source code.
+	 */
+	String SOF_PROJ_PROP_SRC_PROJ_NAME = "srcProjName";
+
+	/**
+	 * Default name of the project with source code.
+	 */
+	String SOF_PROJ_DEFAULT_SRC_PROJ = "sof";
 }
