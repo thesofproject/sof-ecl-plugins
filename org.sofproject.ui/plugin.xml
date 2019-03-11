@@ -47,4 +47,13 @@
             natureId="org.sofproject.core.sofnature">
       </image>
    </extension>
+   <extension
+         point="org.eclipse.ui.console.consolePatternMatchListeners">
+      <consolePatternMatchListener
+            class="org.sofproject.ui.console.LogSourceMatcher"
+            id="org.sofproject.ui.console.LogSourceMatcher"
+            regex=".*:\d{1,}.*">
+         <enablement><test property="org.eclipse.ui.console.consoleTypeTest" value="sofconsole"/></enablement>
+      </consolePatternMatchListener>
+   </extension>
 </plugin>
