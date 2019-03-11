@@ -36,6 +36,7 @@ import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
 public class SofConsole {
+	public static final String TYPE = "sofconsole";
 	public static final String CONSOLE_NAME = "SofConsole";
 
 	private static MessageConsole getConsole(String name) {
@@ -45,7 +46,7 @@ public class SofConsole {
 				return (MessageConsole) c;
 		}
 		// no one found
-		MessageConsole nc = new MessageConsole(name, null);
+		MessageConsole nc = new MessageConsole(name, TYPE, null, true);
 		cm.addConsoles(new IConsole[] { nc });
 		return nc;
 	}
