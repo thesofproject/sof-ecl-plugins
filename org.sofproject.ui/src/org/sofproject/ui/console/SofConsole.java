@@ -34,28 +34,40 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
+import org.sofproject.core.SofNodeProject;
 
-public class SofConsole {
+public class SofConsole extends MessageConsole {
 	public static final String TYPE = "sofconsole";
 	public static final String CONSOLE_NAME = "SofConsole";
 
-	private static MessageConsole getConsole(String name) {
+	SofNodeProject sofNodeProj; // parent project
+
+	public SofConsole(String name, SofNodeProject sofNodeProj) {
+		super(name, TYPE, null, true);
+		this.sofNodeProj = sofNodeProj;
+	}
+
+	public SofNodeProject getSofNodeProj() {
+		return sofNodeProj;
+	}
+
+	private static MessageConsole getConsole(String name, SofNodeProject sofNodeProj) {
 		IConsoleManager cm = ConsolePlugin.getDefault().getConsoleManager();
 		for (IConsole c : cm.getConsoles()) {
 			if (name.equals(c.getName()))
 				return (MessageConsole) c;
 		}
 		// no one found
-		MessageConsole nc = new MessageConsole(name, TYPE, null, true);
+		MessageConsole nc = new SofConsole(name, sofNodeProj);
 		cm.addConsoles(new IConsole[] { nc });
 		return nc;
 	}
 
-	public static MessageConsoleStream getDefaultConsoleStream() {
-		return getConsole(CONSOLE_NAME).newMessageStream();
+	public static MessageConsoleStream getDefaultConsoleStream(SofNodeProject sofNodeProj) {
+		return getConsole(CONSOLE_NAME, sofNodeProj).newMessageStream();
 	}
 
-	public static MessageConsoleStream getConsoleStream(String id) {
-		return getConsole(CONSOLE_NAME + "." + id).newMessageStream();
+	public static MessageConsoleStream getConsoleStream(String id, SofNodeProject sofNodeProj) {
+		return getConsole(CONSOLE_NAME + "." + id, sofNodeProj).newMessageStream();
 	}
 }
