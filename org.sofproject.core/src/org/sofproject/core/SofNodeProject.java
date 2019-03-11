@@ -52,6 +52,11 @@ public class SofNodeProject {
 	private IProject proj;
 
 	/**
+	 * Name of the project with source code.
+	 */
+	private String srcProjName;
+
+	/**
 	 * Node (DUT) attributes.
 	 */
 	private SofNodeDescriptor nodeDesc;
@@ -75,13 +80,14 @@ public class SofNodeProject {
 	 * @throws CoreException See operations on resources.
 	 */
 	public static SofNodeProject fromProject(IProject proj) throws CoreException {
-		String address = proj.getPersistentProperty(new QualifiedName(
-				ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_NODE_ADDRESS));
-		String resPath = proj.getPersistentProperty(new QualifiedName(
-				ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_REMOTE_RES_PATH));
-		SofNodeDescriptor nodeDesc = new SofNodeDescriptor(address, SofNodeDescriptor.DEFAULT_PORT,
-				resPath);
-		SofNodeProject sofNodeProject = new SofNodeProject(proj, nodeDesc);
+		String srcProjName = proj.getPersistentProperty(
+				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_SRC_PROJ_NAME));
+		String address = proj.getPersistentProperty(
+				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_NODE_ADDRESS));
+		String resPath = proj.getPersistentProperty(
+				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_REMOTE_RES_PATH));
+		SofNodeDescriptor nodeDesc = new SofNodeDescriptor(address, SofNodeDescriptor.DEFAULT_PORT, resPath);
+		SofNodeProject sofNodeProject = new SofNodeProject(proj, srcProjName, nodeDesc);
 		return sofNodeProject;
 	}
 
@@ -92,14 +98,20 @@ public class SofNodeProject {
 	 * @param nodeDesc Node (DUT) descriptor.
 	 * @throws CoreException See operations on resources.
 	 */
-	public SofNodeProject(IProject proj, SofNodeDescriptor nodeDesc) throws CoreException {
+	public SofNodeProject(IProject proj, String srcProjName, SofNodeDescriptor nodeDesc) throws CoreException {
 		this.proj = proj;
+		this.srcProjName = srcProjName;
 		this.nodeDesc = nodeDesc;
 
-		proj.setPersistentProperty(new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID,
-				ISofNodeConst.SOF_PROJ_PROP_NODE_ADDRESS), nodeDesc.getAddr());
-		proj.setPersistentProperty(new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID,
-				ISofNodeConst.SOF_PROJ_PROP_REMOTE_RES_PATH), nodeDesc.getResPath());
+		proj.setPersistentProperty(
+				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_SRC_PROJ_NAME),
+				srcProjName);
+		proj.setPersistentProperty(
+				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_NODE_ADDRESS),
+				nodeDesc.getAddr());
+		proj.setPersistentProperty(
+				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_REMOTE_RES_PATH),
+				nodeDesc.getResPath());
 
 		binFolder = proj.getFolder(ISofNodeConst.BIN_FOLDER);
 		if (!binFolder.exists()) {
@@ -110,6 +122,10 @@ public class SofNodeProject {
 		if (!tplgFolder.exists()) {
 			tplgFolder.create(false, true, null);
 		}
+	}
+
+	public String getSrcProjName() {
+		return srcProjName;
 	}
 
 	public SofNodeDescriptor getNodeDescriptor() {
@@ -128,8 +144,8 @@ public class SofNodeProject {
 		return tplgFolder;
 	}
 
-	public static IProject create(String projName, IPath projPath, String nodeAddress,
-			String remoteResPath, IProgressMonitor monitor) throws CoreException {
+	public static IProject create(String projName, IPath projPath, String nodeAddress, String remoteResPath,
+			String srcProjName, IProgressMonitor monitor) throws CoreException {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IProject proj = root.getProject(projName);
 		IProjectDescription desc = ResourcesPlugin.getWorkspace().newProjectDescription(projName);
@@ -141,7 +157,7 @@ public class SofNodeProject {
 		int port = SofNodeDescriptor.DEFAULT_PORT;
 		SofNodeDescriptor nodeDesc = new SofNodeDescriptor(nodeAddress, port, remoteResPath);
 		// TODO: need to force the connection or by an event handler?
-		SofNodeConnectionManager.getInstance().createConnection(new SofNodeProject(proj, nodeDesc));
+		SofNodeConnectionManager.getInstance().createConnection(new SofNodeProject(proj, srcProjName, nodeDesc));
 
 		return proj;
 	}
