@@ -176,7 +176,8 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 			MessageConsoleStream mcs = null;
 			if (consNameExt != null) {
 				mcs = SofConsole.getConsoleStream(
-						conn.getProject().getProject().getName() + "." + consNameExt);
+						conn.getProject().getProject().getName() + "." + consNameExt,
+						conn.getProject());
 			}
 			try {
 				connectNode(conn);
