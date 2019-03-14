@@ -68,6 +68,7 @@ public class BinArray<T extends BinItem> extends BinItem {
 				item = itemClass.newInstance();
 				item.setName(getName());
 				item.read(bb);
+				item.setParent(this);
 				value.add(item);
 			} catch (InstantiationException | IllegalAccessException e) {
 				// TODO Auto-generated catch block
