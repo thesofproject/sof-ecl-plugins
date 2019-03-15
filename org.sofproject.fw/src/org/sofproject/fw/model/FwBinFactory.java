@@ -34,19 +34,36 @@ import java.io.InputStream;
 
 import org.sofproject.core.binfile.BinFile;
 import org.sofproject.core.binfile.BinFileReader;
+import org.sofproject.core.memmap.FwImageMemMap;
+import org.sofproject.core.memmap.MemMapReader;
 import org.sofproject.fw.binfile.FwBinBlockFactory;
 
 public class FwBinFactory {
 
-	public static FwBinGraph readBinary(String fileName, int availableSize, InputStream inputStream) {
+	/**
+	 * Graph creator.
+	 *
+	 * @param fileName
+	 * @param availableSize
+	 * @param inputStream   Opened by environment specific stream reader.
+	 * @return
+	 */
+	public static FwBinGraph readBinary(String fileName, int availableSize, InputStream inputStream, String mmFileName,
+			InputStream mmInputStream) {
 		try {
+			// reading the fw binary file...
 			BinFileReader reader = new BinFileReader(fileName, availableSize, inputStream);
 			FwBinBlockFactory f = new FwBinBlockFactory();
 			BinFile fwBin = reader.read(f);
 			f.dispose();
-			FwBinGraph graph = new FwBinGraph();
-			graph.setBin(fwBin);
-			return graph;
+
+			FwImageMemMap mm = null;
+			if (mmFileName != null) {
+				// reading the memory map (.map from objdump -h) file ...
+				MemMapReader mmReader = new MemMapReader(mmFileName, mmInputStream);
+				mm = mmReader.read();
+			}
+			return new FwBinGraph(fwBin, mm);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
