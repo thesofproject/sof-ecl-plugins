@@ -30,6 +30,8 @@
 package org.sofproject.core.binfile;
 
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class BinItem {
 
@@ -57,11 +59,20 @@ public abstract class BinItem {
 	public BinItem getParent() {
 		return parent;
 	}
-	
+
 	public void setParent(BinItem parent) {
 		this.parent = parent;
 	}
-	
+
+	public List<BinItem> getFullPath() {
+		LinkedList<BinItem> path = new LinkedList<>();
+		BinItem item = this;
+		do {
+			path.addFirst(item);
+		} while ((item = item.getParent()) != null);
+		return path;
+	}
+
 	public int getOffset() {
 		return offset;
 	}
@@ -69,7 +80,7 @@ public abstract class BinItem {
 	public void setOffset(int offset) {
 		this.offset = offset;
 	}
-	
+
 	public BinItem read(ByteBuffer bb) {
 		offset = bb.position();
 		return this;

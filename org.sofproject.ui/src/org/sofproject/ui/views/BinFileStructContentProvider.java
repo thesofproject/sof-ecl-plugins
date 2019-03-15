@@ -33,6 +33,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.sofproject.core.binfile.BinArray;
 import org.sofproject.core.binfile.BinContainer;
 import org.sofproject.core.binfile.BinFile;
+import org.sofproject.core.binfile.BinItem;
 
 /**
  * Tree content provider for {@link BinFile}.
@@ -61,7 +62,9 @@ public class BinFileStructContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object getParent(Object element) {
-		// TODO Auto-generated method stub
+		if (element instanceof BinItem) {
+			return ((BinItem) element).getParent();
+		}
 		return null;
 	}
 

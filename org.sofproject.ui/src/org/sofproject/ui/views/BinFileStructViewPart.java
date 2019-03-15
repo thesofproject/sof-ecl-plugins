@@ -73,18 +73,19 @@ public class BinFileStructViewPart extends ViewPart {
 				// System.out.println("selection changed: " + selection);
 				IEditorPart editor = part.getSite().getPage().getActiveEditor();
 				if (editor instanceof IBinFileEditor) {
-					BinFile tplg = ((IBinFileEditor) editor).getBinFile();
-					if (treeViewer.getInput() != tplg) {
-						treeViewer.setInput(tplg);
+					BinFile binFile = ((IBinFileEditor) editor).getBinFile();
+					if (treeViewer.getInput() != binFile) {
+						treeViewer.setInput(binFile);
 					}
 					if (selection instanceof IStructuredSelection) {
 						IStructuredSelection sel = (IStructuredSelection) selection;
 						if (sel.getFirstElement() instanceof IBinStructHolder) {
 							BinStruct bin = (((IBinStructHolder) sel.getFirstElement())
 									.getBinStruct());
-							TreePath path = new TreePath(new Object[] { bin.getParent(), bin });
-							treeViewer.setSelection(new TreeSelection(path), true);
+							TreePath path = new TreePath(
+									bin.getFullPath().toArray());
 							treeViewer.setExpandedState(path, true);
+							treeViewer.setSelection(new TreeSelection(path), true);
 						}
 					}
 				} else {
