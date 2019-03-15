@@ -29,7 +29,11 @@
 
 package org.sofproject.fw.model;
 
+import org.sofproject.core.memmap.FwImageMemMap;
+
 public class FwMemoryMap extends FwBinItem {
+
+	private FwImageMemMap mm;
 
 	private int row;
 	private int column;
@@ -37,10 +41,15 @@ public class FwMemoryMap extends FwBinItem {
 	// here we wants list of all sections in the fw binary
 	// along with their percentage of the memory occupied?
 
-	public FwMemoryMap(int row, int column) {
+	public FwMemoryMap(FwImageMemMap mm, int row, int column) {
 		super("FW Memory Map");
+		this.mm = mm;
 		this.row = row;
 		this.column = column;
+	}
+
+	public FwImageMemMap getMemMap() {
+		return mm;
 	}
 
 	public int getRow() {

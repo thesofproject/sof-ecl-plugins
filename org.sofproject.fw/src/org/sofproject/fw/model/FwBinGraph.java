@@ -33,11 +33,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sofproject.core.binfile.BinArray;
-import org.sofproject.core.binfile.BinContainer;
 import org.sofproject.core.binfile.BinFile;
 import org.sofproject.core.binfile.BinInteger;
 import org.sofproject.core.binfile.BinItem;
 import org.sofproject.core.binfile.BinStruct;
+import org.sofproject.core.memmap.FwImageMemMap;
 import org.sofproject.fw.binfile.BinStructCseManifestHeader;
 import org.sofproject.fw.binfile.BinStructCssManifestHeader;
 import org.sofproject.fw.binfile.BinStructFwBinaryHeader;
@@ -48,20 +48,24 @@ import org.sofproject.fw.binfile.BinStructSegmentDesc;
 public class FwBinGraph {
 
 	// fw memory map node is standalone and located in [0,0]
-	private static final int FW_MEM_MAP_ROW = 0;
-	private static final int FW_MEM_MAP_COLUMN = 0;
+	public static final int FW_MEM_MAP_ROW = 0;
+	public static final int FW_MEM_MAP_COLUMN = 0;
 
-	// bin tree begins from [1,1]
+	// bin tree begins from [0,1]
 	private static final int FIRST_GRAPH_ROW = 1;
 	private static final int FIRST_GRAPH_COLUMN = 0;
 
 	private List<FwBinItem> childElements = new ArrayList<>();
 
 	BinFile fwBin;
+	FwImageMemMap memMap;
 
-	public void setBin(BinFile fwBin) {
+	public FwBinGraph(BinFile fwBin, FwImageMemMap memMap) {
 		this.fwBin = fwBin;
-		createFwMemoryMap();
+		this.memMap = memMap;
+		if (memMap != null) {
+			createFwMemoryMap();
+		}
 		populateGraph();
 	}
 
@@ -86,8 +90,8 @@ public class FwBinGraph {
 
 	private void createFwMemoryMap() {
 		// TODO:
-		FwMemoryMap memMap = new FwMemoryMap(FW_MEM_MAP_ROW, FW_MEM_MAP_COLUMN);
-		childElements.add(memMap);
+		FwMemoryMap fwMemMap = new FwMemoryMap(memMap, FW_MEM_MAP_ROW, FW_MEM_MAP_COLUMN);
+		childElements.add(fwMemMap);
 	}
 
 	private void populateGraph() {
@@ -99,33 +103,6 @@ public class FwBinGraph {
 
 		// add children starting from row 0 and column 1
 		addElementChildren(rootNode, fwBin.getChildItems(), false, FIRST_GRAPH_ROW, FIRST_GRAPH_COLUMN + 1);
-
-//		for (BinItem item : fwBin.getChildItems()) {
-//			FwBinNode topNode = new FwBinNode(item.getName(), (BinStruct) item);
-//			addChildElement(topNode);
-//			addChildElement(new FwBinConnection(rootNode, topNode));
-//		}
-
-//		for (BinItem item : items) {
-//			if (item instanceof BinStructDapmWidget) {
-//				addWidgetNode(new AlsaTopoNodeWidget((BinStructDapmWidget) item));
-//			} else if (item instanceof BinStructPcm) {
-//				addPcmNode(new AlsaTopoNodePcm((BinStructPcm) item));
-//			} else if (item instanceof BinStructLinkConfig) {
-//				addBeNode(new AlsaTopoNodeBe((BinStructLinkConfig) item));
-//			} else if (item instanceof BinStructDapmGraph) {
-//				BinStructDapmGraph dapmGraph = (BinStructDapmGraph) item;
-//				AlsaTopoNode srcNode = (AlsaTopoNode) findChild((String) dapmGraph.getChildValue("source"));
-//				AlsaTopoNode tgtNode = (AlsaTopoNode) findChild((String) dapmGraph.getChildValue("sink"));
-//				if (srcNode != null && tgtNode != null) {
-//					addChildElement(new AlsaTopoConnection(Type.AUDIO_PATH, srcNode, tgtNode));
-//				} else {
-////					throw new RuntimeException("Graph connection not found");
-//				}
-//			} else if (item instanceof BinContainer) {
-//				populateGraph(((BinContainer) item).getChildItems());
-//			}
-//		}
 	}
 
 	private static FwBinBlock createBinBlock(BinStruct binFileItem, int row, int column) {

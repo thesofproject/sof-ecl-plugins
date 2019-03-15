@@ -31,8 +31,11 @@ package org.sofproject.fw.ui.editor;
 
 import java.io.IOException;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.gef.graph.Graph;
 import org.eclipse.gef.mvc.fx.ui.MvcFxUiModule;
 import org.eclipse.gef.mvc.fx.ui.actions.FitToViewportAction;
@@ -156,8 +159,16 @@ public class FwBinEditor extends AbstractFXEditor implements IBinFileEditor {
 		if (input instanceof IFileEditorInput) {
 			IFileEditorInput fileInput = (IFileEditorInput) input;
 			try {
+				// get IFile for mem map - might not be available
+				IContainer parentFolder = fileInput.getFile().getParent();
+				String binFileName = fileInput.getName();
+				String mmFileName = binFileName.substring(0, binFileName.lastIndexOf('.'));
+				IFile mmFile = parentFolder.getFile(new Path(mmFileName + ".lmap"));
+
 				fwBinModel = FwBinFactory.readBinary(fileInput.getName(), fileInput.getFile().getContents().available(),
-						fileInput.getFile().getContents());
+						fileInput.getFile().getContents(),
+						mmFile.exists() ? mmFile.getName() : null,
+						mmFile.exists() ? mmFile.getContents() : null);
 			} catch (CoreException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
