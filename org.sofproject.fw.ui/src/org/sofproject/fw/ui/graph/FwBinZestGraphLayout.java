@@ -32,100 +32,98 @@ package org.sofproject.fw.ui.graph;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.gef.geometry.planar.Dimension;
 import org.eclipse.gef.geometry.planar.Point;
 import org.eclipse.gef.graph.Graph;
 import org.eclipse.gef.graph.Node;
+import org.eclipse.gef.layout.ILayoutAlgorithm;
 import org.eclipse.gef.layout.LayoutContext;
 import org.eclipse.gef.layout.LayoutProperties;
-import org.eclipse.gef.layout.algorithms.GridLayoutAlgorithm;
+import org.sofproject.fw.model.FwBinGraph;
 
-public class FwBinZestGraphLayout extends GridLayoutAlgorithm {
+public class FwBinZestGraphLayout implements ILayoutAlgorithm {
 
-	class GridPoint {
-		int x;
-		int y;
+	private static double TOP_MARGIN = 10d;
+	private static double LEFT_MARGIN = 10d;
 
-		GridPoint(int x, int y) {
-			this.x = x;
-			this.y = y;
+	private static double COLUMN_MARGIN = 30d; // need more space for nice arrows
+	private static double ROW_MARGIN = 10;
+
+	List<Double> colSizes = new ArrayList<>();
+	List<Double> rowSizes = new ArrayList<>();
+
+	private void updateColumnSize(int col, double size) {
+		while (colSizes.size() <= col) {
+			colSizes.add(0d);
 		}
-
-		void moveLeft() {
-			x++;
-		}
-
-		void moveDown() {
-			y++;
-		}
-
-		GridPoint max(GridPoint other) {
-			return new GridPoint(Integer.max(x, other.x), Integer.max(y, other.y));
-		}
+		colSizes.set(col, Double.max(colSizes.get(col), size));
 	}
 
-	private List<List<Node>> grid = new ArrayList<>();
+	private void updateRowSize(int row, double size) {
+		while (rowSizes.size() <= row) {
+			rowSizes.add(0d);
+		}
+		rowSizes.set(row, Double.max(rowSizes.get(row), size));
+	}
+
+	private void computeSizes(Graph graph) {
+		colSizes.clear();
+		rowSizes.clear();
+		for (Node n : graph.getNodes()) {
+			int col = FwBinZestGraphBuilder.getNodePosX(n);
+			int row = FwBinZestGraphBuilder.getNodePosY(n);
+			Dimension size = LayoutProperties.getSize(n);
+
+//			System.out.println("computeSizes ["+col+", "+row+"] "
+//					+ size.getWidth() + " x " + size.getHeight());
+
+			// item in the first row may span across multiple columns, so do not
+			// update the column size common for other rows
+			if (row != FwBinGraph.FW_MEM_MAP_ROW) {
+				updateColumnSize(col, size.getWidth());
+			}
+			updateRowSize(row, size.getHeight());
+		}
+		// now compute accumulated offsets for each column and row
+		double accSize = LEFT_MARGIN;
+		for (int i = 0; i < colSizes.size(); i++) {
+			double colSize = colSizes.set(i, accSize);
+
+//			System.out.println("colSize [" + i + "] = " + accSize);
+
+			accSize += colSize + COLUMN_MARGIN;
+		}
+
+		accSize = TOP_MARGIN;
+		for (int i = 0; i < rowSizes.size(); i++) {
+			double rowSize = rowSizes.set(i, accSize);
+			accSize += rowSize + ROW_MARGIN;
+		}
+	}
 
 	public void applyLayout(LayoutContext context, boolean clean) {
 
-		// build the grid (once)
-		if (grid.isEmpty()) {
-//			List<Node> pcmNodes = findPcmNodes(context.getGraph());
-//
-//			// start from the first row to keep 0 for unconnected widgets atm
-//			int y = 1;
-//			for (Node pcm : pcmNodes) {
-//				addToGrid(pcm, new GridPoint(0, y));
-//				GridPoint outMaxPos = traverseOutgoing(pcm, new GridPoint(1, y));
-//				// if there is an outgoing stream, move down
-//				if (outMaxPos.x > 1) {
-//					y = outMaxPos.y + 1;
-//				}
-//				GridPoint inMaxPos = traverseIncoming(pcm, new GridPoint(1, y));
-//				if (inMaxPos.x > 1) {
-//					y = inMaxPos.y + 1;
-//				}
-//			}
+		// Some nodes are repositioned since the default GraphLayoutBehavior running
+		// in post-layout step attempts to center the nodes at the provided location
+		// when calling node's setPosition() finally.
 
-			Graph g = context.getGraph();
-			if (g.getNodes().isEmpty())
-				return;
-//			Node rootNode = g.getNodes().get(0);
-//			GridPoint rootGp = new GridPoint(0, 0);
-//			traverseOutgoing(rootNode, rootGp);
-			for (Node n : context.getGraph().getNodes()) {
-				addToGrid(n, new GridPoint(FwBinZestGraphBuilder.getNodePosX(n), FwBinZestGraphBuilder.getNodePosY(n)));
-			}
+		Graph g = context.getGraph();
+		if (g.getNodes().isEmpty())
+			return;
+
+		computeSizes(g);
+
+		// setting up fixed grid locations assigned while building the graph
+
+		// TODO: now the nodes are top-left aligned, should be centered inside cells
+
+		for (Node n : context.getGraph().getNodes()) {
+			int col = FwBinZestGraphBuilder.getNodePosX(n);
+			int row = FwBinZestGraphBuilder.getNodePosY(n);
+			Dimension size = LayoutProperties.getSize(n);
+			double x = colSizes.get(col) + size.getWidth() / 2;
+			double y = rowSizes.get(row) + size.getHeight() / 2;
+			LayoutProperties.setLocation(n, new Point(x, y));
 		}
-
-		int colIdx = 0;
-		for (List<Node> col : grid) {
-			int rowIdx = 0;
-			for (Node n : col) {
-				if (n != null) {
-					LayoutProperties.setLocation(n, new Point(colIdx * 240, rowIdx * 120));
-				}
-				rowIdx++;
-			}
-			colIdx++;
-		}
-
-//		super.applyLayout(context, clean);
-	}
-
-	private void addToGrid(Node node, GridPoint pos) {
-		int col = pos.x;
-		int row = pos.y;
-
-//		System.out.println(String.format("addToGrid() %s at %d.%d", 
-//				FwBinZestGraphBuilder.getNodeName(node), col, row));
-
-		if (col == grid.size()) {
-			grid.add(new ArrayList<Node>());
-		}
-		List<Node> column = grid.get(col);
-		while (row >= column.size()) {
-			column.add(null);
-		}
-		column.set(row, node);
 	}
 }

@@ -136,6 +136,10 @@ public class FwBinZestGraphBuilder {
 		return g;
 	}
 
+	public static FwMemoryMap getModelMemMap(Node n) {
+		return (FwMemoryMap) n.getAttributes().get(FwBinNodePart.MODEL_ITEM_ATTR);
+	}
+
 	public static FwBinBlock getModelNode(Node n) {
 		return (FwBinBlock) n.getAttributes().get(FwBinNodePart.MODEL_ITEM_ATTR);
 	}
@@ -174,20 +178,6 @@ public class FwBinZestGraphBuilder {
 
 	private Node buildNode(FwBinBlock modelBlock) {
 		BinFileNode n = new BinFileNode(modelBlock);
-
-//		if (modelNode instanceof AlsaTopoNodeBe) {
-		// TODO: improve nested graphs for some special nodes
-//			AlsaTopoNodeBe beNode = (AlsaTopoNodeBe) modelNode;
-//			Node nn = new Node.Builder().attr(AlsaTopoNodePart.NAME_ATTR, modelNode.getName())
-//					.buildNode();
-//			Node ns = new Node.Builder().attr(AlsaTopoNodePart.NAME_ATTR, "hw config").buildNode();
-//			Edge e = new Edge.Builder(nn, ns).buildEdge();
-//			Graph sub = new Graph.Builder()
-//					.attr(ZestProperties.LAYOUT_ALGORITHM__G, new SpringLayoutAlgorithm())
-//					.nodes(nn, ns).edges(e).build();
-//			n.setNestedGraph(sub);
-//		}
-
 		nodes.put(modelBlock, n);
 		return n;
 	}
