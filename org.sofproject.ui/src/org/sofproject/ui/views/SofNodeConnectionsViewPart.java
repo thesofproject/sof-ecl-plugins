@@ -136,21 +136,23 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 		toolbarManager.add(new Action("Import Files") {
 			@Override
 			public void run() {
-				runOp(SofNodeConnection.createImportResourcesOp(), null);
+				runOp(SofNodeConnection.createImportResourcesOp(), null, null);
 			}
 		});
 
 		toolbarManager.add(new Action("Open dmesg") {
 			@Override
 			public void run() {
-				runOp(SofNodeConnection.createConnectDmesgOp(), "dmesg");
+				runOp(SofNodeConnection.createConnectDmesgOp(), "dmesg",
+						SofConsole.TYPE_DMESG);
 			}
 		});
 
 		toolbarManager.add(new Action("Open logger") {
 			@Override
 			public void run() {
-				runOp(SofNodeConnection.createConnectLoggerOp(), "logger");
+				runOp(SofNodeConnection.createConnectLoggerOp(), "logger",
+						SofConsole.TYPE_LOG);
 			}
 		});
 
@@ -169,7 +171,7 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 		});
 	}
 
-	private void runOp(SofRemoteOperation op, String consNameExt) {
+	private void runOp(SofRemoteOperation op, String consNameExt, String consType) {
 		Object el = viewer.getStructuredSelection().getFirstElement();
 		if (el != null) {
 			SofNodeConnection conn = (SofNodeConnection) el;
@@ -177,6 +179,7 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 			if (consNameExt != null) {
 				mcs = SofConsole.getConsoleStream(
 						conn.getProject().getProject().getName() + "." + consNameExt,
+						consType,
 						conn.getProject());
 			}
 			try {

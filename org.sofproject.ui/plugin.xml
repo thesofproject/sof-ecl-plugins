@@ -53,7 +53,7 @@
             class="org.sofproject.ui.console.LogSourceMatcher"
             id="org.sofproject.ui.console.LogSourceMatcher"
             regex=".*:\d{1,}.*">
-         <enablement><test property="org.eclipse.ui.console.consoleTypeTest" value="sofconsole"/></enablement>
+         <enablement><test property="org.eclipse.ui.console.consoleTypeTest" value="sofconsole.log"/></enablement>
       </consolePatternMatchListener>
    </extension>
 </plugin>
