@@ -29,12 +29,15 @@
 
 package org.sofproject.ui.console;
 
+import org.eclipse.jface.resource.FontDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 import org.sofproject.core.SofNodeProject;
+import org.sofproject.ui.resources.SofResources;
 
 public class SofConsole extends MessageConsole {
 	public static final String TYPE = "sofconsole";
@@ -45,8 +48,10 @@ public class SofConsole extends MessageConsole {
 	SofNodeProject sofNodeProj; // parent project
 
 	public SofConsole(String name, String type, SofNodeProject sofNodeProj) {
-		super(name, type, null, true);
+		super(name, type, SofResources.getSofIcon(), true);
 		this.sofNodeProj = sofNodeProj;
+		FontDescriptor fd = JFaceResources.getTextFontDescriptor().increaseHeight(-1);
+		setFont(fd.createFont(getFont().getDevice()));
 	}
 
 	public SofNodeProject getSofNodeProj() {
@@ -62,6 +67,7 @@ public class SofConsole extends MessageConsole {
 		// no one found
 		MessageConsole nc = new SofConsole(name, type, sofNodeProj);
 		cm.addConsoles(new IConsole[] { nc });
+		cm.showConsoleView(nc);
 		return nc;
 	}
 

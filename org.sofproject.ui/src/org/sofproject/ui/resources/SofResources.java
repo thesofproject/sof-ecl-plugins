@@ -29,6 +29,14 @@
 
 package org.sofproject.ui.resources;
 
+import java.net.URL;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+
 import javafx.scene.paint.Color;
 
 /**
@@ -42,4 +50,10 @@ public class SofResources {
 	public static final Color SOF_BLUE = Color.rgb(111, 204, 221);
 	public static final Color SOF_LIGHT_BLUE = Color.rgb(183, 229, 238);
 	public static final Color SOF_GREEN = Color.rgb(146, 208, 80);
+
+	public static ImageDescriptor getSofIcon() {
+		Bundle bundle = FrameworkUtil.getBundle(SofResources.class);
+		URL url = FileLocator.find(bundle, new Path("icons/sof-icon.png"));
+		return ImageDescriptor.createFromURL(url);
+	}
 }
