@@ -181,6 +181,10 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 			}
 			try {
 				connectNode(conn);
+				if (!conn.isConnected()) {
+					/* aborted or authentication failure */
+					return;
+				}
 				op.setConnection(conn);
 				op.setOutputStream(mcs);
 
@@ -210,6 +214,7 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 		if (dlg.open() == Window.OK) {
 			conn.connect(dlg.getLogin(), dlg.getPass());
 		}
+		return;
 	}
 
 	@Override
