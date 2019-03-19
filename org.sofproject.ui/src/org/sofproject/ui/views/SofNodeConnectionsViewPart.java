@@ -69,8 +69,7 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		viewer = new TableViewer(parent,
-				SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
+		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 
 		TableViewerColumn colProjName = new TableViewerColumn(viewer, SWT.NONE);
 		colProjName.getColumn().setWidth(200);
@@ -143,16 +142,14 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 		toolbarManager.add(new Action("Open dmesg") {
 			@Override
 			public void run() {
-				runOp(SofNodeConnection.createConnectDmesgOp(), "dmesg",
-						SofConsole.TYPE_DMESG);
+				runOp(SofNodeConnection.createConnectDmesgOp(), "dmesg", SofConsole.TYPE_DMESG);
 			}
 		});
 
 		toolbarManager.add(new Action("Open logger") {
 			@Override
 			public void run() {
-				runOp(SofNodeConnection.createConnectLoggerOp(), "logger",
-						SofConsole.TYPE_LOG);
+				runOp(SofNodeConnection.createConnectLoggerOp(), "logger", SofConsole.TYPE_LOG);
 			}
 		});
 
@@ -175,13 +172,6 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 		Object el = viewer.getStructuredSelection().getFirstElement();
 		if (el != null) {
 			SofNodeConnection conn = (SofNodeConnection) el;
-			MessageConsoleStream mcs = null;
-			if (consNameExt != null) {
-				mcs = SofConsole.getConsoleStream(
-						conn.getProject().getProject().getName() + "." + consNameExt,
-						consType,
-						conn.getProject());
-			}
 			try {
 				connectNode(conn);
 				if (!conn.isConnected()) {
@@ -189,13 +179,20 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 					return;
 				}
 				op.setConnection(conn);
+
+				// now, when the connection is established, let's create an output console
+				MessageConsoleStream mcs = null;
+				if (consNameExt != null) {
+					mcs = SofConsole.getConsoleStream(conn.getProject().getProject().getName() + "." + consNameExt,
+							consType, conn.getProject());
+				}
+
 				op.setOutputStream(mcs);
 
 				new ProgressMonitorDialog(null).run(true, false, new IRunnableWithProgress() {
 
 					@Override
-					public void run(IProgressMonitor monitor)
-							throws InvocationTargetException, InterruptedException {
+					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 						op.run(monitor);
 					}
 				});
@@ -212,8 +209,8 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 		if (conn.isConnected())
 			return;
 
-		SofNodeLoginDialog dlg = new SofNodeLoginDialog(null,
-				conn.getProject().getProject().getName(), conn.getNodeDescriptor().getAddr());
+		SofNodeLoginDialog dlg = new SofNodeLoginDialog(null, conn.getProject().getProject().getName(),
+				conn.getNodeDescriptor().getAddr());
 		if (dlg.open() == Window.OK) {
 			conn.connect(dlg.getLogin(), dlg.getPass());
 		}
