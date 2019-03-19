@@ -47,7 +47,7 @@ public class LogSourceMatcher implements IPatternMatchListenerDelegate {
 
 	@Override
 	public void connect(TextConsole console) {
-		System.out.println("LogSourceMatcher: connecting to console " + console.getName());
+//		System.out.println("LogSourceMatcher: connecting to console " + console.getName());
 		this.console = (SofConsole) console;
 
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
