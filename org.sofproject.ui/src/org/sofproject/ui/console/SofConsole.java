@@ -38,12 +38,14 @@ import org.sofproject.core.SofNodeProject;
 
 public class SofConsole extends MessageConsole {
 	public static final String TYPE = "sofconsole";
+	public static final String TYPE_DMESG = TYPE + ".dmesg";
+	public static final String TYPE_LOG = TYPE + ".log";
 	public static final String CONSOLE_NAME = "SofConsole";
 
 	SofNodeProject sofNodeProj; // parent project
 
-	public SofConsole(String name, SofNodeProject sofNodeProj) {
-		super(name, TYPE, null, true);
+	public SofConsole(String name, String type, SofNodeProject sofNodeProj) {
+		super(name, type, null, true);
 		this.sofNodeProj = sofNodeProj;
 	}
 
@@ -51,23 +53,23 @@ public class SofConsole extends MessageConsole {
 		return sofNodeProj;
 	}
 
-	private static MessageConsole getConsole(String name, SofNodeProject sofNodeProj) {
+	private static MessageConsole getConsole(String name, String type, SofNodeProject sofNodeProj) {
 		IConsoleManager cm = ConsolePlugin.getDefault().getConsoleManager();
 		for (IConsole c : cm.getConsoles()) {
 			if (name.equals(c.getName()))
 				return (MessageConsole) c;
 		}
 		// no one found
-		MessageConsole nc = new SofConsole(name, sofNodeProj);
+		MessageConsole nc = new SofConsole(name, type, sofNodeProj);
 		cm.addConsoles(new IConsole[] { nc });
 		return nc;
 	}
 
-	public static MessageConsoleStream getDefaultConsoleStream(SofNodeProject sofNodeProj) {
-		return getConsole(CONSOLE_NAME, sofNodeProj).newMessageStream();
+	public static MessageConsoleStream getDefaultConsoleStream(SofNodeProject sofNodeProj, String type) {
+		return getConsole(CONSOLE_NAME, type, sofNodeProj).newMessageStream();
 	}
 
-	public static MessageConsoleStream getConsoleStream(String id, SofNodeProject sofNodeProj) {
-		return getConsole(CONSOLE_NAME + "." + id, sofNodeProj).newMessageStream();
+	public static MessageConsoleStream getConsoleStream(String id, String type, SofNodeProject sofNodeProj) {
+		return getConsole(CONSOLE_NAME + "." + id, type, sofNodeProj).newMessageStream();
 	}
 }
