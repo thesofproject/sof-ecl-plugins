@@ -39,7 +39,7 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
@@ -48,8 +48,6 @@ import org.sofproject.core.binfile.BinItem;
 import org.sofproject.core.binfile.BinStruct;
 import org.sofproject.ui.editor.IBinFileEditor;
 import org.sofproject.ui.editor.IBinStructHolder;
-
-// TODO: use ILinkedWithEditor instead of listening on all selection changes?
 
 public class BinFileStructViewPart extends ViewPart {
 
@@ -61,37 +59,73 @@ public class BinFileStructViewPart extends ViewPart {
 		treeViewer.getTree().setHeaderVisible(true);
 		treeViewer.getTree().setLinesVisible(true);
 
-		treeViewer.setLabelProvider(
-				new DelegatingStyledCellLabelProvider(new BinItemLabelProvider()));
+		treeViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new BinItemLabelProvider()));
 		treeViewer.setContentProvider(new BinFileStructContentProvider());
 		treeViewer.setAutoExpandLevel(2); // TODO: find optimal level
+
+		getSite().getPage().addPartListener(new IPartListener() {
+
+			@Override
+			public void partActivated(IWorkbenchPart part) {
+				if (part instanceof IBinFileEditor) {
+					BinFile binFile = ((IBinFileEditor) part).getBinFile();
+					if (treeViewer.getInput() != binFile) {
+						treeViewer.setInput(binFile);
+					}
+				}
+			}
+
+			@Override
+			public void partBroughtToTop(IWorkbenchPart part) {
+				if (part instanceof IBinFileEditor) {
+					BinFile binFile = ((IBinFileEditor) part).getBinFile();
+					if (treeViewer.getInput() != binFile) {
+						treeViewer.setInput(binFile);
+					}
+				}
+			}
+
+			@Override
+			public void partClosed(IWorkbenchPart part) {
+				if (part instanceof IBinFileEditor) {
+					BinFile binFile = ((IBinFileEditor) part).getBinFile();
+					if (treeViewer.getInput() == binFile) {
+						treeViewer.setInput(null);
+					}
+				}
+
+			}
+
+			@Override
+			public void partDeactivated(IWorkbenchPart part) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void partOpened(IWorkbenchPart part) {
+				// TODO Auto-generated method stub
+
+			}
+
+		});
 
 		getSite().getPage().addPostSelectionListener(new ISelectionListener() {
 
 			@Override
 			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-				// System.out.println("selection changed: " + selection);
-				IEditorPart editor = part.getSite().getPage().getActiveEditor();
-				if (editor instanceof IBinFileEditor) {
-					BinFile binFile = ((IBinFileEditor) editor).getBinFile();
-					if (treeViewer.getInput() != binFile) {
-						treeViewer.setInput(binFile);
-					}
-					if (selection instanceof IStructuredSelection) {
-						IStructuredSelection sel = (IStructuredSelection) selection;
-						if (sel.getFirstElement() instanceof IBinStructHolder) {
-							BinStruct bin = (((IBinStructHolder) sel.getFirstElement())
-									.getBinStruct());
-							TreePath path = new TreePath(
-									bin.getFullPath().toArray());
-							treeViewer.setExpandedState(path, true);
-							treeViewer.setSelection(new TreeSelection(path), true);
-						}
-					}
-				} else {
-					treeViewer.setInput(null);
-				}
+				if (selection instanceof IStructuredSelection) {
+					IStructuredSelection sel = (IStructuredSelection) selection;
+					if (sel.getFirstElement() instanceof IBinStructHolder) {
+						BinStruct bin = (((IBinStructHolder) sel.getFirstElement()).getBinStruct());
+						TreePath path = new TreePath(bin.getFullPath().toArray());
+						treeViewer.setExpandedState(path, true);
+						treeViewer.setSelection(new TreeSelection(path), true);
 
+						treeViewer.setExpandedState(((TreeSelection) treeViewer.getSelection()).getFirstElement(),
+								true);
+					}
+				}
 			}
 		});
 	}
