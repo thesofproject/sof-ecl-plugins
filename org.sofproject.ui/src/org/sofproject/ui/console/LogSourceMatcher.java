@@ -67,27 +67,20 @@ public class LogSourceMatcher implements IPatternMatchListenerDelegate {
 			return;
 		try {
 
-			// TODO: this dirty piece needs to be rewritten soon...
-
 			String line = console.getDocument().get(event.getOffset(), event.getLength());
-			String[] tokens = line.split("\\s+");
-			String[] location = tokens[6].split(":");
-			if (location.length < 2) {
-				location = tokens[7].split(":");
+			int locBeginPos = line.lastIndexOf('(');
+			int locEndPos = line.lastIndexOf(')');
+			if (locBeginPos > -1 && locEndPos > -1 && locEndPos > locBeginPos) {
+				locBeginPos++;
+				String locStr = line.substring(locBeginPos, locEndPos);
+				String[] locTok = locStr.split(":");
+				String fileName = locTok[0];
+				int lineNo = Integer.parseInt(locTok[1]);
+
+				IFile file = sofSrcProject.getFile(fileName);
+				FileLink fileLink = new FileLink(file, null, -1, -1, lineNo);
+				console.addHyperlink(fileLink, event.getOffset() + locBeginPos, locEndPos - locBeginPos);
 			}
-
-			String fileName = location[0].substring(3); // remove leading ../
-			int lineNo = Integer.parseInt(location[1]);
-
-//			System.out.println("Got line " + lineNo + " in file " + fileName);
-
-			IFile file = sofSrcProject.getFile(fileName);
-			FileLink fileLink = new FileLink(file, null, -1, -1, lineNo);
-
-			int pathPos = line.indexOf("../");
-			int pathEndPos = line.indexOf(':', pathPos);
-			console.addHyperlink(fileLink, event.getOffset() + pathPos, pathEndPos - pathPos);
-
 		} catch (BadLocationException e) {
 		}
 	}
