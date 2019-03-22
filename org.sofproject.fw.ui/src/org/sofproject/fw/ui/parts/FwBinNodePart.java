@@ -42,12 +42,12 @@ public class FwBinNodePart extends NodePart {
 	public static final String BORDER_WIDTH_ATTR = "fw-bin-node-border-width";
 	
 	/**
-	 * X (column) position in the grid. 
+	 * X (column) position in the grid. - TODO: to be removed, dynamic layout
 	 */
 	public static final String X_POS_ATTR = "fw-bin-node-x-pos";
 	
 	/**
-	 * Y (row) position in the grid.
+	 * Y (row) position in the grid. - TODO: to be removed, dynamic layout
 	 */
 	public static final String Y_POS_ATTR = "fw-bin-node-y-pos";
 
@@ -62,17 +62,8 @@ public class FwBinNodePart extends NodePart {
 	 */
 	public static final String BIN_ITEM_ATTR = "fw-bin-node-bin-item";
 	
-	Text label;
-
 	@Override
 	protected Group doCreateVisual() {
-		label = new Text("?"); // TODO:
 		return new Group(new FwBinNodeVisual(getContent()));
 	}
-
-	@Override
-	protected Text getLabelText() {
-		return label;
-	}
-
 }

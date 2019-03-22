@@ -32,85 +32,99 @@ package org.sofproject.alsa.topo.ui.graph;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.gef.geometry.planar.Point;
 import org.eclipse.gef.graph.Edge;
 import org.eclipse.gef.graph.Graph;
 import org.eclipse.gef.graph.Node;
 import org.eclipse.gef.layout.LayoutContext;
-import org.eclipse.gef.layout.LayoutProperties;
-import org.eclipse.gef.layout.algorithms.GridLayoutAlgorithm;
 import org.sofproject.alsa.topo.model.AlsaTopoConnection;
 import org.sofproject.alsa.topo.model.AlsaTopoConnection.Type;
+import org.sofproject.alsa.topo.model.AlsaTopoNode;
 import org.sofproject.alsa.topo.model.AlsaTopoNodeBe;
 import org.sofproject.alsa.topo.model.AlsaTopoNodePcm;
 import org.sofproject.alsa.topo.ui.parts.AlsaTopoNodePart;
+import org.sofproject.ui.graph.SofXyZestGraphLayout;
 
-public class AlsaTopoZestGraphLayout extends GridLayoutAlgorithm {
+public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 
-	class GridPoint {
-		int x;
-		int y;
+	class GridPosition {
+		int col;
+		int row;
 
-		GridPoint(int x, int y) {
-			this.x = x;
-			this.y = y;
+		GridPosition(int col, int row) {
+			this.col = col;
+			this.row = row;
 		}
 
-		void moveLeft() {
-			x++;
-		}
-
-		void moveDown() {
-			y++;
-		}
-
-		GridPoint max(GridPoint other) {
-			return new GridPoint(Integer.max(x, other.x), Integer.max(y, other.y));
+		GridPosition max(GridPosition other) {
+			return new GridPosition(Integer.max(col, other.col), Integer.max(row, other.row));
 		}
 	}
 
-	private List<List<Node>> grid = new ArrayList<>();
+//	private List<List<Node>> grid = new ArrayList<>();
 
 	public void applyLayout(LayoutContext context, boolean clean) {
-//		Rectangle bounds = LayoutProperties.getBounds(context.getGraph());
-//		
-//		bounds.scale(2.0);
-//		LayoutProperties.setBounds(context.getGraph(), bounds);
-
-		// build the grid (once)
-		if (grid.isEmpty()) {
+		if (isGridEmpty()) {
 			List<Node> pcmNodes = findPcmNodes(context.getGraph());
 
 			// start from the first row to keep 0 for unconnected widgets atm
 			int y = 1;
 			for (Node pcm : pcmNodes) {
-				addToGrid(pcm, new GridPoint(0, y));
-				GridPoint outMaxPos = traverseOutgoing(pcm, new GridPoint(1, y));
+				addToGrid(pcm, 0, y);
+				GridPosition outMaxPos = traverseOutgoing(pcm, new GridPosition(1, y));
 				// if there is an outgoing stream, move down
-				if (outMaxPos.x > 1) {
-					y = outMaxPos.y + 1;
+				if (outMaxPos.col > 1) {
+					y = outMaxPos.row + 1;
 				}
-				GridPoint inMaxPos = traverseIncoming(pcm, new GridPoint(1, y));
-				if (inMaxPos.x > 1) {
-					y = inMaxPos.y + 1;
-				}
+				GridPosition inMaxPos = traverseIncoming(pcm, new GridPosition(1, y));
+				if (inMaxPos.col > 1) {
+					y = inMaxPos.row + 1;
+				}				
 			}
+			gridComplete();
 		}
-
-		int colIdx = 0;
-		for (List<Node> col : grid) {
-			int rowIdx = 0;
-			for (Node n : col) {
-				if (n != null) {
-					LayoutProperties.setLocation(n, new Point(colIdx * 150, rowIdx * 80));
-				}
-				rowIdx++;
-			}
-			colIdx++;
-		}
-
-//		super.applyLayout(context, clean);
+		super.applyLayout(context, clean);
 	}
+	
+//	public void _applyLayout(LayoutContext context, boolean clean) {
+////		Rectangle bounds = LayoutProperties.getBounds(context.getGraph());
+////		
+////		bounds.scale(2.0);
+////		LayoutProperties.setBounds(context.getGraph(), bounds);
+//
+//		// build the grid (once)
+//		if (grid.isEmpty()) {
+//			List<Node> pcmNodes = findPcmNodes(context.getGraph());
+//
+//			// start from the first row to keep 0 for unconnected widgets atm
+//			int y = 1;
+//			for (Node pcm : pcmNodes) {
+//				addToGrid(pcm, new GridPoint(0, y));
+//				GridPoint outMaxPos = traverseOutgoing(pcm, new GridPoint(1, y));
+//				// if there is an outgoing stream, move down
+//				if (outMaxPos.col > 1) {
+//					y = outMaxPos.row + 1;
+//				}
+//				GridPoint inMaxPos = traverseIncoming(pcm, new GridPoint(1, y));
+//				if (inMaxPos.col > 1) {
+//					y = inMaxPos.row + 1;
+//				}
+//			}
+//		}
+//
+//		int colIdx = 0;
+//		for (List<Node> col : grid) {
+//			int rowIdx = 0;
+//			for (Node n : col) {
+//				if (n != null) {
+//					LayoutProperties.setLocation(n, new Point(colIdx * 150, rowIdx * 80));
+//				}
+//				rowIdx++;
+//			}
+//			colIdx++;
+//		}
+//
+////		super.applyLayout(context, clean);
+//	}
 
 	private List<Node> findPcmNodes(Graph g) {
 		List<Node> pcmNodes = new ArrayList<>();
@@ -123,38 +137,40 @@ public class AlsaTopoZestGraphLayout extends GridLayoutAlgorithm {
 		return pcmNodes;
 	}
 
-	private void addToGrid(Node node, GridPoint pos) {
-		int col = pos.x;
-		int row = pos.y;
+//	private void addToGrid(Node node, GridPoint pos) {
+//		int col = pos.col;
+//		int row = pos.row;
+//
+////		System.out.println(String.format("addToGrid() %s at %d.%d", 
+////				AlsaTopoZestGraphBuilder.getNodeName(node), col, row));
+//
+//		if (col == grid.size()) {
+//			grid.add(new ArrayList<Node>());
+//		}
+//		List<Node> column = grid.get(col);
+//		while (row >= column.size()) {
+//			column.add(null);
+//		}
+//		column.set(row, node);
+//	}
 
-//		System.out.println(String.format("addToGrid() %s at %d.%d", 
-//				AlsaTopoZestGraphBuilder.getNodeName(node), col, row));
-
-		if (col == grid.size()) {
-			grid.add(new ArrayList<Node>());
-		}
-		List<Node> column = grid.get(col);
-		while (row >= column.size()) {
-			column.add(null);
-		}
-		column.set(row, node);
-	}
-
-	private GridPoint traverseOutgoing(Node node, GridPoint pos) {
-		GridPoint ctrlPos = new GridPoint(pos.x - 1, pos.y + 1);
+	private GridPosition traverseOutgoing(Node node, GridPosition pos) {
+		GridPosition ctrlPos = new GridPosition(pos.col - 1, pos.row + 1);
 		for (Edge e : node.getAllIncomingEdges()) {
 			AlsaTopoConnection topoConn = AlsaTopoZestGraphBuilder.getModelConnection(e);
 			if (topoConn.getType() == Type.CONTROL_PATH) {
 				Node ctrlNode = e.getSource();
-				addToGrid(ctrlNode, ctrlPos);
-				ctrlPos.moveLeft();
+				addToGrid(ctrlNode, ctrlPos.col, ctrlPos.row);
+				ctrlPos.col++;
 			}
 		}
 		for (Edge e : node.getAllOutgoingEdges()) {
 			Node audioNode = e.getTarget();
-			addToGrid(audioNode, pos);
-			if (!(AlsaTopoZestGraphBuilder.getModelNode(audioNode) instanceof AlsaTopoNodeBe)) {
-				pos.moveLeft();
+			AlsaTopoNode modelNode = AlsaTopoZestGraphBuilder.getModelNode(audioNode);
+			// TODO: should request to remove empty columns before layouting
+			addToGrid(audioNode, modelNode instanceof AlsaTopoNodeBe ? 10 : pos.col, pos.row);
+			if (!(modelNode instanceof AlsaTopoNodeBe)) {
+				pos.col++;
 				pos = traverseOutgoing(audioNode, pos);
 			}
 		}
@@ -162,19 +178,20 @@ public class AlsaTopoZestGraphLayout extends GridLayoutAlgorithm {
 		return pos.max(ctrlPos);
 	}
 
-	private GridPoint traverseIncoming(Node node, GridPoint pos) {
-		GridPoint ctrlPos = new GridPoint(pos.x - 1, pos.y + 1);
+	private GridPosition traverseIncoming(Node node, GridPosition pos) {
+		GridPosition ctrlPos = new GridPosition(pos.col - 1, pos.row + 1);
 		for (Edge e : node.getAllIncomingEdges()) {
 			AlsaTopoConnection topoConn = AlsaTopoZestGraphBuilder.getModelConnection(e);
 			if (topoConn.getType() == Type.CONTROL_PATH) {
 				Node ctrlNode = e.getSource();
-				addToGrid(ctrlNode, ctrlPos);
-				ctrlPos.moveLeft();
+				addToGrid(ctrlNode, ctrlPos.col, ctrlPos.row);
+				ctrlPos.col++;
 			} else {
 				Node audioNode = e.getSource();
-				addToGrid(audioNode, pos);
-				if (!(AlsaTopoZestGraphBuilder.getModelNode(audioNode) instanceof AlsaTopoNodeBe)) {
-					pos.moveLeft();
+				AlsaTopoNode modelNode = AlsaTopoZestGraphBuilder.getModelNode(audioNode);
+				addToGrid(audioNode, modelNode instanceof AlsaTopoNodeBe ? 10 : pos.col, pos.row);
+				if (!(modelNode instanceof AlsaTopoNodeBe)) {
+					pos.col++;
 					pos = traverseIncoming(audioNode, pos);
 				}
 			}
