@@ -86,7 +86,7 @@ public class AlsaTopoGraph extends AlsaTopoItem {
 				AlsaTopoNode srcNode = (AlsaTopoNode) findChild((String) dapmGraph.getChildValue("source"));
 				AlsaTopoNode tgtNode = (AlsaTopoNode) findChild((String) dapmGraph.getChildValue("sink"));
 				if (srcNode != null && tgtNode != null) {
-					addChildElement(new AlsaTopoConnection(Type.AUDIO_PATH, srcNode, tgtNode));
+					addChildElement(new AlsaTopoConnection(Type.DAPM_PATH, srcNode, tgtNode));
 				} else {
 //					throw new RuntimeException("Graph connection not found");
 				}
@@ -144,9 +144,9 @@ public class AlsaTopoGraph extends AlsaTopoItem {
 				AlsaTopoNodeBe be = beIndex.get(widget.getSname());
 				if (be != null) {
 					if (widget.getTypeName().equals("dai_in")) {
-						addChildElement(new AlsaTopoConnection(Type.AUDIO_PATH, widget, be));
+						addChildElement(new AlsaTopoConnection(Type.STREAM_PATH, widget, be));
 					} else {
-						addChildElement(new AlsaTopoConnection(Type.AUDIO_PATH, be, widget));
+						addChildElement(new AlsaTopoConnection(Type.STREAM_PATH, be, widget));
 					}
 				}
 			} else if (widget.getTypeName().equals("scheduler")) {

@@ -32,7 +32,7 @@ package org.sofproject.alsa.topo.model;
 public class AlsaTopoConnection extends AlsaTopoItem {
 
 	public enum Type {
-		AUDIO_PATH, CONTROL_PATH,
+		DAPM_PATH, STREAM_PATH, CONTROL_PATH,
 	}
 
 	private Type type;

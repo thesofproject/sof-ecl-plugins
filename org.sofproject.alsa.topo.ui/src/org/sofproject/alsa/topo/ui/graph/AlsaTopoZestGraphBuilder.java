@@ -113,13 +113,21 @@ public class AlsaTopoZestGraphBuilder {
 	public Graph build(AlsaTopoGraph topoModel) {
 		Graph g = new Graph.Builder().attr(ZestProperties.LAYOUT_ALGORITHM__G, new AlsaTopoZestGraphLayout()).build();
 
+		// create graph objects in two iterations
+		// the second one creates the edges to make sure all nodes are already there
+
 		for (AlsaTopoItem item : topoModel.getChildElements()) {
 			if (item instanceof AlsaTopoNode) {
 				g.getNodes().add(buildNode((AlsaTopoNode) item));
-			} else if (item instanceof AlsaTopoConnection) {
+			}
+		}
+
+		for (AlsaTopoItem item : topoModel.getChildElements()) {
+			if (item instanceof AlsaTopoConnection) {
 				g.getEdges().add(buildEdge((AlsaTopoConnection) item));
 			}
 		}
+
 		return g;
 	}
 
@@ -176,7 +184,7 @@ public class AlsaTopoZestGraphBuilder {
 		Node destNode = nodes.get(modelEdge.getTgt());
 		Edge.Builder builder = new Edge.Builder(srcNode, destNode).attr(AlsaTopoNodePart.MODEL_ITEM_ATTR, modelEdge);
 		// control path does not have arrows.
-		if (modelEdge.getType() == AlsaTopoConnection.Type.AUDIO_PATH) {
+		if (modelEdge.getType() != AlsaTopoConnection.Type.CONTROL_PATH) {
 			builder.attr(ZestProperties.TARGET_DECORATION__E, new EdgeArrow());
 		}
 		return builder.buildEdge();
