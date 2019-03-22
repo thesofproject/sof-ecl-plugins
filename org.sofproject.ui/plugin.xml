@@ -56,4 +56,33 @@
          <enablement><test property="org.eclipse.ui.console.consoleTypeTest" value="sofconsole.log"/></enablement>
       </consolePatternMatchListener>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            description="Commands for SOF Graph Editor"
+            id="sofGraphEditor.category"
+            name="SOF Graph Editor">
+      </category>
+      <command
+            categoryId="sofGraphEditor.category"
+            id="sofGraphEditor.fitToViewport.command"
+            name="Fit to Viewport">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.sofproject.ui.editor.actions.GraphEditorFitToViewportAd"
+            commandId="sofGraphEditor.fitToViewport.command">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="sofGraphEditor.fitToViewport.command"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+Shift+F">
+      </key>
+   </extension>
 </plugin>
