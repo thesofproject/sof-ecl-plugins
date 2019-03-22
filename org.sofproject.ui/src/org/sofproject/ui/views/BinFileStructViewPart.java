@@ -52,6 +52,8 @@ import org.sofproject.ui.editor.IBinStructHolder;
 public class BinFileStructViewPart extends ViewPart {
 
 	private TreeViewer treeViewer;
+	IPartListener partListener;
+	ISelectionListener selectionListener;
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -63,7 +65,7 @@ public class BinFileStructViewPart extends ViewPart {
 		treeViewer.setContentProvider(new BinFileStructContentProvider());
 		treeViewer.setAutoExpandLevel(2); // TODO: find optimal level
 
-		getSite().getPage().addPartListener(new IPartListener() {
+		partListener = new IPartListener() {
 
 			@Override
 			public void partActivated(IWorkbenchPart part) {
@@ -108,9 +110,10 @@ public class BinFileStructViewPart extends ViewPart {
 
 			}
 
-		});
+		};
+		getSite().getPage().addPartListener(partListener);
 
-		getSite().getPage().addPostSelectionListener(new ISelectionListener() {
+		selectionListener = new ISelectionListener() {
 
 			@Override
 			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
@@ -127,7 +130,15 @@ public class BinFileStructViewPart extends ViewPart {
 					}
 				}
 			}
-		});
+		};
+		getSite().getPage().addPostSelectionListener(selectionListener);
+	}
+
+	@Override
+	public void dispose() {
+		getSite().getPage().removePartListener(partListener);
+		getSite().getPage().removeSelectionListener(selectionListener);
+		super.dispose();
 	}
 
 	@Override
