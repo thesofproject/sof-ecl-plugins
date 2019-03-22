@@ -60,10 +60,10 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 		}
 	}
 
-//	private List<List<Node>> grid = new ArrayList<>();
-
 	public void applyLayout(LayoutContext context, boolean clean) {
 		if (isGridEmpty()) {
+
+			// create all paths that begins/ends with pcm node, from column 0
 			List<Node> pcmNodes = findPcmNodes(context.getGraph());
 
 			// start from the first row to keep 0 for unconnected widgets atm
@@ -78,58 +78,42 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 				GridPosition inMaxPos = traverseIncoming(pcm, new GridPosition(1, y));
 				if (inMaxPos.col > 1) {
 					y = inMaxPos.row + 1;
-				}				
+				}
 			}
+
+			// create all paths that begins with siggen node, from column 1
+			List<Node> sigGenNodes = findSigGenNodes(context.getGraph());
+			for (Node sigNode : sigGenNodes) {
+				addToGrid(sigNode, 1, y);
+				GridPosition outMaxPos = traverseOutgoing(sigNode, new GridPosition(2, y));
+				if (outMaxPos.col > 1) {
+					y = outMaxPos.row + 1;
+				}
+			}
+
+			// now layout unconnected nodes
+			layoutUnconnected(context);
+
 			gridComplete();
 		}
 		super.applyLayout(context, clean);
 	}
-	
-//	public void _applyLayout(LayoutContext context, boolean clean) {
-////		Rectangle bounds = LayoutProperties.getBounds(context.getGraph());
-////		
-////		bounds.scale(2.0);
-////		LayoutProperties.setBounds(context.getGraph(), bounds);
-//
-//		// build the grid (once)
-//		if (grid.isEmpty()) {
-//			List<Node> pcmNodes = findPcmNodes(context.getGraph());
-//
-//			// start from the first row to keep 0 for unconnected widgets atm
-//			int y = 1;
-//			for (Node pcm : pcmNodes) {
-//				addToGrid(pcm, new GridPoint(0, y));
-//				GridPoint outMaxPos = traverseOutgoing(pcm, new GridPoint(1, y));
-//				// if there is an outgoing stream, move down
-//				if (outMaxPos.col > 1) {
-//					y = outMaxPos.row + 1;
-//				}
-//				GridPoint inMaxPos = traverseIncoming(pcm, new GridPoint(1, y));
-//				if (inMaxPos.col > 1) {
-//					y = inMaxPos.row + 1;
-//				}
-//			}
-//		}
-//
-//		int colIdx = 0;
-//		for (List<Node> col : grid) {
-//			int rowIdx = 0;
-//			for (Node n : col) {
-//				if (n != null) {
-//					LayoutProperties.setLocation(n, new Point(colIdx * 150, rowIdx * 80));
-//				}
-//				rowIdx++;
-//			}
-//			colIdx++;
-//		}
-//
-////		super.applyLayout(context, clean);
-//	}
+
+	// move all unconnected widgets to row 0
+	private void layoutUnconnected(LayoutContext context) {
+		int col = 1;
+		for (Node n : context.getGraph().getNodes()) {
+			if (n.getIncomingEdges().isEmpty() && n.getOutgoingEdges().isEmpty()) {
+				addToGrid(n, col++, 0);
+			}
+		}
+
+	}
 
 	private List<Node> findPcmNodes(Graph g) {
 		List<Node> pcmNodes = new ArrayList<>();
 		for (Node n : g.getNodes()) {
-			Object modelItem = n.getAttributes().get(AlsaTopoNodePart.MODEL_ITEM_ATTR);
+			AlsaTopoNode modelItem = AlsaTopoZestGraphBuilder.getModelNode(n);
 			if (modelItem instanceof AlsaTopoNodePcm) {
 				pcmNodes.add(n);
 			}
@@ -137,26 +121,20 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 		return pcmNodes;
 	}
 
-//	private void addToGrid(Node node, GridPoint pos) {
-//		int col = pos.col;
-//		int row = pos.row;
-//
-////		System.out.println(String.format("addToGrid() %s at %d.%d", 
-////				AlsaTopoZestGraphBuilder.getNodeName(node), col, row));
-//
-//		if (col == grid.size()) {
-//			grid.add(new ArrayList<Node>());
-//		}
-//		List<Node> column = grid.get(col);
-//		while (row >= column.size()) {
-//			column.add(null);
-//		}
-//		column.set(row, node);
-//	}
+	private List<Node> findSigGenNodes(Graph g) {
+		List<Node> sigGenNodes = new ArrayList<>();
+		for (Node n : g.getNodes()) {
+			AlsaTopoNode modelItem = AlsaTopoZestGraphBuilder.getModelNode(n);
+			if (modelItem.getTypeName().equals("siggen")) {
+				sigGenNodes.add(n);
+			}
+		}
+		return sigGenNodes;
+	}
 
 	private GridPosition traverseOutgoing(Node node, GridPosition pos) {
 		GridPosition ctrlPos = new GridPosition(pos.col - 1, pos.row + 1);
-		for (Edge e : node.getAllIncomingEdges()) {
+		for (Edge e : node.getIncomingEdges()) {
 			AlsaTopoConnection topoConn = AlsaTopoZestGraphBuilder.getModelConnection(e);
 			if (topoConn.getType() == Type.CONTROL_PATH) {
 				Node ctrlNode = e.getSource();
@@ -164,11 +142,11 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 				ctrlPos.col++;
 			}
 		}
-		for (Edge e : node.getAllOutgoingEdges()) {
+		for (Edge e : node.getOutgoingEdges()) {
 			Node audioNode = e.getTarget();
 			AlsaTopoNode modelNode = AlsaTopoZestGraphBuilder.getModelNode(audioNode);
 			// TODO: should request to remove empty columns before layouting
-			addToGrid(audioNode, modelNode instanceof AlsaTopoNodeBe ? 10 : pos.col, pos.row);
+			addToGrid(audioNode, modelNode instanceof AlsaTopoNodeBe ? 20 : pos.col, pos.row);
 			if (!(modelNode instanceof AlsaTopoNodeBe)) {
 				pos.col++;
 				pos = traverseOutgoing(audioNode, pos);
@@ -189,7 +167,7 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 			} else {
 				Node audioNode = e.getSource();
 				AlsaTopoNode modelNode = AlsaTopoZestGraphBuilder.getModelNode(audioNode);
-				addToGrid(audioNode, modelNode instanceof AlsaTopoNodeBe ? 10 : pos.col, pos.row);
+				addToGrid(audioNode, modelNode instanceof AlsaTopoNodeBe ? 20 : pos.col, pos.row);
 				if (!(modelNode instanceof AlsaTopoNodeBe)) {
 					pos.col++;
 					pos = traverseIncoming(audioNode, pos);
