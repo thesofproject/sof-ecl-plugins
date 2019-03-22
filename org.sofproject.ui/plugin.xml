@@ -68,12 +68,21 @@
             id="sofGraphEditor.fitToViewport.command"
             name="Fit to Viewport">
       </command>
+      <command
+            categoryId="sofGraphEditor.category"
+            id="sofGraphEditor.resetZoom.command"
+            name="Reset Zoom">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
             class="org.sofproject.ui.editor.actions.GraphEditorFitToViewportAd"
             commandId="sofGraphEditor.fitToViewport.command">
+      </handler>
+      <handler
+            class="org.sofproject.ui.editor.actions.GraphEditorResetZoomAd"
+            commandId="sofGraphEditor.resetZoom.command">
       </handler>
    </extension>
    <extension
@@ -83,6 +92,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+Shift+F">
+      </key>
+      <key
+            commandId="sofGraphEditor.resetZoom.command"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+1">
       </key>
    </extension>
 </plugin>
