@@ -53,14 +53,12 @@ public class SofSshImportOperation extends SofRemoteOperation {
 
 	// TODO: check monitor.isCanceled() and throw InterruptedException then...
 	@Override
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException {
+	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		monitor.beginTask("Importing files", 1000);
 
 		try {
 			if (!conn.isConnected()) {
-				throw new InvocationTargetException(
-						new IllegalStateException("Node not connected"));
+				throw new InvocationTargetException(new IllegalStateException("Node not connected"));
 			}
 
 			SofNodeDescriptor nodeDesc = conn.getNodeDescriptor();
@@ -75,7 +73,7 @@ public class SofSshImportOperation extends SofRemoteOperation {
 
 			monitor.subTask("Listing files");
 			Vector<?> remoteFiles = c.ls(nodeDesc.getResPath());
-			
+
 			for (int i = 0; i < remoteFiles.size(); i++) {
 				Object en = remoteFiles.elementAt(i);
 				if (en instanceof ChannelSftp.LsEntry) {
@@ -90,8 +88,12 @@ public class SofSshImportOperation extends SofRemoteOperation {
 					}
 					if (localFile != null) {
 						monitor.subTask("Downloading " + entry.getFilename());
-						localFile.create(c.get(nodeDesc.getResPath() + "/" + entry.getFilename()),
-								false, null);
+						if (localFile.exists()) {
+							localFile.setContents(c.get(nodeDesc.getResPath() + "/" + entry.getFilename()), true, false,
+									null);
+						} else {
+							localFile.create(c.get(nodeDesc.getResPath() + "/" + entry.getFilename()), false, null);
+						}
 					}
 				}
 				monitor.worked(900 / remoteFiles.size());
