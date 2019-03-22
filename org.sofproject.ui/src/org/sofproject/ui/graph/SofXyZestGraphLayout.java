@@ -111,7 +111,20 @@ public class SofXyZestGraphLayout implements ILayoutAlgorithm {
 		computeOffsets();
 	}
 
+	protected GridNode findNode(Node node) {
+		for (GridNode gn : grid) {
+			if (gn.node == node)
+				return gn;
+		}
+		return null;
+	}
+
 	protected void addToGrid(Node node, int col, int row) {
+		// make sure the node is not added twice
+		// TODO: reposition to the new requested location?
+		if (findNode(node) != null)
+			return;
+
 		Dimension nodeSize = LayoutProperties.getSize(node);
 
 		grid.add(new GridNode(node, col, row));
