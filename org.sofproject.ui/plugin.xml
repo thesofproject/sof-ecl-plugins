@@ -38,6 +38,13 @@
             name="Sof Node Connections"
             restorable="true">
       </view>
+      <view
+            category="org.sofproject.ui.views"
+            class="org.sofproject.ui.views.SofLoggerViewPart"
+            id="org.sofproject.ui.views.SofLoggerView"
+            name="SOF log"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.ide.projectNatureImages">
