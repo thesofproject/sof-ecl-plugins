@@ -29,6 +29,7 @@
 
 package org.sofproject.ui.views;
 
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Observable;
 import java.util.Observer;
@@ -51,7 +52,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.console.MessageConsoleStream;
 import org.eclipse.ui.part.ViewPart;
 import org.sofproject.core.connection.SofNodeConnection;
 import org.sofproject.core.connection.SofNodeConnectionManager;
@@ -135,21 +135,32 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 		toolbarManager.add(new Action("Import Files") {
 			@Override
 			public void run() {
-				runOp(SofNodeConnection.createImportResourcesOp(), null, null);
+				runOp(SofNodeConnection.createImportResourcesOp(), null);
 			}
 		});
 
 		toolbarManager.add(new Action("Open dmesg") {
 			@Override
 			public void run() {
-				runOp(SofNodeConnection.createConnectDmesgOp(), "dmesg", SofConsole.TYPE_DMESG);
+				// runOp(SofNodeConnection.createConnectDmesgOp(), "dmesg",
+				// SofConsole.TYPE_DMESG);
+				Object el = viewer.getStructuredSelection().getFirstElement();
+				if (el != null) {
+					SofNodeConnection conn = (SofNodeConnection) el;
+					runOp(SofNodeConnection.createConnectDmesgOp(),
+							new SofOpConsoleStreamProvider(conn, "dmesg", SofConsole.TYPE_DMESG));
+				}
 			}
 		});
 
 		toolbarManager.add(new Action("Open logger") {
 			@Override
 			public void run() {
-				runOp(SofNodeConnection.createConnectLoggerOp(), "logger", SofConsole.TYPE_LOG);
+				Object el = viewer.getStructuredSelection().getFirstElement();
+				if (el != null) {
+					SofNodeConnection conn = (SofNodeConnection) el;
+					runOp(SofNodeConnection.createConnectLoggerOp(), new SofOpLoggerStreamProvider(conn));
+				}
 			}
 		});
 
@@ -168,7 +179,7 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 		});
 	}
 
-	private void runOp(SofRemoteOperation op, String consNameExt, String consType) {
+	private void runOp(SofRemoteOperation op, SofOpOutputStreamProvider strProv) {
 		Object el = viewer.getStructuredSelection().getFirstElement();
 		if (el != null) {
 			SofNodeConnection conn = (SofNodeConnection) el;
@@ -181,13 +192,12 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 				op.setConnection(conn);
 
 				// now, when the connection is established, let's create an output console
-				MessageConsoleStream mcs = null;
-				if (consNameExt != null) {
-					mcs = SofConsole.getConsoleStream(conn.getProject().getProject().getName() + "." + consNameExt,
-							consType, conn.getProject());
+				OutputStream os = null;
+				if (strProv != null) {
+					os = strProv.createOutputStream();
 				}
 
-				op.setOutputStream(mcs);
+				op.setOutputStream(os);
 
 				new ProgressMonitorDialog(null).run(true, false, new IRunnableWithProgress() {
 
