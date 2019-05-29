@@ -59,6 +59,12 @@ public class SofNodeLoginDialog extends TrayDialog {
 		this.nodeAddress = nodeAddress;
 	}
 
+	@Override
+	protected void configureShell(Shell shell) {
+		super.configureShell(shell);
+		shell.setText("Enter your credentials");
+	}
+
 	protected Control createDialogArea(Composite parent) {
 		Composite container = (Composite) super.createDialogArea(parent);
 		Composite infoGroup = new Composite(container, SWT.NONE);
