@@ -29,55 +29,120 @@
 
 package org.sofproject.fw.ui.visuals;
 
-import org.eclipse.gef.fx.nodes.GeometryNode;
-import org.eclipse.gef.geometry.planar.RoundedRectangle;
+import org.sofproject.core.memmap.FwImageMemMap;
+import org.sofproject.core.memmap.FwImageMemSection;
+import org.sofproject.core.memmap.MemSegment;
 import org.sofproject.fw.ui.graph.FwBinZestGraphBuilder;
 import org.sofproject.fw.ui.resources.FwBinResources;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Scale;
 
 public class FwMemoryMapVisual extends Region {
 	private static final double HORIZONTAL_PADDING = 5d;
-	private static final double VERTICAL_PADDING = 5d;
 	private static final double VERTICAL_SPACING = 2d;
+	private static final double HORIZONTAL_SPACING = 5d;
+
+	private static final double MM_NODE_WIDTH = 1000d;
+	private static final double MM_NODE_SEG_HEIGHT = 100d;
 
 	private Text nameText;
-	private GeometryNode<RoundedRectangle> shape;
 	private VBox topBox;
+	private VBox memSegmentBox;
 
 	public FwMemoryMapVisual(org.eclipse.gef.graph.Node node) {
-		GeometryNode<RoundedRectangle> shape = new GeometryNode<>(new RoundedRectangle(0, 0, 500, 70, 4, 4));
-
-		shape.setFill(FwBinZestGraphBuilder.getNodeColor(node));
-		shape.setStroke(FwBinZestGraphBuilder.getNodeBorderColor(node));
-		shape.setStrokeWidth(FwBinZestGraphBuilder.getNodeBorderWidth(node));
-
 		topBox = new VBox(VERTICAL_SPACING);
-		topBox.setPadding(new Insets(VERTICAL_PADDING, HORIZONTAL_PADDING, VERTICAL_PADDING, HORIZONTAL_PADDING));
 
-		shape.prefWidthProperty().bind(widthProperty());
-		shape.prefHeightProperty().bind(heightProperty());
 		topBox.prefWidthProperty().bind(widthProperty());
 		topBox.prefHeightProperty().bind(heightProperty());
 
-		nameText = new Text("FW Memory Map");
+		FwImageMemMap mm = FwBinZestGraphBuilder.getModelMemMap(node).getMemMap();
+
+		nameText = new Text("FW Memory Map - " + mm.getMemLayout().getName());
 		nameText.setTextOrigin(VPos.TOP);
 		nameText.setFont(FwBinResources.getGraphBoldFont());
 
-		topBox.getChildren().addAll(nameText);
-		topBox.setAlignment(Pos.CENTER);
+		memSegmentBox = new VBox();
+		for (MemSegment segment : mm.getMemLayout().getMemSegments()) {
+			HBox segBox = new HBox(HORIZONTAL_SPACING);
+
+			// segment properties box on the left size
+			VBox segTextBox = new VBox();
+			Text segName = new Text(segment.getName());
+			segName.setTextOrigin(VPos.TOP);
+			Text segBaseAddr = new Text(String.format("0x%08x", segment.getBaseAddr()));
+			segBaseAddr.setTextOrigin(VPos.TOP);
+			Text segSize = new Text(String.format("0x%x", segment.getSize()));
+			segSize.setTextOrigin(VPos.TOP);
+			segTextBox.getChildren().addAll(segName, segBaseAddr, segSize);
+
+			// colorful memory sections visualization on the right size
+			int curAddr = segment.getBaseAddr();
+			HBox sectionBox = new HBox();
+			for (FwImageMemSection sec : mm.getSectionsFromSegment(segment)) {
+
+				if (!sec.allocsMem())
+					continue;
+
+				// Insert spacers in memory gaps.
+				if (curAddr < sec.getVma()) {
+					double spaceW = (MM_NODE_WIDTH * (sec.getVma() - curAddr) / segment.getSize());
+					Rectangle r = new Rectangle(spaceW, MM_NODE_SEG_HEIGHT - 2 * HORIZONTAL_PADDING, Color.LIGHTGREY);
+					r.setStrokeWidth(0d);
+					r.setFill(Color.WHITE);
+					sectionBox.getChildren().add(r);
+				}
+				curAddr = sec.getVma() + sec.getSize();
+
+				double width = (MM_NODE_WIDTH * sec.getSize() / segment.getSize());
+				if (width >= 1.0) {
+					Rectangle r = new Rectangle(width - 1, MM_NODE_SEG_HEIGHT - 2 * HORIZONTAL_PADDING,
+							Color.LIGHTGREY);
+					r.setStroke(Color.DARKGREY);
+					r.setStrokeWidth(.5d);
+					if (sec.hasAttr("code")) {
+						r.setFill(Color.LIGHTGREEN);
+					} else if (sec.hasAttr("data")) {
+						r.setFill(Color.LIGHTSALMON);
+					} else if (sec.isSystemHeap()) {
+						r.setFill(Color.CORNFLOWERBLUE);
+					} else if (sec.isHeap()) {
+						r.setFill(Color.LIGHTBLUE);
+					} else if (sec.isStack()) {
+						r.setFill(Color.LIGHTYELLOW);
+					}
+					Pane oneSecBox = new Pane();
+					oneSecBox.setMinWidth(r.getWidth());
+					oneSecBox.setMinHeight(r.getHeight());
+					Text secName = new Text(sec.getName());
+					secName.getTransforms().add(new Scale(0.7, 0.7));
+					secName.getTransforms().add(new Rotate(90.0));
+					oneSecBox.getChildren().addAll(new Group(r), new Group(secName));
+					sectionBox.getChildren().add(oneSecBox);
+				}
+			}
+			segBox.getChildren().addAll(segTextBox, sectionBox);
+
+			memSegmentBox.getChildren().add(segBox);
+		}
+
+		topBox.getChildren().addAll(nameText, memSegmentBox);
+		topBox.setAlignment(Pos.CENTER_LEFT);
 
 		setMinSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
 
-		getChildren().addAll(new Group(shape), new Group(topBox));
+		getChildren().add(topBox);
 	}
 
 	@Override
@@ -87,8 +152,7 @@ public class FwMemoryMapVisual extends Region {
 
 	@Override
 	public double computeMinWidth(double height) {
-		double maxW = nameText.getLayoutBounds().getWidth();
-		return maxW + HORIZONTAL_PADDING * 2;
+		return memSegmentBox.getMinWidth() + HORIZONTAL_PADDING * 2;
 	}
 
 	@Override
@@ -106,16 +170,8 @@ public class FwMemoryMapVisual extends Region {
 		return Orientation.HORIZONTAL;
 	}
 
-	public GeometryNode<?> getGeometryNode() {
-		return shape;
-	}
-
 	public Text getNameText() {
 		return nameText;
-	}
-
-	public void setColor(Color color) {
-		shape.setFill(color);
 	}
 
 	public void setName(String name) {
