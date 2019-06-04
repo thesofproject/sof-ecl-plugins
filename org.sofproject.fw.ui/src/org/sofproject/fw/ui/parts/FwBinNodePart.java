@@ -33,7 +33,6 @@ import org.eclipse.gef.zest.fx.parts.NodePart;
 import org.sofproject.fw.ui.visuals.FwBinNodeVisual;
 
 import javafx.scene.Group;
-import javafx.scene.text.Text;
 
 public class FwBinNodePart extends NodePart {
 
