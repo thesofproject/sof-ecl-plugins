@@ -41,7 +41,6 @@ import org.sofproject.alsa.topo.model.AlsaTopoConnection.Type;
 import org.sofproject.alsa.topo.model.AlsaTopoNode;
 import org.sofproject.alsa.topo.model.AlsaTopoNodeBe;
 import org.sofproject.alsa.topo.model.AlsaTopoNodePcm;
-import org.sofproject.alsa.topo.ui.parts.AlsaTopoNodePart;
 import org.sofproject.ui.graph.SofXyZestGraphLayout;
 
 public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
