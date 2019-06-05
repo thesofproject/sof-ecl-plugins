@@ -82,6 +82,8 @@ public class SofNodeProject {
 	public static SofNodeProject fromProject(IProject proj) throws CoreException {
 		String srcProjName = proj.getPersistentProperty(
 				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_SRC_PROJ_NAME));
+		if (srcProjName == null)
+			return null; //project might be partially created
 		String address = proj.getPersistentProperty(
 				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_NODE_ADDRESS));
 		String resPath = proj.getPersistentProperty(

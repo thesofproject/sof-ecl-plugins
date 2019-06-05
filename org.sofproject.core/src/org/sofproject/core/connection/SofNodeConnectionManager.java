@@ -60,7 +60,8 @@ public class SofNodeConnectionManager extends Observable {
 				if (!project.hasNature(ISofNodeConst.SOF_NODE_NATURE_ID))
 					continue;
 				SofNodeProject sofNodeProject = SofNodeProject.fromProject(project);
-				createConnection(sofNodeProject);
+				if (sofNodeProject != null)
+					createConnection(sofNodeProject);
 			}
 			workspace.addResourceChangeListener(new IResourceChangeListener() {
 
