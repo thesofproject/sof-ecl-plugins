@@ -162,6 +162,7 @@ public class SofXyZestGraphLayout implements ILayoutAlgorithm {
 		}
 	}
 
+	@Override
 	public void applyLayout(LayoutContext context, boolean clean) {
 
 		// Some nodes are repositioned since the default GraphLayoutBehavior running
@@ -178,10 +179,19 @@ public class SofXyZestGraphLayout implements ILayoutAlgorithm {
 				Dimension size = LayoutProperties.getSize(gridNode.node);
 				GridElemSize colData = colSizes.get(gridNode.col);
 				GridElemSize rowData = rowSizes.get(gridNode.row);
+
 				double x = colData.getOffset() + size.getWidth() / 2;
-				x += (colData.getSize() - size.getWidth()) / 2;
+				// the top row's items (if excluded from centering/max'ing)
+				// are adjusted to the left meaning that their center needs to be set
+				// in the middle of the item to neutralize re-centering that happens
+				// later so they are skipped here
+				if (gridNode.row >= topRowsExcluded) {
+					x += (colData.getSize() - size.getWidth()) / 2;
+				}
+
 				double y = rowData.getOffset() + size.getHeight() / 2;
 				y += (rowData.getSize() - size.getHeight()) / 2;
+
 				LayoutProperties.setLocation(gridNode.node, new Point(x, y));
 			}
 		}
