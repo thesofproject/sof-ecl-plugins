@@ -39,6 +39,7 @@ import org.sofproject.core.binfile.BinInteger;
 import org.sofproject.core.binfile.BinStruct;
 import org.sofproject.fw.binfile.FwBinBlockFactory;
 import org.sofproject.fw.memmap.AplMemLayout;
+import org.sofproject.fw.memmap.CnlMemLayout;
 import org.sofproject.fw.memmap.DspMemLayout;
 import org.sofproject.fw.memmap.DspMemoryMap;
 import org.sofproject.fw.memmap.DspMemoryRegion;
@@ -63,9 +64,14 @@ public class FwBinFactory {
 			BinFile fwBin = reader.read(f);
 			f.dispose();
 
-			// TODO: determine target platform and associate appropriate mem layout
-			// (based on fileName prefix e.g. apl- cnl-)
-			DspMemLayout memLayout = new AplMemLayout();
+			DspMemLayout memLayout = null;
+			if (fileName.indexOf("sof-apl") != -1) {
+				memLayout = new AplMemLayout();
+			} else if (fileName.indexOf("sof-cnl") != -1) {
+				memLayout = new CnlMemLayout();
+			} else {
+				memLayout = new CnlMemLayout(); // TODO: guess the part of layout based on manifest info
+			}
 			DspMemoryMap mm = new DspMemoryMap(memLayout);
 
 			populateSegments(mm, fwBin);
