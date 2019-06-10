@@ -32,11 +32,17 @@ package org.sofproject.fw.model;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.sofproject.core.binfile.BinArray;
 import org.sofproject.core.binfile.BinFile;
 import org.sofproject.core.binfile.BinFileReader;
-import org.sofproject.core.memmap.FwImageMemMap;
-import org.sofproject.core.memmap.MemMapReader;
+import org.sofproject.core.binfile.BinInteger;
+import org.sofproject.core.binfile.BinStruct;
 import org.sofproject.fw.binfile.FwBinBlockFactory;
+import org.sofproject.fw.memmap.AplMemLayout;
+import org.sofproject.fw.memmap.DspMemLayout;
+import org.sofproject.fw.memmap.DspMemoryMap;
+import org.sofproject.fw.memmap.DspMemoryRegion;
+import org.sofproject.fw.memmap.SectionHeaderListReader;
 
 public class FwBinFactory {
 
@@ -57,18 +63,43 @@ public class FwBinFactory {
 			BinFile fwBin = reader.read(f);
 			f.dispose();
 
-			FwImageMemMap mm = null;
+			// TODO: determine target platform and associate appropriate mem layout
+			// (based on fileName prefix e.g. apl- cnl-)
+			DspMemLayout memLayout = new AplMemLayout();
+			DspMemoryMap mm = new DspMemoryMap(memLayout);
+
+			populateSegments(mm, fwBin);
+
 			if (mmFileName != null) {
 				// reading the memory map (.map from objdump -h) file ...
-				MemMapReader mmReader = new MemMapReader(mmFileName, mmInputStream);
-				mm = mmReader.read();
+				SectionHeaderListReader mmReader = new SectionHeaderListReader(mmInputStream, mm);
+				mmReader.read();
 			}
+
 			return new FwBinGraph(fwBin, mm);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static void populateSegments(DspMemoryMap memMap, BinFile fwBin) {
+		BinStruct mft = (BinStruct) fwBin.getChildItem("fw manifest");
+		BinArray<BinStruct> moduleEntries = (BinArray<BinStruct>) mft.getChildItem("module_entries");
+		for (BinStruct me : moduleEntries.getItems()) {
+			BinArray<BinStruct> segments = (BinArray<BinStruct>) me.getChildItem("segments");
+			for (BinStruct seg : segments.getItems()) {
+				BinInteger flags = (BinInteger) seg.getChildItem("flags");
+				int baseAddr = (Integer) seg.getChildValue("v_base_addr");
+				int length = ((Integer) flags.getChildValue("length")) * 4096;
+				String name = (String) me.getChildValue("name")
+						+ FwBinGraph.segmentIndexToString((Integer) flags.getChildValue("type"));
+
+				memMap.addSegment(new DspMemoryRegion(name, baseAddr, length));
+			}
+		}
 	}
 
 }

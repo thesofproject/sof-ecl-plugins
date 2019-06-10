@@ -26,72 +26,88 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package org.sofproject.core.memmap;
+package org.sofproject.fw.memmap;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-public class FwImageMemMap {
+public class DspMemoryRegion {
 
-	/**
-	 * Name of the memory map file.
-	 */
-	String fileName;
+	public static final int UNDEFINED = -1;
 
-	/**
-	 * Memory layout of the target dsp platform.
-	 */
-	IMemLayout memLayout;
+	private DspMemoryRegion parent = null;
 
-	private List<FwImageMemSection> sections = new ArrayList<>();
+	private String name;
+	private int baseAddr;
+	private int sizeBytes;
+	private int usedBytes;
+	private boolean hideFree;
 
-	private Map<MemSegment, List<FwImageMemSection>> secMap = new HashMap<>();
+	private List<DspMemoryRegion> nested = new LinkedList<>();
 
-	public FwImageMemMap(String fileName, IMemLayout memLayout) {
-		this.fileName = fileName;
-		this.memLayout = memLayout;
-		for (MemSegment segment : memLayout.getMemSegments()) {
-			secMap.put(segment, new ArrayList<>());
+	public DspMemoryRegion(String name) {
+		this(name, UNDEFINED, UNDEFINED);
+	}
+
+	public DspMemoryRegion(String name, int baseAddr, int sizeBytes) {
+		this(name, baseAddr, sizeBytes, false);
+	}
+
+	public DspMemoryRegion(String name, int baseAddr, int sizeBytes, boolean hideFree) {
+		this.name = name;
+		this.baseAddr = baseAddr;
+		this.sizeBytes = sizeBytes;
+		this.usedBytes = 0;
+		this.hideFree = hideFree;
+	}
+
+	public void addNested(DspMemoryRegion child) {
+		nested.add(child);
+		child.setParent(this);
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public int getBaseAddr() {
+		return baseAddr;
+	}
+
+	public int getEndAddr() {
+		return baseAddr + sizeBytes;
+	}
+
+	public int getSizeBytes() {
+		return sizeBytes;
+	}
+
+	public int getUsedBytes() {
+		return usedBytes;
+	}
+
+	public boolean getHideFree() {
+		return hideFree;
+	}
+
+	public void setParent(DspMemoryRegion parent) {
+		this.parent = parent;
+	}
+
+	public void addUsedBytes(int usedBytesDelta) {
+		usedBytes += usedBytesDelta;
+		if (parent != null) {
+			parent.addUsedBytes(usedBytesDelta);
 		}
 	}
 
-	public void addSection(FwImageMemSection sec) {
-		sections.add(sec);
+	public boolean containsAddr(int addr) {
+		return getBaseAddr() <= addr && addr < getEndAddr();
 	}
 
-	public void endOfMemMap() {
-		sections.sort((s1, s2) -> Integer.compare(s1.getVma(), s2.getVma()));
-		for (FwImageMemSection sec : sections) {
-			MemSegment seg = mapSectionToSegment(sec);
-			// TODO: skip sections that do not belong to any
-			// segment defined by the passed mem layout
-			if (seg != null) {
-				secMap.get(seg).add(sec);
-			}
-		}
-	}
-
-	public IMemLayout getMemLayout() {
-		return memLayout;
-	}
-
-	public Collection<FwImageMemSection> getSections() {
-		return sections;
-	}
-
-	public Collection<FwImageMemSection> getSectionsFromSegment(MemSegment seg) {
-		return secMap.get(seg);
-	}
-
-	private MemSegment mapSectionToSegment(FwImageMemSection sec) {
-		for (MemSegment segment : memLayout.getMemSegments()) {
-			if (sec.isInSegment(segment))
-				return segment;
-		}
-		return null;
+	public Collection<DspMemoryRegion> getNested() {
+		return nested;
 	}
 
 }

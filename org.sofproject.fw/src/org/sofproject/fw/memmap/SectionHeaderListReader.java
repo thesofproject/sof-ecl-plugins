@@ -26,34 +26,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package org.sofproject.core.memmap;
+package org.sofproject.fw.memmap;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class MemMapReader {
+/**
+ * Reads section header list from a file. The file is expected to be in format
+ * used by the objdump.
+ */
+public class SectionHeaderListReader {
 
-	private String fileName;
 	private InputStream is;
+	private DspMemoryMap mm;
+	DspMemLayout memLayout;
 
 	private enum ReadState {
 		SEARCHING_IDX, READING_SECTION, READING_SECTION_ATTRIBS,
 	};
 
-	public MemMapReader(String fileName, InputStream inputStream) {
-		this.fileName = fileName;
+	public SectionHeaderListReader(InputStream inputStream, DspMemoryMap mm) {
 		this.is = inputStream;
+		this.mm = mm;
 	}
 
 	/*
 	 * Idx Name Size VMA LMA File off Algn 0 .MemoryExceptionVector.text 00000006
 	 * befe0400 befe0400 00000494 2**2 CONTENTS, ALLOC, LOAD, READONLY, CODE
 	 */
-	public FwImageMemMap read() throws IOException {
-		// TODO: determine target platform and associate appropriate mem layout
-		FwImageMemMap mm = new FwImageMemMap(fileName, new AplMemLayout());
+	public DspMemoryMap read() throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
 		String line;

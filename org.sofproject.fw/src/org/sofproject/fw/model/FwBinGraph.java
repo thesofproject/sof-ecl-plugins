@@ -37,13 +37,13 @@ import org.sofproject.core.binfile.BinFile;
 import org.sofproject.core.binfile.BinInteger;
 import org.sofproject.core.binfile.BinItem;
 import org.sofproject.core.binfile.BinStruct;
-import org.sofproject.core.memmap.FwImageMemMap;
 import org.sofproject.fw.binfile.BinStructCseManifestHeader;
 import org.sofproject.fw.binfile.BinStructCssManifestHeader;
 import org.sofproject.fw.binfile.BinStructFwBinaryHeader;
 import org.sofproject.fw.binfile.BinStructFwModuleEntry;
 import org.sofproject.fw.binfile.BinStructFwVersion;
 import org.sofproject.fw.binfile.BinStructSegmentDesc;
+import org.sofproject.fw.memmap.DspMemoryMap;
 
 public class FwBinGraph {
 
@@ -57,10 +57,10 @@ public class FwBinGraph {
 
 	private List<FwBinItem> childElements = new ArrayList<>();
 
-	BinFile fwBin;
-	FwImageMemMap memMap;
+	private BinFile fwBin;
+	private DspMemoryMap memMap;
 
-	public FwBinGraph(BinFile fwBin, FwImageMemMap memMap) {
+	public FwBinGraph(BinFile fwBin, DspMemoryMap memMap) {
 		this.fwBin = fwBin;
 		this.memMap = memMap;
 		if (memMap != null) {
@@ -71,6 +71,10 @@ public class FwBinGraph {
 
 	public BinFile getBinFile() {
 		return fwBin;
+	}
+
+	public DspMemoryMap getMemoryMap() {
+		return memMap;
 	}
 
 	public void addChildElement(FwBinBlock parentNode, FwBinBlock node) {
@@ -151,9 +155,23 @@ public class FwBinGraph {
 		binBlock.setAttribute(FwBinBlock.AG_GRAPH, "entry point",
 				modEntry.getChildItem("entry_point").getValueString());
 		BinArray<BinStructSegmentDesc> segments = (BinArray<BinStructSegmentDesc>) modEntry.getChildItem("segments");
-		binBlock.setAttribute(FwBinBlock.AG_GRAPH, ".text", segmentToString(segments.getItem(0)));
-		binBlock.setAttribute(FwBinBlock.AG_GRAPH, ".rodata", segmentToString(segments.getItem(1)));
-		binBlock.setAttribute(FwBinBlock.AG_GRAPH, ".bss", segmentToString(segments.getItem(2)));
+		for (int i = 0; i < segments.getItems().size(); i++) {
+			binBlock.setAttribute(FwBinBlock.AG_GRAPH, segmentIndexToString(i),
+					segmentToString(segments.getItem(i)));
+		}
+	}
+
+	public static String segmentIndexToString(int index) {
+		switch (index) {
+		case 0:
+			return ".text";
+		case 1:
+			return ".rodata";
+		case 2:
+			return ".bss";
+		default:
+			return "unknown";
+		}
 	}
 
 	private static String segmentToString(BinStructSegmentDesc seg) {
