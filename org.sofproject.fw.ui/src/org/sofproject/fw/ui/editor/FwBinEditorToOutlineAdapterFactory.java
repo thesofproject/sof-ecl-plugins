@@ -1,3 +1,5 @@
+package org.sofproject.fw.ui.editor;
+
 /*
  * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
@@ -26,45 +28,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package org.sofproject.core.memmap;
 
-public class MemSegment {
+import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.sofproject.fw.ui.outline.FwBinGraphContentOutlinePage;
 
-	public enum MemClass {
-		L2_HP_MEMORY, // TODO: Tensilica for Intel specific, to be moved...
-		L2_LP_MEMORY
+public class FwBinEditorToOutlineAdapterFactory implements IAdapterFactory {
+
+	@Override
+	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
+		if (adapterType == IContentOutlinePage.class) {
+			FwBinEditor editor = (FwBinEditor) adaptableObject;
+			return adapterType.cast(new FwBinGraphContentOutlinePage(editor));
+		}
+		return null;
 	}
 
-	private MemClass cl;
-	private String name;
-	private int baseAddr;
-	private int size;
-
-	public MemSegment(MemClass cl, String name, int baseAddr, int size) {
-		this.cl = cl;
-		this.name = name;
-		this.baseAddr = baseAddr;
-		this.size = size;
-	}
-
-	public MemClass getMemClass() {
-		return cl;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public int getBaseAddr() {
-		return baseAddr;
-	}
-
-	public int getEndAddr() {
-		return baseAddr + size;
-	}
-
-	public int getSize() {
-		return size;
+	@Override
+	public Class<?>[] getAdapterList() {
+		return new Class[] { IContentOutlinePage.class };
 	}
 
 }

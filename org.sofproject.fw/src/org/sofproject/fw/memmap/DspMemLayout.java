@@ -26,37 +26,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+package org.sofproject.fw.memmap;
 
-package org.sofproject.fw.model;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.sofproject.fw.memmap.DspMemoryMap;
+public class DspMemLayout {
 
-public class FwMemoryMap extends FwBinItem {
+	private String name;
+	private List<DspMemoryRegion> regions = new LinkedList<>();
 
-	private DspMemoryMap mm;
-
-	private int row;
-	private int column;
-
-	// here we wants list of all sections in the fw binary
-	// along with their percentage of the memory occupied?
-
-	public FwMemoryMap(DspMemoryMap mm, int row, int column) {
-		super("FW Memory Map");
-		this.mm = mm;
-		this.row = row;
-		this.column = column;
+	protected DspMemLayout(String name) {
+		this.name = name;
 	}
 
-	public DspMemoryMap getMemMap() {
-		return mm;
+	protected void addRegion(DspMemoryRegion region) {
+		regions.add(region);
 	}
 
-	public int getRow() {
-		return row;
+	public String getName() {
+		return name;
 	}
 
-	public int getColumn() {
-		return column;
+	public Collection<DspMemoryRegion> getMemRegions() {
+		return regions;
 	}
 }

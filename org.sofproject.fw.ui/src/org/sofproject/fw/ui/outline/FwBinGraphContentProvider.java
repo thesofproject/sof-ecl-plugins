@@ -26,91 +26,42 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package org.sofproject.core.memmap;
+package org.sofproject.fw.ui.outline;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.sofproject.fw.memmap.DspMemoryMap;
+import org.sofproject.fw.memmap.DspMemoryRegion;
 
-public class FwImageMemSection {
-	private int idx;
-	private String name;
-	private int size;
-	private int vma;
-	private int lma;
-	private int fileOff;
-	private int align;
+public class FwBinGraphContentProvider implements ITreeContentProvider {
 
-	private Set<String> attrs = new HashSet<>();
-
-	public FwImageMemSection(int idx, String name, int size, int vma, int lma, int fileOff, int align) {
-		this.idx = idx;
-		this.name = name;
-		this.size = size;
-		this.vma = vma;
-		this.lma = lma;
-		this.fileOff = fileOff;
-		this.align = align;
-	}
-
-	void addAttr(String attr) {
-		attrs.add(attr.toLowerCase());
-	}
-
-	public boolean allocsMem() {
-		return hasAttr("alloc");
-	}
-
-	public boolean isStack() {
-		return getName().indexOf("stack") != -1;
-	}
-
-	public boolean isSystemHeap() {
-		return isHeap() && getName().indexOf("system") != -1;
-	}
-
-	public boolean isHeap() {
-		return getName().indexOf("heap") != -1;
-	}
-
-	public boolean hasAttr(String attr) {
-		return attrs.contains(attr.toLowerCase());
-	}
-
-	public int getIdx() {
-		return idx;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public int getSize() {
-		return size;
-	}
-
-	public int getVma() {
-		return vma;
-	}
-
-	public int getLma() {
-		return lma;
-	}
-
-	public int getFileOff() {
-		return fileOff;
-	}
-
-	public int getAlign() {
-		return align;
-	}
-
-	public boolean isInSegment(MemSegment segment) {
-		return segment.getBaseAddr() <= getVma() && getVma() < segment.getEndAddr();
+	@Override
+	public Object[] getElements(Object inputElement) {
+		if (inputElement instanceof DspMemoryMap) {
+			return ((DspMemoryMap) inputElement).getMemLayout().getMemRegions().toArray();
+		}
+		return null;
 	}
 
 	@Override
-	public String toString() {
-		return String.format("%s %08x %x", getName(), getVma(), getSize());
+	public Object[] getChildren(Object parentElement) {
+		if (parentElement instanceof DspMemoryRegion) {
+			return ((DspMemoryRegion) parentElement).getNested().toArray();
+		}
+		return null;
 	}
-	
+
+	@Override
+	public Object getParent(Object element) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean hasChildren(Object element) {
+		if (element instanceof DspMemoryRegion) {
+			return !((DspMemoryRegion) element).getNested().isEmpty();
+		}
+		return false;
+	}
+
 }

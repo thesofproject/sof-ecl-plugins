@@ -26,29 +26,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package org.sofproject.core.memmap;
+package org.sofproject.fw.memmap;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+public class AplMemLayout extends DspMemLayout {
 
-public class AplMemLayout implements IMemLayout {
-
-	List<MemSegment> segments = new ArrayList<MemSegment>(2);
+	// TODO: add IMR
 
 	public AplMemLayout() {
-		segments.add(new MemSegment(MemSegment.MemClass.L2_HP_MEMORY, "L2 HP", 0xbe000000, 8 * 64 * 1024));
-		segments.add(new MemSegment(MemSegment.MemClass.L2_LP_MEMORY, "L2 LP", 0xbe800000, 2 * 64 * 1024));
+		super("Intel Apollolake");
+		addRegion(new DspMemoryRegion("L2 HP", 0xbe000000, 8 * 64 * 1024));
+		addRegion(new DspMemoryRegion("L2 LP", 0xbe800000, 2 * 64 * 1024));
 	}
-
-	@Override
-	public String getName() {
-		return "Intel Apollolake";
-	}
-
-	@Override
-	public Collection<MemSegment> getMemSegments() {
-		return segments;
-	}
-
 }

@@ -134,6 +134,10 @@ public class FwBinEditor extends AbstractFXEditor implements IBinFileEditor {
 		return super.getAdapter(key);
 	}
 
+	public FwBinGraph getFwBinModel() {
+		return fwBinModel;
+	}
+
 	@Override
 	public BinFile getBinFile() {
 		return fwBinModel.getBinFile();

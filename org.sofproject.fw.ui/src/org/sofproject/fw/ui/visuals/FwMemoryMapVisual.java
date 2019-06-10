@@ -29,9 +29,9 @@
 
 package org.sofproject.fw.ui.visuals;
 
-import org.sofproject.core.memmap.FwImageMemMap;
-import org.sofproject.core.memmap.FwImageMemSection;
-import org.sofproject.core.memmap.MemSegment;
+import org.sofproject.fw.memmap.DspMemoryMap;
+import org.sofproject.fw.memmap.DspMemoryRegion;
+import org.sofproject.fw.memmap.FwImageMemSection;
 import org.sofproject.fw.ui.graph.FwBinZestGraphBuilder;
 import org.sofproject.fw.ui.resources.FwBinResources;
 
@@ -67,14 +67,14 @@ public class FwMemoryMapVisual extends Region {
 		topBox.prefWidthProperty().bind(widthProperty());
 		topBox.prefHeightProperty().bind(heightProperty());
 
-		FwImageMemMap mm = FwBinZestGraphBuilder.getModelMemMap(node).getMemMap();
+		DspMemoryMap mm = FwBinZestGraphBuilder.getModelMemMap(node).getMemMap();
 
 		nameText = new Text("FW Memory Map - " + mm.getMemLayout().getName());
 		nameText.setTextOrigin(VPos.TOP);
 		nameText.setFont(FwBinResources.getGraphBoldFont());
 
 		memSegmentBox = new VBox();
-		for (MemSegment segment : mm.getMemLayout().getMemSegments()) {
+		for (DspMemoryRegion segment : mm.getMemLayout().getMemRegions()) {
 			HBox segBox = new HBox(HORIZONTAL_SPACING);
 
 			// segment properties box on the left size
@@ -83,21 +83,21 @@ public class FwMemoryMapVisual extends Region {
 			segName.setTextOrigin(VPos.TOP);
 			Text segBaseAddr = new Text(String.format("0x%08x", segment.getBaseAddr()));
 			segBaseAddr.setTextOrigin(VPos.TOP);
-			Text segSize = new Text(String.format("0x%x", segment.getSize()));
+			Text segSize = new Text(String.format("0x%x", segment.getSizeBytes()));
 			segSize.setTextOrigin(VPos.TOP);
 			segTextBox.getChildren().addAll(segName, segBaseAddr, segSize);
 
 			// colorful memory sections visualization on the right size
 			int curAddr = segment.getBaseAddr();
 			HBox sectionBox = new HBox();
-			for (FwImageMemSection sec : mm.getSectionsFromSegment(segment)) {
+			for (FwImageMemSection sec : mm.getSectionsFromArea(segment)) {
 
 				if (!sec.allocsMem())
 					continue;
 
 				// Insert spacers in memory gaps.
 				if (curAddr < sec.getVma()) {
-					double spaceW = (MM_NODE_WIDTH * (sec.getVma() - curAddr) / segment.getSize());
+					double spaceW = (MM_NODE_WIDTH * (sec.getVma() - curAddr) / segment.getSizeBytes());
 					Rectangle r = new Rectangle(spaceW, MM_NODE_SEG_HEIGHT - 2 * HORIZONTAL_PADDING, Color.LIGHTGREY);
 					r.setStrokeWidth(0d);
 					r.setFill(Color.WHITE);
@@ -105,7 +105,7 @@ public class FwMemoryMapVisual extends Region {
 				}
 				curAddr = sec.getVma() + sec.getSize();
 
-				double width = (MM_NODE_WIDTH * sec.getSize() / segment.getSize());
+				double width = (MM_NODE_WIDTH * sec.getSize() / segment.getSizeBytes());
 				if (width >= 1.0) {
 					Rectangle r = new Rectangle(width - 1, MM_NODE_SEG_HEIGHT - 2 * HORIZONTAL_PADDING,
 							Color.LIGHTGREY);

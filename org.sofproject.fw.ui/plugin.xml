@@ -11,5 +11,14 @@
             name="Fw Binary Editor">
       </editor>
    </extension>
-
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.sofproject.fw.ui.editor.FwBinEditor"
+            class="org.sofproject.fw.ui.editor.FwBinEditorToOutlineAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.views.contentoutline.IContentOutlinePage">
+         </adapter>
+      </factory>
+   </extension>
 </plugin>
