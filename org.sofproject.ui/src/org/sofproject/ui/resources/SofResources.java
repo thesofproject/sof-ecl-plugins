@@ -47,8 +47,27 @@ public class SofResources {
 	public static final Color SOF_LIGHT_GREY = Color.rgb(235, 235, 235);
 	public static final Color SOF_YELLOW = Color.rgb(246, 237, 128);
 	public static final Color SOF_RED = Color.rgb(240, 87, 114);
+
+	/**
+	 * Used to fill rectangles/blocks.
+	 */
 	public static final Color SOF_BLUE = Color.rgb(111, 204, 221);
+
+	/**
+	 * Lighter blue.
+	 */
 	public static final Color SOF_LIGHT_BLUE = Color.rgb(183, 229, 238);
+
+	/**
+	 * Darker blue for rectangle/block borders.
+	 */
+	public static final Color SOF_DARK_BLUE = Color.rgb(80, 149, 162);
+
+	/**
+	 * Used for main lines and labels.
+	 */
+	public static final Color SOF_DARK_VIOLET = Color.rgb(51, 51, 91);
+
 	public static final Color SOF_GREEN = Color.rgb(146, 208, 80);
 
 	public static ImageDescriptor getSofIcon() {

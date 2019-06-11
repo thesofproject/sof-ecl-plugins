@@ -55,7 +55,7 @@ public class FwMemoryMapVisual extends Region {
 	private static final double HORIZONTAL_SPACING = 5d;
 
 	private static final double MM_NODE_WIDTH = 1000d;
-	private static final double MM_NODE_SEG_HEIGHT = 100d;
+	private static final double MM_NODE_SEG_HEIGHT = 150d;
 
 	private Text nameText;
 	private VBox topBox;
@@ -125,10 +125,13 @@ public class FwMemoryMapVisual extends Region {
 					Pane oneSecBox = new Pane();
 					oneSecBox.setMinWidth(r.getWidth());
 					oneSecBox.setMinHeight(r.getHeight());
-					Text secName = new Text(sec.getName());
-					secName.getTransforms().add(new Scale(0.7, 0.7));
-					secName.getTransforms().add(new Rotate(90.0));
-					oneSecBox.getChildren().addAll(new Group(r), new Group(secName));
+					oneSecBox.getChildren().add(new Group(r));
+					if (width >= 5.0) { // do not show the label if smaller
+						Text secName = new Text(sec.getName());
+						secName.getTransforms().add(new Scale(0.9, 0.9));
+						secName.getTransforms().add(new Rotate(90.0));
+						oneSecBox.getChildren().add(new Group(secName));
+					}
 					sectionBox.getChildren().add(oneSecBox);
 				}
 			}
