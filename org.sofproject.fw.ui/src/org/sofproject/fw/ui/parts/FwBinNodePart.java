@@ -36,15 +36,16 @@ import javafx.scene.Group;
 
 public class FwBinNodePart extends NodePart {
 
+	public static final String TEXT_COLOR_ATTR = "fw-bin-node-text-color";
 	public static final String COLOR_ATTR = "fw-bin-node-color";
 	public static final String BORDER_COLOR_ATTR = "fw-bin-node-border-color";
 	public static final String BORDER_WIDTH_ATTR = "fw-bin-node-border-width";
-	
+
 	/**
 	 * X (column) position in the grid. - TODO: to be removed, dynamic layout
 	 */
 	public static final String X_POS_ATTR = "fw-bin-node-x-pos";
-	
+
 	/**
 	 * Y (row) position in the grid. - TODO: to be removed, dynamic layout
 	 */
@@ -54,13 +55,13 @@ public class FwBinNodePart extends NodePart {
 	 * Attribute holds a reference to FwBinBlock instance.
 	 */
 	public static final String MODEL_ITEM_ATTR = "fw-bin-node-model-item";
-	
+
 	/**
 	 * Attribute holds a reference to the source BinStruct instance,
 	 * the FwBinBlock was built from.
 	 */
 	public static final String BIN_ITEM_ATTR = "fw-bin-node-bin-item";
-	
+
 	@Override
 	protected Group doCreateVisual() {
 		return new Group(new FwBinNodeVisual(getContent()));

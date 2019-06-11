@@ -43,6 +43,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -52,11 +53,14 @@ public class FwBinNodeVisual extends Region {
 	private static final double HORIZONTAL_PADDING = 5d;
 	private static final double VERTICAL_PADDING = 5d;
 	private static final double VERTICAL_SPACING = 2d;
+	private static final double HORIZONTAL_SPACING = 2d;
 
 	private Text nameText;
 	private GeometryNode<RoundedRectangle> shape;
 	private VBox topBox;
-	private VBox attrBox;
+	private HBox attrBox;
+	private VBox attrNameBox;
+	private VBox attrValBox;
 
 	public FwBinNodeVisual(org.eclipse.gef.graph.Node node) {
 		GeometryNode<RoundedRectangle> shape = new GeometryNode<>(new RoundedRectangle(0, 0, 70, 30, 8, 8));
@@ -76,17 +80,25 @@ public class FwBinNodeVisual extends Region {
 		nameText = new Text(FwBinZestGraphBuilder.getNodeName(node));
 		nameText.setTextOrigin(VPos.TOP);
 		nameText.setFont(FwBinResources.getGraphBoldFont());
+		nameText.setFill(FwBinZestGraphBuilder.getNodeTextColor(node));
 
-		attrBox = new VBox(VERTICAL_SPACING);
-		attrBox.setAlignment(Pos.CENTER_LEFT);
+		attrBox = new HBox(HORIZONTAL_SPACING);
+		attrBox.setAlignment(Pos.CENTER);
+		attrNameBox = new VBox(VERTICAL_SPACING);
+		attrValBox = new VBox(VERTICAL_SPACING);
+		attrBox.getChildren().addAll(attrNameBox, attrValBox);
 		FwBinBlock binBlock = FwBinZestGraphBuilder.getModelNode(node);
 		Set<String> attrNames = binBlock.getAttributeNamesFromGroup(FwBinBlock.AG_GRAPH);
 		for (String attrName : attrNames) {
+			Text aNameText = new Text(attrName);
+			aNameText.setTextOrigin(VPos.TOP);
+			aNameText.setFont(FwBinResources.getGraphMediumFont());
+			attrNameBox.getChildren().add(aNameText);
 			Object attr = binBlock.getAttribute(FwBinBlock.AG_GRAPH, attrName);
-			Text atext = new Text(attrName + " : " + attr.toString());
+			Text atext = new Text(attr.toString());
 			atext.setTextOrigin(VPos.TOP);
 			atext.setFont(FwBinResources.getGraphMediumFont());
-			attrBox.getChildren().add(atext);
+			attrValBox.getChildren().add(atext);
 		}
 
 		topBox.getChildren().addAll(nameText, attrBox);
@@ -105,10 +117,15 @@ public class FwBinNodeVisual extends Region {
 	@Override
 	public double computeMinWidth(double height) {
 		double maxW = nameText.getLayoutBounds().getWidth();
-		for (Node n : attrBox.getChildren()) {
-			maxW = Double.max(maxW, n.getLayoutBounds().getWidth());
+		double maxAn = 0d;
+		double maxAv = 0d;
+		for (Node n : attrNameBox.getChildren()) {
+			maxAn = Double.max(maxAn, n.getLayoutBounds().getWidth());
 		}
-		return maxW + HORIZONTAL_PADDING * 2;
+		for (Node n : attrValBox.getChildren()) {
+			maxAv = Double.max(maxAv, n.getLayoutBounds().getWidth());
+		}
+		return Double.max(maxW, maxAv + maxAn) + HORIZONTAL_PADDING * 3;
 	}
 
 	@Override

@@ -156,8 +156,7 @@ public class FwBinGraph {
 				modEntry.getChildItem("entry_point").getValueString());
 		BinArray<BinStructSegmentDesc> segments = (BinArray<BinStructSegmentDesc>) modEntry.getChildItem("segments");
 		for (int i = 0; i < segments.getItems().size(); i++) {
-			binBlock.setAttribute(FwBinBlock.AG_GRAPH, segmentIndexToString(i),
-					segmentToString(segments.getItem(i)));
+			binBlock.setAttribute(FwBinBlock.AG_GRAPH, segmentIndexToString(i), segmentToString(segments.getItem(i)));
 		}
 	}
 
@@ -175,7 +174,8 @@ public class FwBinGraph {
 	}
 
 	private static String segmentToString(BinStructSegmentDesc seg) {
-		String s = String.format("%s pages at %s", ((BinInteger) seg.getChildItem("flags")).getChildValue("length"),
+		int pages = (Integer) ((BinInteger) seg.getChildItem("flags")).getChildValue("length");
+		String s = String.format("%d pag%s at %s", pages, pages != 1 ? "es" : "e",
 				seg.getChildItem("v_base_addr").getValueString());
 		return s;
 	}

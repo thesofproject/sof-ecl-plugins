@@ -61,38 +61,14 @@ public class FwBinZestGraphBuilder {
 
 		public BinFileNode(FwBinBlock modelBlock) {
 
-			Color color = SofResources.SOF_LIGHT_GREY;
-			Color borderColor = SofResources.SOF_BLUE;
-			double borderWidth = 1.0;
-
-//			if (modelNode instanceof AlsaTopoNodePcm) {
-//				color = SofResources.SOF_YELLOW;
-//				borderWidth = 2.0;
-//				borderColor = Color.BLACK;
-//			} else if (modelNode instanceof AlsaTopoNodeBe) {
-//				color = SofResources.SOF_RED;
-//				borderWidth = 2.0;
-//				borderColor = Color.BLACK;
-//			} else if (modelNode instanceof AlsaTopoNodeWidget) {
-//				switch (modelNode.getTypeName()) {
-//				case "aif_in":
-//					color = SofResources.SOF_BLUE;
-//					break;
-//				case "aif_out":
-//					color = SofResources.SOF_LIGHT_BLUE;
-//					break;
-//				case "buffer":
-//					color = SofResources.SOF_GREEN;
-//					break;
-//				case "scheduler":
-//					color = SofResources.SOF_LIGHT_GREY;
-//					borderColor = SofResources.SOF_GREY;
-//					break;
-//				}
-//			}
+			Color textColor = SofResources.SOF_DARK_VIOLET;
+			Color color = SofResources.SOF_LIGHT_BLUE;
+			Color borderColor = SofResources.SOF_DARK_BLUE;
+			double borderWidth = 1.5d;
 
 			getAttributes().put(FwBinNodePart.MODEL_ITEM_ATTR, modelBlock);
 			getAttributes().put(FwBinNodePart.BIN_ITEM_ATTR, modelBlock.getBinStruct());
+			getAttributes().put(FwBinNodePart.TEXT_COLOR_ATTR, textColor);
 			getAttributes().put(FwBinNodePart.COLOR_ATTR, color);
 			getAttributes().put(FwBinNodePart.BORDER_COLOR_ATTR, borderColor);
 			getAttributes().put(FwBinNodePart.BORDER_WIDTH_ATTR, borderWidth);
@@ -158,6 +134,10 @@ public class FwBinZestGraphBuilder {
 
 	public static Color getNodeColor(Node n) {
 		return (Color) n.getAttributes().get(FwBinNodePart.COLOR_ATTR);
+	}
+
+	public static Color getNodeTextColor(Node n) {
+		return (Color) n.getAttributes().get(FwBinNodePart.TEXT_COLOR_ATTR);
 	}
 
 	public static Color getNodeBorderColor(Node n) {
