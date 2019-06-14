@@ -149,6 +149,20 @@ public class AlsaTopoGraph extends AlsaTopoItem {
 						addChildElement(new AlsaTopoConnection(Type.STREAM_PATH, be, widget));
 					}
 				}
+			} else if (widget.getTypeName().equals("aif_in") || widget.getTypeName().equals("aif_out")) {
+				/*
+				 * TODO: newer version of the topologies seem to skip this connection in the
+				 * graph definition. Should avoid adding double one for old versions? Does not
+				 * hurt atm
+				 */
+				AlsaTopoNodePcm pcm = pcmIndex.get(widget.getSname());
+				if (pcm != null) {
+					if (widget.getTypeName().equals("aif_in")) {
+						addChildElement(new AlsaTopoConnection(Type.STREAM_PATH, pcm, widget));
+					} else {
+						addChildElement(new AlsaTopoConnection(Type.STREAM_PATH, widget, pcm));
+					}
+				}
 			} else if (widget.getTypeName().equals("scheduler")) {
 				AlsaTopoNode node = (AlsaTopoNode) findChild(widget.getSname());
 				addChildElement(new AlsaTopoConnection(Type.CONTROL_PATH, widget, node));
