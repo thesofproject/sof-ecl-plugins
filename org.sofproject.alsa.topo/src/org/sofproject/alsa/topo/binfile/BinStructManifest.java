@@ -47,6 +47,11 @@ public class BinStructManifest extends BinStruct {
 		addChildItem(new BinInteger("dai_list_elems"));
 		addChildItem(new BinInteger("dai_elems"));
 		addChildItem(new BinByteArray("reserved", RESERVED_SIZE * 4));
-		addChildItem(new BinStructPrivate("priv"));
+
+		// private data in the manifest seems to be just an array of bytes
+		// not formatted as tuples
+		BinInteger privSize = new BinInteger("priv_size");
+		addChildItem(privSize);
+		addChildItem(new BinByteArray("priv_data", privSize));
 	}
 }
