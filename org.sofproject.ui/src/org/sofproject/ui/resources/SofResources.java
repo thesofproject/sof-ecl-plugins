@@ -47,6 +47,7 @@ public class SofResources {
 	public static final Color SOF_LIGHT_GREY = Color.rgb(235, 235, 235);
 	public static final Color SOF_YELLOW = Color.rgb(246, 237, 128);
 	public static final Color SOF_RED = Color.rgb(240, 87, 114);
+	public static final Color SOF_LIGHT_RED = Color.rgb(250, 199, 207);
 
 	/**
 	 * Used to fill rectangles/blocks.
