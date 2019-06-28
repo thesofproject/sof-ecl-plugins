@@ -37,6 +37,9 @@ public class BinEnumTupleTokenId extends BinItem {
 
 	// TODO: move token ids to separate plug-in queried by vendor id
 
+	/**
+	 * @formatter:off
+	 */
 	public enum TupleTokenId {
 		BUF_SIZE(100),
 		BUF_CAPS(101),
@@ -126,6 +129,11 @@ public class BinEnumTupleTokenId extends BinItem {
 	@Override
 	public Object getValue() {
 		return value;
+	}
+
+	@Override
+	public Object getRawValue() {
+		return value.val;
 	}
 
 	@Override

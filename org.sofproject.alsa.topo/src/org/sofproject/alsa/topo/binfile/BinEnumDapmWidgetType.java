@@ -35,6 +35,9 @@ import org.sofproject.core.binfile.BinItem;
 
 public class BinEnumDapmWidgetType extends BinItem {
 
+	/**
+	 * @formatter:off
+	 */
 	public enum Type {
 		DAPM_INPUT(0),
 		DAPM_OUTPUT(1),
@@ -96,6 +99,11 @@ public class BinEnumDapmWidgetType extends BinItem {
 	@Override
 	public Object getValue() {
 		return value;
+	}
+
+	@Override
+	public Object getRawValue() {
+		return value.val;
 	}
 
 	@Override

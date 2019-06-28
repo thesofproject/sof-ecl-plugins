@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,59 +27,53 @@
  *
  */
 
-package org.sofproject.core.binfile;
+package org.sofproject.alsa.topo.model;
 
-import java.nio.ByteBuffer;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public class BinByteArray extends BinItem {
+import org.sofproject.alsa.topo.conf.ConfElement;
 
-	private byte[] value;
-	BinInteger dynSize;
-	int sizeAdjustment = 0;
+/**
+ * TODO: remove dummy ConfElement assigned as there is no real conf item below,
+ * once another abstraction level is introduced.
+ *
+ * @param <T>
+ */
+public class AlsaTopoNodeCollection<T extends AlsaTopoNode> extends AlsaTopoNode {
 
-	public BinByteArray(String name, int length) {
-		super(name);
-		this.value = new byte[length];
-	}
+	private String name;
+	private Map<String, T> elements = new LinkedHashMap<>();
 
-	public BinByteArray(String name, BinInteger size) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-	}
-
-	public BinByteArray(String name, BinInteger size, int sizeAdjustment) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-		this.sizeAdjustment = sizeAdjustment;
+	public AlsaTopoNodeCollection(String name) {
+		super(new ConfElement(name, null));
+		this.name = name;
 	}
 
 	@Override
-	public BinItem read(ByteBuffer bb) {
-		super.read(bb);
-		if (value == null) {
-			int size = dynSize.getValue();
-			size += sizeAdjustment;
-			value = new byte[size];
-		}
-		bb.get(value);
-		return this;
+	public String getName() {
+		return name;
+	}
+
+	public void add(T element) {
+		elements.put(element.getName(), element);
+	}
+
+	public T get(String name) {
+		return elements.get(name);
+	}
+
+	public Collection<T> getElements() {
+		return elements.values();
+	}
+
+	public int size() {
+		return elements.size();
 	}
 
 	@Override
-	public String getValueString() {
-		StringBuffer s = new StringBuffer("[ ");
-		for (byte b : value) {
-			s.append(String.format("%02x " , b));
-		}
-		s.append("]");
-		return s.toString();
+	public String toString() {
+		return name;
 	}
-
-	@Override
-	public Object getValue() {
-		return value;
-	}
-
 }

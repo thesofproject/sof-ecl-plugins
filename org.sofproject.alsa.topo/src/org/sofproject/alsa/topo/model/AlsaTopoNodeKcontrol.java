@@ -29,13 +29,19 @@
 
 package org.sofproject.alsa.topo.model;
 
-import org.sofproject.core.binfile.BinStruct;
+import org.sofproject.alsa.topo.conf.ConfControlBytes;
+import org.sofproject.alsa.topo.conf.ConfControlMixer;
 
 public class AlsaTopoNodeKcontrol extends AlsaTopoNode {
 
-	public AlsaTopoNodeKcontrol(String name, BinStruct binItem) {
-		super(name, binItem);
-		// TODO Auto-generated constructor stub
+	public AlsaTopoNodeKcontrol(ConfControlMixer mixer) {
+		super(mixer);
+		setTypeName("kcontrol : mixer");
+	}
+
+	public AlsaTopoNodeKcontrol(ConfControlBytes bytes) {
+		super(bytes);
+		setTypeName("kcontrol : bytes");
 	}
 
 }

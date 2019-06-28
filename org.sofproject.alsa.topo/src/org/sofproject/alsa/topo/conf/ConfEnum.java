@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,54 +27,32 @@
  *
  */
 
-package org.sofproject.core.binfile;
+package org.sofproject.alsa.topo.conf;
 
-import java.nio.ByteBuffer;
+import java.util.Collection;
 
-public class BinByteArray extends BinItem {
+public abstract class ConfEnum extends ConfAttribute {
 
-	private byte[] value;
-	BinInteger dynSize;
-	int sizeAdjustment = 0;
+	private static final String TYPE_NAME = "enum";
 
-	public BinByteArray(String name, int length) {
-		super(name);
-		this.value = new byte[length];
+	private String value;
+
+	public ConfEnum(String name) {
+		super(TYPE_NAME, name);
 	}
 
-	public BinByteArray(String name, BinInteger size) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
+	public abstract Collection<String> getValueSet();
+
+	public abstract void setIntValue(int value);
+
+	public void setStringValue(String value) {
+		if (value != null && !isValid(value))
+			throw new RuntimeException("Invalid value " + value + " for " + getName()); // TODO: custom exception
+		this.value = value;
 	}
 
-	public BinByteArray(String name, BinInteger size, int sizeAdjustment) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-		this.sizeAdjustment = sizeAdjustment;
-	}
-
-	@Override
-	public BinItem read(ByteBuffer bb) {
-		super.read(bb);
-		if (value == null) {
-			int size = dynSize.getValue();
-			size += sizeAdjustment;
-			value = new byte[size];
-		}
-		bb.get(value);
-		return this;
-	}
-
-	@Override
-	public String getValueString() {
-		StringBuffer s = new StringBuffer("[ ");
-		for (byte b : value) {
-			s.append(String.format("%02x " , b));
-		}
-		s.append("]");
-		return s.toString();
+	public boolean isValid(String value) {
+		return getValueSet().contains(value);
 	}
 
 	@Override
@@ -82,4 +60,15 @@ public class BinByteArray extends BinItem {
 		return value;
 	}
 
+	@Override
+	public void setValue(Object value) {
+		if (value instanceof Integer)
+			setIntValue((Integer) value);
+		else if (value instanceof Short)
+			setIntValue((Short) value);
+		else if (value instanceof Byte)
+			setIntValue((Byte) value);
+		else
+			throw new RuntimeException("Expected Integer value for " + getName() + ", got " + value.getClass());
+	}
 }

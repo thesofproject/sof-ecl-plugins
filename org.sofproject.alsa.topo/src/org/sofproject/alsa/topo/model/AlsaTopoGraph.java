@@ -30,17 +30,31 @@
 package org.sofproject.alsa.topo.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.sofproject.alsa.topo.binfile.BinBlock;
+import org.sofproject.alsa.topo.binfile.BinEnumBlockType;
 import org.sofproject.alsa.topo.binfile.BinStructDapmGraph;
 import org.sofproject.alsa.topo.binfile.BinStructDapmWidget;
+import org.sofproject.alsa.topo.binfile.BinStructHdr;
 import org.sofproject.alsa.topo.binfile.BinStructLinkConfig;
 import org.sofproject.alsa.topo.binfile.BinStructPcm;
+import org.sofproject.alsa.topo.conf.ConfBackEnd;
+import org.sofproject.alsa.topo.conf.ConfControlBytes;
+import org.sofproject.alsa.topo.conf.ConfControlMixer;
+import org.sofproject.alsa.topo.conf.ConfData;
+import org.sofproject.alsa.topo.conf.ConfGraph;
+import org.sofproject.alsa.topo.conf.ConfHwConfig;
+import org.sofproject.alsa.topo.conf.ConfPcm;
+import org.sofproject.alsa.topo.conf.ConfPcmCapabilities;
+import org.sofproject.alsa.topo.conf.ConfTlvDbScale;
+import org.sofproject.alsa.topo.conf.ConfTopology;
+import org.sofproject.alsa.topo.conf.ConfVendorTokens;
+import org.sofproject.alsa.topo.conf.ConfVendorTuples;
+import org.sofproject.alsa.topo.conf.ConfWidget;
 import org.sofproject.alsa.topo.model.AlsaTopoConnection.Type;
-import org.sofproject.core.binfile.BinContainer;
 import org.sofproject.core.binfile.BinFile;
 import org.sofproject.core.binfile.BinItem;
 
@@ -50,22 +64,60 @@ import org.sofproject.core.binfile.BinItem;
 public class AlsaTopoGraph extends AlsaTopoItem {
 
 	private List<AlsaTopoItem> childElements = new ArrayList<>();
-	private List<AlsaTopoNodePcm> pcmList = new ArrayList<>();
-	private Map<String, AlsaTopoNodePcm> pcmIndex = new HashMap<>();
-	private Map<String, AlsaTopoNodeWidget> widgetIndex = new HashMap<>();
-	private Map<String, AlsaTopoNodeBe> beIndex = new HashMap<>();
+	private AlsaTopoNodeCollection<AlsaTopoNodePcm> pcms = new AlsaTopoNodeCollection<>("PCMs");
+	private AlsaTopoNodeCollection<AlsaTopoNode> pcmCapsIndex = new AlsaTopoNodeCollection<>("PCM Capabilities");
+	private AlsaTopoNodeCollection<AlsaTopoNodeWidget> widgetIndex = new AlsaTopoNodeCollection<>("Widgets");
+	private AlsaTopoNodeCollection<AlsaTopoNodeBe> beIndex = new AlsaTopoNodeCollection<>("BackEnds");
+	private AlsaTopoNodeCollection<AlsaTopoNodeHwConfig> hwConfigs = new AlsaTopoNodeCollection<>("HW Configurations");
+	private AlsaTopoNodeCollection<AlsaTopoNodeTlv> tlvs = new AlsaTopoNodeCollection<>("TLVs");
+	private AlsaTopoNodeCollection<AlsaTopoNode> dataIndex = new AlsaTopoNodeCollection<>("Data");
+	private AlsaTopoNodeCollection<AlsaTopoNodeKcontrol> controlMixers = new AlsaTopoNodeCollection<>("Control Mixers");
+	private AlsaTopoNodeCollection<AlsaTopoNodeKcontrol> controlBytes = new AlsaTopoNodeCollection<>("Control Bytes");
+	private AlsaTopoNodeCollection<AlsaTopoNodeVendorTokens> vTokensIndex = new AlsaTopoNodeCollection<>(
+			"Vendor Tokens");
+	private AlsaTopoNodeCollection<AlsaTopoNodeVendorTuples> vTuplesIndex = new AlsaTopoNodeCollection<>(
+			"Vendor Tuples");
+
+	// some collections to hide never-connected nodes from the top level
+	private AlsaTopoNodeCollection<AlsaTopoNodeWidget> inputWidgets = new AlsaTopoNodeCollection<>("input Widgets");
+	private AlsaTopoNodeCollection<AlsaTopoNodeWidget> outputWidgets = new AlsaTopoNodeCollection<>("output Widgets");
+	private AlsaTopoNodeCollection<AlsaTopoNodeWidget> outDrvWidgets = new AlsaTopoNodeCollection<>("out_drv Widgets");
+
+	// graph collection to show the structure in the outline
+	private AlsaTopoNodeCollection<AlsaTopoNode> pipelines = new AlsaTopoNodeCollection<>("Pipelines");
 
 	private BinFile binTplg;
 
+	private ConfTopology confTplg;
+
 	public AlsaTopoGraph() {
 		super("Graph");
+
+		// collections represented as 'collection' nodes added
+		childElements.add(vTokensIndex);
+		childElements.add(vTuplesIndex);
+		childElements.add(hwConfigs);
+		childElements.add(tlvs);
+		childElements.add(inputWidgets);
+		childElements.add(outputWidgets);
+		childElements.add(outDrvWidgets);
 	}
 
+	/**
+	 * Topology read from a binary '.tplg' file is assigned and translated to the
+	 * '.conf' topology model.
+	 *
+	 * @param binTplg
+	 */
 	public void setBinTopology(BinFile binTplg) {
 		this.binTplg = binTplg;
 		// TODO: resetting topo, remove all existing content
 
+		confTplg = new ConfTopology(binTplg.getName());
 		populateGraph(binTplg.getChildItems());
+		createVendorNodes();
+		createTlvNodes();
+		createDataNodes();
 		connectOthers();
 	}
 
@@ -73,54 +125,138 @@ public class AlsaTopoGraph extends AlsaTopoItem {
 		return binTplg;
 	}
 
+	public ConfTopology getConfTopology() {
+		return confTplg;
+	}
+
 	private void populateGraph(Collection<BinItem> items) {
 		for (BinItem item : items) {
-			if (item instanceof BinStructDapmWidget) {
-				addWidgetNode(new AlsaTopoNodeWidget((BinStructDapmWidget) item));
-			} else if (item instanceof BinStructPcm) {
-				addPcmNode(new AlsaTopoNodePcm((BinStructPcm) item));
-			} else if (item instanceof BinStructLinkConfig) {
-				addBeNode(new AlsaTopoNodeBe((BinStructLinkConfig) item));
-			} else if (item instanceof BinStructDapmGraph) {
-				BinStructDapmGraph dapmGraph = (BinStructDapmGraph) item;
-				AlsaTopoNode srcNode = (AlsaTopoNode) findChild((String) dapmGraph.getChildValue("source"));
-				AlsaTopoNode tgtNode = (AlsaTopoNode) findChild((String) dapmGraph.getChildValue("sink"));
-				if (srcNode != null && tgtNode != null) {
-					addChildElement(new AlsaTopoConnection(Type.DAPM_PATH, srcNode, tgtNode));
-				} else {
-//					throw new RuntimeException("Graph connection not found");
+			if (item instanceof BinBlock) {
+				BinBlock block = (BinBlock) item;
+				BinStructHdr hdr = (BinStructHdr) block.getChildItem("hdr");
+				switch ((BinEnumBlockType.Type) hdr.getChildValue("type")) {
+				case DAPM_WIDGET:
+					createWidgets(block.getChildItems(), (Integer) hdr.getChildValue("index"));
+					break;
+				case PCM:
+					createPcms(block.getChildItems());
+					break;
+				case BACKEND_LINK:
+					createBackEnds(block.getChildItems());
+					break;
+				case DAPM_GRAPH:
+					createConnections(block.getChildItems(), (Integer) hdr.getChildValue("index"));
+					break;
+				default:
+					System.out.println("warn: unprocessed block " + hdr.getChildValue("type"));
+					break;
 				}
-			} else if (item instanceof BinContainer) {
-				populateGraph(((BinContainer) item).getChildItems());
+			}
+		}
+
+		// now query the graphs
+		for (ConfGraph graph : confTplg.getGraphs()) {
+			pipelines.add(new AlsaTopoNode(graph));
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void createWidgets(Collection<BinItem> items, int blockIndex) {
+		for (BinItem item : items) {
+			if (item instanceof BinStructDapmWidget) {
+				BinStructDapmWidget binWidget = (BinStructDapmWidget) item;
+				ConfWidget confWidget = AlsaTopoBin2Conf.createConfWidget(confTplg, binWidget, blockIndex);
+				AlsaTopoNodeWidget node = new AlsaTopoNodeWidget(confWidget);
+				widgetIndex.add(node);
+				switch (node.getTypeName()) {
+				case "input":
+					inputWidgets.add(node);
+					break;
+				case "output":
+					outputWidgets.add(node);
+					break;
+				case "out_drv":
+					outDrvWidgets.add(node);
+					break;
+				default:
+					childElements.add(node);
+					break;
+				}
+				for (ConfControlMixer mixer : (Collection<ConfControlMixer>) confWidget.getAttributeValue("mixer")) {
+					AlsaTopoNodeKcontrol mixerNode = new AlsaTopoNodeKcontrol(mixer);
+					childElements.add(mixerNode);
+					controlMixers.add(mixerNode);
+					childElements.add(new AlsaTopoConnection(Type.CONTROL_PATH, mixerNode, node));
+				}
+				for (ConfControlBytes bytes : (Collection<ConfControlBytes>) confWidget.getAttributeValue("bytes")) {
+					AlsaTopoNodeKcontrol bytesNode = new AlsaTopoNodeKcontrol(bytes);
+					childElements.add(bytesNode);
+					controlBytes.add(bytesNode);
+					childElements.add(new AlsaTopoConnection(Type.CONTROL_PATH, bytesNode, node));
+				}
 			}
 		}
 	}
 
-	public void addPcmNode(AlsaTopoNodePcm pcmNode) {
-		// Map instance to each active capability name
-		for (String capName : pcmNode.getAllCapNames()) {
-			pcmIndex.put(capName, pcmNode);
+	private void createPcms(Collection<BinItem> items) {
+		for (BinItem item : items) {
+			if (item instanceof BinStructPcm) {
+				BinStructPcm binPcm = (BinStructPcm) item;
+				ConfPcm confPcm = AlsaTopoBin2Conf.createConfPcm(confTplg, binPcm);
+				AlsaTopoNodePcm node = new AlsaTopoNodePcm(confPcm);
+				childElements.add(node);
+				pcms.add(node);
+
+				// create a node for each supported capability and create connections
+				ConfPcmCapabilities playbackCaps = confPcm.getPlaybackCaps();
+				if (playbackCaps != null) {
+					AlsaTopoNode pcNode = new AlsaTopoNode(playbackCaps);
+					childElements.add(pcNode);
+					pcmCapsIndex.add(pcNode);
+					childElements.add(new AlsaTopoConnection(Type.STREAM_PATH, node, pcNode));
+				}
+				ConfPcmCapabilities captureCaps = confPcm.getCaptureCaps();
+				if (captureCaps != null) {
+					AlsaTopoNode ccNode = new AlsaTopoNode(captureCaps);
+					childElements.add(ccNode);
+					pcmCapsIndex.add(ccNode);
+					childElements.add(new AlsaTopoConnection(Type.STREAM_PATH, ccNode, node));
+				}
+			}
 		}
-		pcmList.add(pcmNode);
-		addChildElement(pcmNode);
 	}
 
-	public void addWidgetNode(AlsaTopoNodeWidget widgetNode) {
-		widgetIndex.put(widgetNode.getName(), widgetNode);
-		addChildElement(widgetNode);
+	@SuppressWarnings("unchecked")
+	private void createBackEnds(Collection<BinItem> items) {
+		int index = 0;
+		for (BinItem item : items) {
+			if (item instanceof BinStructLinkConfig) {
+				BinStructLinkConfig binLinkConfig = (BinStructLinkConfig) item;
+				ConfBackEnd confBe = AlsaTopoBin2Conf.createConfBackEnd(confTplg, binLinkConfig, index++);
+				AlsaTopoNodeBe node = new AlsaTopoNodeBe(confBe);
+				beIndex.add(node);
+				childElements.add(node);
+
+				for (ConfHwConfig hwConfig : (Collection<ConfHwConfig>) confBe.getAttributeValue("hw_configs")) {
+					AlsaTopoNodeHwConfig hwConfigNode = new AlsaTopoNodeHwConfig(hwConfig);
+					hwConfigs.add(hwConfigNode);
+				}
+			}
+		}
 	}
 
-	public void addBeNode(AlsaTopoNodeBe beNode) {
-		beIndex.put(beNode.getName(), beNode);
-		addChildElement(beNode);
-	}
-
-	public void addChildElement(AlsaTopoItem node) {
-		childElements.add(node);
-	}
-
-	public void addChildElement(AlsaTopoItem node, int idx) {
-		childElements.add(idx, node);
+	private void createConnections(Collection<BinItem> items, int blockIndex) {
+		for (BinItem item : items) {
+			if (item instanceof BinStructDapmGraph) {
+				BinStructDapmGraph binGraph = (BinStructDapmGraph) item;
+				AlsaTopoBin2Conf.createLine(confTplg, binGraph, blockIndex);
+				AlsaTopoNode srcNode = widgetIndex.get((String) binGraph.getChildValue("source"));
+				AlsaTopoNode tgtNode = widgetIndex.get((String) binGraph.getChildValue("sink"));
+				if (srcNode != null && tgtNode != null) {
+					childElements.add(new AlsaTopoConnection(Type.DAPM_PATH, srcNode, tgtNode));
+				}
+			}
+		}
 	}
 
 	public List<AlsaTopoItem> getChildElements() {
@@ -131,22 +267,45 @@ public class AlsaTopoGraph extends AlsaTopoItem {
 		childElements.remove(node);
 	}
 
-	public AlsaTopoItem findChild(String name) {
-		AlsaTopoItem item = widgetIndex.get(name);
-		if (item != null)
-			return item;
-		return pcmIndex.get(name);
+	public Collection<AlsaTopoNodeCollection<?>> getSections() {
+		return Arrays.asList(vTokensIndex, vTuplesIndex, tlvs, dataIndex, controlMixers, controlBytes, pcms,
+				pcmCapsIndex, beIndex, hwConfigs, pipelines);
+	}
+
+	private void createVendorNodes() {
+		// vendor tokens
+		for (ConfVendorTokens vendorTokens : confTplg.getVendorTokens()) {
+			vTokensIndex.add(new AlsaTopoNodeVendorTokens(vendorTokens));
+		}
+
+		// vendor tuples
+		for (ConfVendorTuples vendorTuples : confTplg.getVendorTuples()) {
+			vTuplesIndex.add(new AlsaTopoNodeVendorTuples(vendorTuples));
+		}
+	}
+
+	private void createTlvNodes() {
+		for (ConfTlvDbScale tlv : confTplg.getTlvs()) {
+			AlsaTopoNodeTlv tlvNode = new AlsaTopoNodeTlv(tlv);
+			tlvs.add(tlvNode);
+		}
+	}
+
+	private void createDataNodes() {
+		for (ConfData d : confTplg.getData()) {
+			dataIndex.add(new AlsaTopoNode(d));
+		}
 	}
 
 	private void connectOthers() {
-		for (AlsaTopoNodeWidget widget : widgetIndex.values()) {
+		for (AlsaTopoNodeWidget widget : widgetIndex.getElements()) {
 			if (widget.getTypeName().equals("dai_in") || widget.getTypeName().equals("dai_out")) {
 				AlsaTopoNodeBe be = beIndex.get(widget.getSname());
 				if (be != null) {
 					if (widget.getTypeName().equals("dai_in")) {
-						addChildElement(new AlsaTopoConnection(Type.STREAM_PATH, widget, be));
+						childElements.add(new AlsaTopoConnection(Type.STREAM_PATH, widget, be));
 					} else {
-						addChildElement(new AlsaTopoConnection(Type.STREAM_PATH, be, widget));
+						childElements.add(new AlsaTopoConnection(Type.STREAM_PATH, be, widget));
 					}
 				}
 			} else if (widget.getTypeName().equals("aif_in") || widget.getTypeName().equals("aif_out")) {
@@ -155,18 +314,21 @@ public class AlsaTopoGraph extends AlsaTopoItem {
 				 * graph definition. Should avoid adding double one for old versions? Does not
 				 * hurt atm
 				 */
-				AlsaTopoNodePcm pcm = pcmIndex.get(widget.getSname());
-				if (pcm != null) {
+				AlsaTopoNode pcmCaps = pcmCapsIndex.get(widget.getSname());
+				if (pcmCaps != null) {
 					if (widget.getTypeName().equals("aif_in")) {
-						addChildElement(new AlsaTopoConnection(Type.STREAM_PATH, pcm, widget));
+						childElements.add(new AlsaTopoConnection(Type.STREAM_PATH, pcmCaps, widget));
 					} else {
-						addChildElement(new AlsaTopoConnection(Type.STREAM_PATH, widget, pcm));
+						childElements.add(new AlsaTopoConnection(Type.STREAM_PATH, widget, pcmCaps));
 					}
 				}
 			} else if (widget.getTypeName().equals("scheduler")) {
-				AlsaTopoNode node = (AlsaTopoNode) findChild(widget.getSname());
-				addChildElement(new AlsaTopoConnection(Type.CONTROL_PATH, widget, node));
+				AlsaTopoNode node = widgetIndex.get(widget.getSname());
+				if (node != null) { // some tplg-s declare schedulers with no stream name set
+					childElements.add(new AlsaTopoConnection(Type.CONTROL_PATH, widget, node));
+				}
 			}
 		}
 	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,59 +27,41 @@
  *
  */
 
-package org.sofproject.core.binfile;
+package org.sofproject.alsa.topo.conf;
 
-import java.nio.ByteBuffer;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-public class BinByteArray extends BinItem {
+public class ConfOpsInfo extends ConfEnum {
 
-	private byte[] value;
-	BinInteger dynSize;
-	int sizeAdjustment = 0;
+	private static final Map<Integer, String> BIN_VALUE_MAP = new HashMap<Integer, String>() {
+		private static final long serialVersionUID = 1L;
 
-	public BinByteArray(String name, int length) {
-		super(name);
-		this.value = new byte[length];
-	}
-
-	public BinByteArray(String name, BinInteger size) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-	}
-
-	public BinByteArray(String name, BinInteger size, int sizeAdjustment) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-		this.sizeAdjustment = sizeAdjustment;
-	}
-
-	@Override
-	public BinItem read(ByteBuffer bb) {
-		super.read(bb);
-		if (value == null) {
-			int size = dynSize.getValue();
-			size += sizeAdjustment;
-			value = new byte[size];
+		{
+			put(1, "volsw");
+			put(2, "volsw_sx");
+			put(3, "volsw_xr_sx");
+			put(4, "enum");
+			put(5, "bytes");
+			put(6, "enum_value");
+			put(7, "range");
+			put(8, "strobe");
 		}
-		bb.get(value);
-		return this;
+	};
+
+	public ConfOpsInfo(String name) {
+		super(name);
 	}
 
 	@Override
-	public String getValueString() {
-		StringBuffer s = new StringBuffer("[ ");
-		for (byte b : value) {
-			s.append(String.format("%02x " , b));
-		}
-		s.append("]");
-		return s.toString();
+	public Collection<String> getValueSet() {
+		return BIN_VALUE_MAP.values();
 	}
 
 	@Override
-	public Object getValue() {
-		return value;
+	public void setIntValue(int value) {
+		setStringValue(BIN_VALUE_MAP.get(value));
 	}
 
 }

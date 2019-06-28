@@ -1,5 +1,7 @@
+package org.sofproject.alsa.topo.conf;
+
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,59 +29,43 @@
  *
  */
 
-package org.sofproject.core.binfile;
+public class ConfBytes extends ConfAttribute {
 
-import java.nio.ByteBuffer;
-
-public class BinByteArray extends BinItem {
+	private static final String TYPE_NAME = "bytes";
 
 	private byte[] value;
-	BinInteger dynSize;
-	int sizeAdjustment = 0;
 
-	public BinByteArray(String name, int length) {
-		super(name);
-		this.value = new byte[length];
-	}
-
-	public BinByteArray(String name, BinInteger size) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-	}
-
-	public BinByteArray(String name, BinInteger size, int sizeAdjustment) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-		this.sizeAdjustment = sizeAdjustment;
+	public ConfBytes(String name) {
+		super(TYPE_NAME, name);
 	}
 
 	@Override
-	public BinItem read(ByteBuffer bb) {
-		super.read(bb);
-		if (value == null) {
-			int size = dynSize.getValue();
-			size += sizeAdjustment;
-			value = new byte[size];
-		}
-		bb.get(value);
-		return this;
-	}
-
-	@Override
-	public String getValueString() {
-		StringBuffer s = new StringBuffer("[ ");
-		for (byte b : value) {
-			s.append(String.format("%02x " , b));
-		}
-		s.append("]");
-		return s.toString();
+	public void setValue(Object value) {
+		if (value instanceof byte[])
+			this.value = (byte[]) value;
+		else
+			throw new RuntimeException("Expected byte[] value for " + getName() + ", got " + value.getClass());
 	}
 
 	@Override
 	public Object getValue() {
 		return value;
+	}
+
+	@Override
+	public String getStringValue() {
+		StringBuilder sb = new StringBuilder();
+		int i = 0;
+		for (byte b : value) {
+			sb.append(String.format("%02x", b));
+			if (i++ == 8) {
+				sb.append("...");
+				break;
+			} else {
+				sb.append(' ');
+			}
+		}
+		return sb.toString();
 	}
 
 }

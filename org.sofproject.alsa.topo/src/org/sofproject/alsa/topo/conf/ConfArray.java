@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,59 +27,54 @@
  *
  */
 
-package org.sofproject.core.binfile;
+package org.sofproject.alsa.topo.conf;
 
-import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-public class BinByteArray extends BinItem {
+public class ConfArray<T extends ConfItem> extends ConfAttribute {
 
-	private byte[] value;
-	BinInteger dynSize;
-	int sizeAdjustment = 0;
+	private static final String TYPE_NAME = "array";
 
-	public BinByteArray(String name, int length) {
-		super(name);
-		this.value = new byte[length];
-	}
+	private List<T> value = new ArrayList<>();
 
-	public BinByteArray(String name, BinInteger size) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-	}
-
-	public BinByteArray(String name, BinInteger size, int sizeAdjustment) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-		this.sizeAdjustment = sizeAdjustment;
+	public ConfArray(String name) {
+		super(TYPE_NAME, name);
 	}
 
 	@Override
-	public BinItem read(ByteBuffer bb) {
-		super.read(bb);
-		if (value == null) {
-			int size = dynSize.getValue();
-			size += sizeAdjustment;
-			value = new byte[size];
-		}
-		bb.get(value);
-		return this;
-	}
+	public void setValue(Object value) {
+		// TODO Auto-generated method stub
 
-	@Override
-	public String getValueString() {
-		StringBuffer s = new StringBuffer("[ ");
-		for (byte b : value) {
-			s.append(String.format("%02x " , b));
-		}
-		s.append("]");
-		return s.toString();
 	}
 
 	@Override
 	public Object getValue() {
 		return value;
+	}
+
+	@Override
+	public boolean hasChildren() {
+		return !value.isEmpty();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Collection<ConfItem> getChildren() {
+		return (Collection<ConfItem>) value;
+	}
+
+	public void add(T item) {
+		value.add(item);
+	}
+
+	public void remove(T item) {
+		value.remove(item);
+	}
+
+	public int size() {
+		return value.size();
 	}
 
 }

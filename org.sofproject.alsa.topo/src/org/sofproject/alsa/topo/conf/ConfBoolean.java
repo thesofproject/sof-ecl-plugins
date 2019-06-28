@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,59 +27,42 @@
  *
  */
 
-package org.sofproject.core.binfile;
+package org.sofproject.alsa.topo.conf;
 
-import java.nio.ByteBuffer;
+public class ConfBoolean extends ConfAttribute {
 
-public class BinByteArray extends BinItem {
+	private static final String TYPE_NAME = "boolean";
 
-	private byte[] value;
-	BinInteger dynSize;
-	int sizeAdjustment = 0;
+	private boolean value = false;
 
-	public BinByteArray(String name, int length) {
-		super(name);
-		this.value = new byte[length];
+	public ConfBoolean(String name) {
+		super(TYPE_NAME, name);
 	}
 
-	public BinByteArray(String name, BinInteger size) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-	}
-
-	public BinByteArray(String name, BinInteger size, int sizeAdjustment) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-		this.sizeAdjustment = sizeAdjustment;
-	}
-
-	@Override
-	public BinItem read(ByteBuffer bb) {
-		super.read(bb);
-		if (value == null) {
-			int size = dynSize.getValue();
-			size += sizeAdjustment;
-			value = new byte[size];
-		}
-		bb.get(value);
-		return this;
-	}
-
-	@Override
-	public String getValueString() {
-		StringBuffer s = new StringBuffer("[ ");
-		for (byte b : value) {
-			s.append(String.format("%02x " , b));
-		}
-		s.append("]");
-		return s.toString();
+	public void setBooleanValue(boolean value) {
+		this.value = value;
 	}
 
 	@Override
 	public Object getValue() {
 		return value;
+	}
+
+	@Override
+	public void setValue(Object value) {
+		if (value instanceof Boolean)
+			setBooleanValue((Boolean) value);
+		else if (value instanceof Integer)
+			setBooleanValue(((Integer) value) == 0 ? false : true);
+		else if (value instanceof Byte)
+			setBooleanValue(((Byte) value) == 0 ? false : true);
+		else
+			throw new RuntimeException("Boolean value expected for " + getName() + ", got " + value.getClass());
+	}
+
+	@Override
+	public String getStringValue() {
+		return value ? "true" : "false";
 	}
 
 }

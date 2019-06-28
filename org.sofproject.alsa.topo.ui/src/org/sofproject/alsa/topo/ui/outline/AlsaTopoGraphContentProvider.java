@@ -30,24 +30,34 @@
 package org.sofproject.alsa.topo.ui.outline;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.sofproject.alsa.topo.conf.ConfItem;
 import org.sofproject.alsa.topo.model.AlsaTopoGraph;
+import org.sofproject.alsa.topo.model.AlsaTopoNode;
+import org.sofproject.alsa.topo.model.AlsaTopoNodeCollection;
 
 public class AlsaTopoGraphContentProvider implements ITreeContentProvider {
-
-	// TODO: should rather display content of the editor, bare binary structure
-	// should be in another view.
 
 	@Override
 	public Object[] getElements(Object inputElement) {
 		if (inputElement instanceof AlsaTopoGraph) {
 			AlsaTopoGraph topo = (AlsaTopoGraph) inputElement;
-			return topo.getChildElements().toArray();
+			return topo.getSections().toArray();
 		}
 		return null;
 	}
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
+		if (parentElement instanceof AlsaTopoNodeCollection<?>) {
+			AlsaTopoNodeCollection<?> col = (AlsaTopoNodeCollection<?>) parentElement;
+			return col.getElements().toArray();
+		} else if (parentElement instanceof AlsaTopoNode) {
+			AlsaTopoNode node = (AlsaTopoNode) parentElement;
+			return node.getConfItems().toArray();
+		} else if (parentElement instanceof ConfItem) {
+			ConfItem item = (ConfItem) parentElement;
+			return item.getChildren().toArray();
+		}
 		return null;
 	}
 
@@ -59,6 +69,13 @@ public class AlsaTopoGraphContentProvider implements ITreeContentProvider {
 
 	@Override
 	public boolean hasChildren(Object element) {
+		if (element instanceof AlsaTopoNodeCollection<?>) {
+			return !((AlsaTopoNodeCollection<?>) element).getElements().isEmpty();
+		} else if (element instanceof AlsaTopoNode) {
+			return !((AlsaTopoNode) element).getConfItems().isEmpty();
+		} else if (element instanceof ConfItem) {
+			return ((ConfItem) element).hasChildren();
+		}
 		return false;
 	}
 }

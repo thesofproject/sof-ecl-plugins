@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,59 +27,30 @@
  *
  */
 
-package org.sofproject.core.binfile;
+package org.sofproject.alsa.topo.conf;
 
-import java.nio.ByteBuffer;
+public class ConfPcmRates extends ConfBitSet {
 
-public class BinByteArray extends BinItem {
+	public static final String[][] BIT_NAMES = {
+		{ "SND_PCM_RATE_5512", "5512" },
+		{ "SND_PCM_RATE_8000", "8K" },
+		{ "SND_PCM_RATE_11025", "11.025K" },
+		{ "SND_PCM_RATE_16000", "16K" },
+		{ "SND_PCM_RATE_22050", "22.05K" },
+		{ "SND_PCM_RATE_32000", "32K" },
+		{ "SND_PCM_RATE_44100", "44.1K" },
+		{ "SND_PCM_RATE_48000", "48K" },
+		{ "SND_PCM_RATE_64000", "64K" },
+		{ "SND_PCM_RATE_88200", "88.2K" },
+		{ "SND_PCM_RATE_96000", "96K" },
+		{ "SND_PCM_RATE_176400", "176.4K" },
+		{ "SND_PCM_RATE_192000", "192K" },
+		{ "SND_PCM_RATE_CONTINUOUS", "Continuous" },
+		{ "SND_PCM_RATE_KNOT", "Knot" }
+	};
 
-	private byte[] value;
-	BinInteger dynSize;
-	int sizeAdjustment = 0;
-
-	public BinByteArray(String name, int length) {
-		super(name);
-		this.value = new byte[length];
-	}
-
-	public BinByteArray(String name, BinInteger size) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-	}
-
-	public BinByteArray(String name, BinInteger size, int sizeAdjustment) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-		this.sizeAdjustment = sizeAdjustment;
-	}
-
-	@Override
-	public BinItem read(ByteBuffer bb) {
-		super.read(bb);
-		if (value == null) {
-			int size = dynSize.getValue();
-			size += sizeAdjustment;
-			value = new byte[size];
-		}
-		bb.get(value);
-		return this;
-	}
-
-	@Override
-	public String getValueString() {
-		StringBuffer s = new StringBuffer("[ ");
-		for (byte b : value) {
-			s.append(String.format("%02x " , b));
-		}
-		s.append("]");
-		return s.toString();
-	}
-
-	@Override
-	public Object getValue() {
-		return value;
+	public ConfPcmRates(String name) {
+		super(name, BIT_NAMES);
 	}
 
 }

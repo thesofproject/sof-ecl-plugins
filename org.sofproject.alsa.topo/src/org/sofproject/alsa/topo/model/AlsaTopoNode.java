@@ -29,17 +29,12 @@
 
 package org.sofproject.alsa.topo.model;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.sofproject.alsa.topo.binfile.BinStructTuple;
-import org.sofproject.alsa.topo.binfile.BinStructTupleArray;
-import org.sofproject.core.binfile.BinContainer;
-import org.sofproject.core.binfile.BinItem;
+import org.sofproject.alsa.topo.conf.ConfElement;
+import org.sofproject.alsa.topo.conf.ConfItem;
 import org.sofproject.core.binfile.BinStruct;
 
 /**
@@ -47,82 +42,37 @@ import org.sofproject.core.binfile.BinStruct;
  */
 public class AlsaTopoNode extends AlsaTopoItem {
 
-	private String typeName;
-	private BinStruct binItem;
+	private String typeName = "";
 
-	public static final String AG_GENERAL = "General";
-	public static final String AG_TUPLES = "Vendor Tuples";
-	public static final String AG_STREAM = "Streams";
-
-	protected Map<String, Map<String, Object>> attributes = new LinkedHashMap<>();
+	/**
+	 * Main model element, represented here as associated graph node. If the model
+	 * is being "disassembled" from the binary topology file, it provides also the
+	 * reference to part of the binary file. May give null otherwise.
+	 */
+	private ConfElement confElement;
 
 	private List<AlsaTopoConnection> inConn = new ArrayList<>();
 	private List<AlsaTopoConnection> outConn = new ArrayList<>();
 
-	public AlsaTopoNode(String name, BinStruct binItem) {
-		super(name);
-		this.binItem = binItem;
-
-		addAttributeGroup(AG_GENERAL);
-		addAttributeGroup(AG_TUPLES);
-
-		setAttribute(AG_GENERAL, "name", name);
-		setAttribute(AG_GENERAL, "stream name", binItem.getChildValue("sname"));
-
-		BinContainer priv = (BinContainer) binItem.getChildItem("priv");
-		if (priv != null) {
-			BinItem[] tas = (BinItem[]) priv.getAllChildItems("tuple_array");
-			for (BinItem it : tas) {
-				BinStructTupleArray ta = (BinStructTupleArray) it;
-				String typeName = ta.getChildItem("type").getValueString();
-				typeName = typeName.substring(typeName.lastIndexOf('_') + 1).toLowerCase();
-				for (BinItem c : ta.getChildItems()) {
-					if (c instanceof BinStructTuple) {
-						BinStructTuple t = (BinStructTuple) c;
-						setAttribute(AG_TUPLES, typeName + " : " + t.getChildItem("tkn_id").getValueString(),
-								t.getChildItem("value").getValueString());
-					}
-				}
-			}
-		}
+	/**
+	 * @param confElement Topology file element, already initialized with data from
+	 *                    binItem.
+	 */
+	public AlsaTopoNode(ConfElement confElement) {
+		super(confElement.getName());
+		this.confElement = confElement;
 	}
 
 	public BinStruct getBinStruct() {
-		return binItem;
+		return confElement.getBinSource();
 	}
 
-	public void setAttribute(String group, String name, Object value) {
-		Map<String, Object> ag = attributes.get(group);
-		if (ag == null)
-			throw new InvalidParameterException("Invalid attribute group");
-		ag.put(name, value);
+	public ConfElement getConfElement() {
+		return confElement;
 	}
 
-	protected void setAttributeRange(String group, String name, BinContainer parent, String minFieldName,
-			String maxFieldName) {
-		int min = (Integer) parent.getChildValue(minFieldName);
-		int max = (Integer) parent.getChildValue(maxFieldName);
-		if (min == max) {
-			setAttribute(group, name, String.format("%d", min));
-		} else {
-			setAttribute(group, name, String.format("%d .. %d", min, max));
-		}
-	}
-
-	protected void addAttributeGroup(String group) {
-		attributes.put(group, new LinkedHashMap<String, Object>());
-	}
-
-	public Set<String> getAttributeGroups() {
-		return attributes.keySet();
-	}
-
-	public Set<String> getAttributeNamesFromGroup(String group) {
-		return attributes.get(group).keySet();
-	}
-
-	public Object getAttribute(String group, String name) {
-		return attributes.get(group).get(name);
+	public Collection<ConfItem> getConfItems() {
+		return confElement.getChildren();
 	}
 
 	public void addInConn(AlsaTopoConnection conn) {
@@ -157,8 +107,4 @@ public class AlsaTopoNode extends AlsaTopoItem {
 		outConn.remove(conn);
 	}
 
-	@Override
-	public String toString() {
-		return getName() + " " + getTypeName();
-	}
 }

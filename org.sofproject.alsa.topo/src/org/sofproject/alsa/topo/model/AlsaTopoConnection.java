@@ -41,13 +41,12 @@ public class AlsaTopoConnection extends AlsaTopoItem {
 	private AlsaTopoNode tgt;
 
 	public AlsaTopoConnection(Type type, AlsaTopoNode src, AlsaTopoNode tgt) {
-		super("");
+		super(src.getName() + ".." + tgt.getName());
 		this.type = type;
 		this.src = src;
 		this.tgt = tgt;
 		src.addOutConn(this);
 		tgt.addInConn(this);
-		setName(src.getName() + ".." + tgt.getName());
 	}
 
 	public Type getType() {
@@ -62,8 +61,4 @@ public class AlsaTopoConnection extends AlsaTopoItem {
 		return tgt;
 	}
 
-	@Override
-	public String toString() {
-		return getName();
-	}
 }
