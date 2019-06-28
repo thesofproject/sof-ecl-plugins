@@ -89,4 +89,15 @@ public abstract class BinItem {
 	public abstract Object getValue();
 
 	public abstract String getValueString();
+
+	/**
+	 * Retrieves the value as obtained from the binary, with no translation. For
+	 * example, enums may override this to return integer value, not mapped to enum
+	 * object.
+	 *
+	 * @return Raw value.
+	 */
+	public Object getRawValue() {
+		return getValue();
+	}
 }

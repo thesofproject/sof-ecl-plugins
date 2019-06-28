@@ -38,11 +38,11 @@ public class BinContainer extends BinItem {
 	protected List<BinItem> children = new ArrayList<>();
 
 	int dispSize = -1;
-	
+
 	public BinContainer(String name) {
 		super(name);
 	}
-	
+
 	public void addChildItem(BinItem item) {
 		children.add(item);
 		item.setParent(this);
@@ -52,7 +52,7 @@ public class BinContainer extends BinItem {
 		for (BinItem item : children) {
 			if (item.getName().equals(name))
 				return item;
-		}	
+		}
 		return null;
 	}
 
@@ -64,12 +64,17 @@ public class BinContainer extends BinItem {
 		}
 		return items.toArray(new BinItem[0]);
 	}
-	
+
 	public Object getChildValue(String name) {
 		BinItem item = getChildItem(name);
 		return item != null ? item.getValue() : null;
 	}
-	
+
+	public Object getChildRawValue(String name) {
+		BinItem item = getChildItem(name);
+		return item != null ? item.getRawValue() : null;
+	}
+
 	public BinItem getChildArrayField(String name, int index) {
 		for (BinItem field : children) {
 			if (field.getName().equals(name))
@@ -90,7 +95,7 @@ public class BinContainer extends BinItem {
 		}
 		return this;
 	}
-	
+
 	@Override
 	public Object getValue() {
 		return this;
@@ -99,12 +104,12 @@ public class BinContainer extends BinItem {
 	public void setDispSize(int dispSize) {
 		this.dispSize = dispSize;
 	}
-	
+
 	@Override
 	public String getValueString() {
 		return String.format("[%d]", dispSize != -1 ? dispSize : children.size());
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("Container %s", getName());
