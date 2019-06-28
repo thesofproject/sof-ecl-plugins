@@ -45,6 +45,8 @@ import org.sofproject.ui.graph.SofXyZestGraphLayout;
 
 public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 
+	public static final int UNCONNECTED_PER_ROW = 8;
+
 	class GridPosition {
 		int col;
 		int row;
@@ -59,14 +61,17 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 		}
 	}
 
+	@Override
 	public void applyLayout(LayoutContext context, boolean clean) {
 		if (isGridEmpty()) {
 
 			// create all paths that begins/ends with pcm node, from column 0
 			List<Node> pcmNodes = findPcmNodes(context.getGraph());
 
-			// start from the first row to keep 0 for unconnected widgets atm
-			int y = 1;
+			// layout unconnected nodes ...
+			int y = layoutUnconnected(context) + 1;
+
+			// ... and continue from the next row
 			for (Node pcm : pcmNodes) {
 				addToGrid(pcm, 0, y);
 				GridPosition outMaxPos = traverseOutgoing(pcm, new GridPosition(1, y));
@@ -90,23 +95,31 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 				}
 			}
 
-			// now layout unconnected nodes
-			layoutUnconnected(context);
-
 			gridComplete();
 		}
 		super.applyLayout(context, clean);
 	}
 
 	// move all unconnected widgets to row 0
-	private void layoutUnconnected(LayoutContext context) {
+	/**
+	 * Moves all unconnected widgets to top.
+	 *
+	 * @param context
+	 * @return Number of occupied rows
+	 */
+	private int layoutUnconnected(LayoutContext context) {
+		int row = 0;
 		int col = 1;
 		for (Node n : context.getGraph().getNodes()) {
 			if (n.getIncomingEdges().isEmpty() && n.getOutgoingEdges().isEmpty()) {
-				addToGrid(n, col++, 0);
+				addToGrid(n, col++, row);
+				if (col == UNCONNECTED_PER_ROW + 1) {
+					col = 1;
+					row++;
+				}
 			}
 		}
-
+		return row;
 	}
 
 	private List<Node> findPcmNodes(Graph g) {
@@ -122,12 +135,15 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 
 	private List<Node> findSigGenNodes(Graph g) {
 		List<Node> sigGenNodes = new ArrayList<>();
-		for (Node n : g.getNodes()) {
-			AlsaTopoNode modelItem = AlsaTopoZestGraphBuilder.getModelNode(n);
-			if (modelItem.getTypeName().equals("siggen")) {
-				sigGenNodes.add(n);
-			}
-		}
+
+		// TODO:
+
+//		for (Node n : g.getNodes()) {
+//			AlsaTopoNode modelItem = AlsaTopoZestGraphBuilder.getModelNode(n);
+//			if (modelItem.getTypeName().equals("siggen")) {
+//				sigGenNodes.add(n);
+//			}
+//		}
 		return sigGenNodes;
 	}
 

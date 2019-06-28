@@ -36,9 +36,8 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
-import org.sofproject.alsa.topo.model.AlsaTopoConnection;
+import org.sofproject.alsa.topo.conf.ConfAttribute;
 import org.sofproject.alsa.topo.model.AlsaTopoGraph;
-import org.sofproject.alsa.topo.model.AlsaTopoNode;
 import org.sofproject.alsa.topo.ui.editor.AlsaTopoEditor;
 
 public class AlsaTopoGraphContentOutlinePage extends ContentOutlinePage {
@@ -62,17 +61,14 @@ public class AlsaTopoGraphContentOutlinePage extends ContentOutlinePage {
 
 		@Override
 		public StyledString getStyledText(Object element) {
-			if (element instanceof AlsaTopoNode) {
-				AlsaTopoNode node = (AlsaTopoNode) element;
-				StyledString s = new StyledString(node.getName());
-				s.append(" (" + node.getTypeName() + ")", StyledString.DECORATIONS_STYLER);
+			if (element instanceof ConfAttribute) {
+				ConfAttribute ca = (ConfAttribute) element;
+				StyledString s = new StyledString(ca.getName());
+				s.append(" : " + ca.getStringValue(), StyledString.DECORATIONS_STYLER);
 				return s;
-			} else if (element instanceof AlsaTopoConnection) {
-				AlsaTopoConnection conn = (AlsaTopoConnection) element;
-				return new StyledString(conn.toString(), StyledString.COUNTER_STYLER);
 			}
-			// TODO Auto-generated method stub
-			return new StyledString("?");
+
+			return new StyledString(element.toString());
 		}
 
 	}

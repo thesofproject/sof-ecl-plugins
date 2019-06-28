@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,59 +27,18 @@
  *
  */
 
-package org.sofproject.core.binfile;
+package org.sofproject.alsa.topo.model;
 
-import java.nio.ByteBuffer;
+import org.sofproject.alsa.topo.conf.ConfHwConfig;
 
-public class BinByteArray extends BinItem {
+/**
+ * HW Configuration item. Serialized to the topology definition as
+ * SectionHWConfig.
+ *
+ */
+public class AlsaTopoNodeHwConfig extends AlsaTopoNode {
 
-	private byte[] value;
-	BinInteger dynSize;
-	int sizeAdjustment = 0;
-
-	public BinByteArray(String name, int length) {
-		super(name);
-		this.value = new byte[length];
+	public AlsaTopoNodeHwConfig(ConfHwConfig hwConfig) {
+		super(hwConfig);
 	}
-
-	public BinByteArray(String name, BinInteger size) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-	}
-
-	public BinByteArray(String name, BinInteger size, int sizeAdjustment) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-		this.sizeAdjustment = sizeAdjustment;
-	}
-
-	@Override
-	public BinItem read(ByteBuffer bb) {
-		super.read(bb);
-		if (value == null) {
-			int size = dynSize.getValue();
-			size += sizeAdjustment;
-			value = new byte[size];
-		}
-		bb.get(value);
-		return this;
-	}
-
-	@Override
-	public String getValueString() {
-		StringBuffer s = new StringBuffer("[ ");
-		for (byte b : value) {
-			s.append(String.format("%02x " , b));
-		}
-		s.append("]");
-		return s.toString();
-	}
-
-	@Override
-	public Object getValue() {
-		return value;
-	}
-
 }

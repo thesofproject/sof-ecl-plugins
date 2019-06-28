@@ -29,19 +29,16 @@
 
 package org.sofproject.alsa.topo.model;
 
-import org.sofproject.alsa.topo.binfile.BinEnumDapmWidgetType;
-import org.sofproject.alsa.topo.binfile.BinStructDapmWidget;
+import org.sofproject.alsa.topo.conf.ConfWidget;
 
 public class AlsaTopoNodeWidget extends AlsaTopoNode {
 
-	public AlsaTopoNodeWidget(BinStructDapmWidget binWidget) {
-		super((String) binWidget.getChildValue("name"), binWidget);
-
-		String type = ((BinEnumDapmWidgetType) binWidget.getChildItem("id")).getShortString();
-		setTypeName(type);
+	public AlsaTopoNodeWidget(ConfWidget confWidget) {
+		super(confWidget);
+		setTypeName(confWidget.getType());
 	}
 
 	public String getSname() {
-		return (String)getBinStruct().getChildValue("sname");
-	}	
+		return (String) getConfElement().getAttributeValue("stream_name");
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,54 +27,29 @@
  *
  */
 
-package org.sofproject.core.binfile;
+package org.sofproject.alsa.topo.conf;
 
-import java.nio.ByteBuffer;
+public class ConfLong extends ConfAttribute {
 
-public class BinByteArray extends BinItem {
+	private static final String TYPE_NAME = "long";
 
-	private byte[] value;
-	BinInteger dynSize;
-	int sizeAdjustment = 0;
+	private long value;
 
-	public BinByteArray(String name, int length) {
-		super(name);
-		this.value = new byte[length];
+	public ConfLong(String name) {
+		super(TYPE_NAME, name);
 	}
 
-	public BinByteArray(String name, BinInteger size) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
+	public ConfLong(String name, long value) {
+		this(name);
+		setLongValue(value);
 	}
 
-	public BinByteArray(String name, BinInteger size, int sizeAdjustment) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-		this.sizeAdjustment = sizeAdjustment;
+	public long getLongValue() {
+		return this.value;
 	}
 
-	@Override
-	public BinItem read(ByteBuffer bb) {
-		super.read(bb);
-		if (value == null) {
-			int size = dynSize.getValue();
-			size += sizeAdjustment;
-			value = new byte[size];
-		}
-		bb.get(value);
-		return this;
-	}
-
-	@Override
-	public String getValueString() {
-		StringBuffer s = new StringBuffer("[ ");
-		for (byte b : value) {
-			s.append(String.format("%02x " , b));
-		}
-		s.append("]");
-		return s.toString();
+	public void setLongValue(long value) {
+		this.value = value;
 	}
 
 	@Override
@@ -82,4 +57,11 @@ public class BinByteArray extends BinItem {
 		return value;
 	}
 
+	@Override
+	public void setValue(Object value) {
+		if (value instanceof Long)
+			setLongValue((Long) value);
+		else
+			throw new RuntimeException("Expected Long value for " + getName() + ", got " + value.getClass());
+	}
 }

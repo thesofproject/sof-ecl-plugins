@@ -29,34 +29,11 @@
 
 package org.sofproject.alsa.topo.model;
 
-import org.sofproject.alsa.topo.binfile.BinStructLinkConfig;
-import org.sofproject.core.binfile.BinArray;
-import org.sofproject.core.binfile.BinContainer;
+import org.sofproject.alsa.topo.conf.ConfBackEnd;
 
 public class AlsaTopoNodeBe extends AlsaTopoNode {
 
-	public static final String AG_HW_CONFIG = "HW Configuration";
-
-	@SuppressWarnings("unchecked")
-	public AlsaTopoNodeBe(BinStructLinkConfig binBe) {
-		super((String) binBe.getChildValue("name"), binBe);
-		setTypeName("BE");
-
-		setAttribute(AG_GENERAL, "id", binBe.getChildValue("id"));
-		setAttribute(AG_GENERAL, "default hw configuration id",
-				binBe.getChildValue("default_hw_config_id"));
-
-		int streamCount = (Integer) binBe.getChildValue("num_hw_configs");
-		BinArray<? extends BinContainer> hwCfgArray = (BinArray<? extends BinContainer>) binBe.getChildItem("hw_config");
-		for (int i = 0; i < streamCount; i++) {			
-			String hwAg = String.format("%s #%d", AG_HW_CONFIG, i);
-			addAttributeGroup(hwAg);
-			BinContainer hwCfg = hwCfgArray.getItem(i);
-			setAttribute(hwAg, "id", hwCfg.getChildValue("id"));
-			setAttribute(hwAg, "fmt", hwCfg.getChildValue("fmt"));
-			// TODO: add the rest
-			setAttribute(hwAg, "todo...", "todo...");
-		}
-
+	public AlsaTopoNodeBe(ConfBackEnd confBe) {
+		super(confBe);
 	}
 }

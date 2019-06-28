@@ -31,6 +31,9 @@ package org.sofproject.alsa.topo.model;
 
 public class AlsaTopoItem {
 
+	/**
+	 * Name, unique within the topology graph (TODO: verify this).
+	 */
 	private String name;
 
 	public AlsaTopoItem(String name) {
@@ -45,4 +48,8 @@ public class AlsaTopoItem {
 		this.name = name;
 	}
 
+	@Override
+	public String toString() {
+		return name;
+	}
 }

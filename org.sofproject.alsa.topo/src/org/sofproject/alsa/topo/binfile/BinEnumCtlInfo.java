@@ -35,6 +35,9 @@ import org.sofproject.core.binfile.BinItem;
 
 public class BinEnumCtlInfo extends BinItem {
 
+	/**
+	 * @formatter:off
+	 */
 	public enum Type {
 		UNDEF(0), // let's accept 0 for extops
 		VOLSW(1),
@@ -77,6 +80,11 @@ public class BinEnumCtlInfo extends BinItem {
 	@Override
 	public Object getValue() {
 		return value;
+	}
+
+	@Override
+	public Object getRawValue() {
+		return value.val;
 	}
 
 	@Override

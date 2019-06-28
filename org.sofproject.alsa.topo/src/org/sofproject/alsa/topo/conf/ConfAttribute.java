@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,59 +27,28 @@
  *
  */
 
-package org.sofproject.core.binfile;
+package org.sofproject.alsa.topo.conf;
 
-import java.nio.ByteBuffer;
+public abstract class ConfAttribute extends ConfItem {
 
-public class BinByteArray extends BinItem {
+	public final String typeName;
 
-	private byte[] value;
-	BinInteger dynSize;
-	int sizeAdjustment = 0;
-
-	public BinByteArray(String name, int length) {
+	public ConfAttribute(String typeName, String name) {
 		super(name);
-		this.value = new byte[length];
+		this.typeName = typeName;
 	}
 
-	public BinByteArray(String name, BinInteger size) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
+	public abstract void setValue(Object value);
+
+	public abstract Object getValue();
+
+	public String getTypeName() {
+		return typeName;
 	}
 
-	public BinByteArray(String name, BinInteger size, int sizeAdjustment) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-		this.sizeAdjustment = sizeAdjustment;
-	}
-
-	@Override
-	public BinItem read(ByteBuffer bb) {
-		super.read(bb);
-		if (value == null) {
-			int size = dynSize.getValue();
-			size += sizeAdjustment;
-			value = new byte[size];
-		}
-		bb.get(value);
-		return this;
-	}
-
-	@Override
-	public String getValueString() {
-		StringBuffer s = new StringBuffer("[ ");
-		for (byte b : value) {
-			s.append(String.format("%02x " , b));
-		}
-		s.append("]");
-		return s.toString();
-	}
-
-	@Override
-	public Object getValue() {
-		return value;
+	public String getStringValue() {
+		Object value = getValue();
+		return value != null ? value.toString() : "(null)";
 	}
 
 }

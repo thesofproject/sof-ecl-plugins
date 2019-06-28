@@ -35,12 +35,15 @@ import java.util.Map;
 import org.eclipse.gef.graph.Edge;
 import org.eclipse.gef.graph.Graph;
 import org.eclipse.gef.graph.Node;
+import org.eclipse.gef.layout.algorithms.GridLayoutAlgorithm;
 import org.eclipse.gef.zest.fx.ZestProperties;
 import org.sofproject.alsa.topo.model.AlsaTopoConnection;
 import org.sofproject.alsa.topo.model.AlsaTopoGraph;
 import org.sofproject.alsa.topo.model.AlsaTopoItem;
 import org.sofproject.alsa.topo.model.AlsaTopoNode;
 import org.sofproject.alsa.topo.model.AlsaTopoNodeBe;
+import org.sofproject.alsa.topo.model.AlsaTopoNodeCollection;
+import org.sofproject.alsa.topo.model.AlsaTopoNodeKcontrol;
 import org.sofproject.alsa.topo.model.AlsaTopoNodePcm;
 import org.sofproject.alsa.topo.model.AlsaTopoNodeWidget;
 import org.sofproject.alsa.topo.ui.parts.AlsaTopoNodePart;
@@ -75,6 +78,8 @@ public class AlsaTopoZestGraphBuilder {
 				color = SofResources.SOF_RED;
 				borderWidth = 2.0;
 				borderColor = Color.BLACK;
+			} else if (modelNode instanceof AlsaTopoNodeKcontrol) {
+				color = SofResources.SOF_LIGHT_RED;
 			} else if (modelNode instanceof AlsaTopoNodeWidget) {
 				switch (modelNode.getTypeName()) {
 				case "aif_in":
@@ -159,20 +164,19 @@ public class AlsaTopoZestGraphBuilder {
 		return (double) n.getAttributes().get(AlsaTopoNodePart.BORDER_WIDTH_ATTR);
 	}
 
+	@SuppressWarnings("unchecked")
 	private Node buildNode(AlsaTopoNode modelNode) {
 		BinFileNode n = new BinFileNode(modelNode);
 
-		if (modelNode instanceof AlsaTopoNodeBe) {
-			// TODO: improve nested graphs for some special nodes
-//			AlsaTopoNodeBe beNode = (AlsaTopoNodeBe) modelNode;
-//			Node nn = new Node.Builder().attr(AlsaTopoNodePart.NAME_ATTR, modelNode.getName())
-//					.buildNode();
-//			Node ns = new Node.Builder().attr(AlsaTopoNodePart.NAME_ATTR, "hw config").buildNode();
-//			Edge e = new Edge.Builder(nn, ns).buildEdge();
-//			Graph sub = new Graph.Builder()
-//					.attr(ZestProperties.LAYOUT_ALGORITHM__G, new SpringLayoutAlgorithm())
-//					.nodes(nn, ns).edges(e).build();
-//			n.setNestedGraph(sub);
+		if (modelNode instanceof AlsaTopoNodeCollection<?>) {
+			Graph sub = new Graph.Builder().attr(ZestProperties.LAYOUT_ALGORITHM__G, new GridLayoutAlgorithm()).build();
+
+			AlsaTopoNodeCollection<AlsaTopoNode> col = (AlsaTopoNodeCollection<AlsaTopoNode>) modelNode;
+			for (AlsaTopoNode childNode : col.getElements()) {
+				sub.getNodes().add(buildNode(childNode));
+			}
+			n.setNestedGraph(sub);
+			// TODO: subgraph has no layout applied on the first entry (dbl-click).
 		}
 
 		nodes.put(modelNode, n);

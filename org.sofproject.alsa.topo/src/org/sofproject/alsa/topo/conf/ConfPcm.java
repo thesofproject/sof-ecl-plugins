@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,59 +27,50 @@
  *
  */
 
-package org.sofproject.core.binfile;
+package org.sofproject.alsa.topo.conf;
 
-import java.nio.ByteBuffer;
+import java.util.Arrays;
 
-public class BinByteArray extends BinItem {
+/**
+ * TODO: support for streams
+ */
+public class ConfPcm extends ConfElement {
 
-	private byte[] value;
-	BinInteger dynSize;
-	int sizeAdjustment = 0;
+	public static final String PLAYBACK_CAPS_NAME = "playback";
+	public static final String CAPTURE_CAPS_NAME = "capture";
 
-	public BinByteArray(String name, int length) {
-		super(name);
-		this.value = new byte[length];
+	public ConfPcm(String name) {
+		super(name, Arrays.asList(new ConfInteger("id")));
 	}
 
-	public BinByteArray(String name, BinInteger size) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
+	public void addFeDai(String name, int id) {
+		ConfInteger daiId = new ConfInteger("id");
+		daiId.setIntValue(id);
+		ConfElement feDai = new ConfElement(name, Arrays.asList(daiId));
+		feDai.setSectionName("dai");
+		addChild(feDai);
 	}
 
-	public BinByteArray(String name, BinInteger size, int sizeAdjustment) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-		this.sizeAdjustment = sizeAdjustment;
+	public void addCapabilities(String name, ConfPcmCapabilities caps) {
+		ConfReference capRef = new ConfReference("capabilities");
+		capRef.setRefValue(caps);
+		ConfElement pcm = new ConfElement(name, Arrays.asList(capRef));
+		pcm.setSectionName("pcm");
+		addChild(pcm);
 	}
 
-	@Override
-	public BinItem read(ByteBuffer bb) {
-		super.read(bb);
-		if (value == null) {
-			int size = dynSize.getValue();
-			size += sizeAdjustment;
-			value = new byte[size];
-		}
-		bb.get(value);
-		return this;
+	public ConfPcmCapabilities getPlaybackCaps() {
+		return getCaps(PLAYBACK_CAPS_NAME);
 	}
 
-	@Override
-	public String getValueString() {
-		StringBuffer s = new StringBuffer("[ ");
-		for (byte b : value) {
-			s.append(String.format("%02x " , b));
-		}
-		s.append("]");
-		return s.toString();
+	public ConfPcmCapabilities getCaptureCaps() {
+		return getCaps(CAPTURE_CAPS_NAME);
 	}
 
-	@Override
-	public Object getValue() {
-		return value;
+	private ConfPcmCapabilities getCaps(String name) {
+		ConfElement e = getChildElement("pcm", name);
+		if (e != null)
+			return (ConfPcmCapabilities) e.getAttributeValue("capabilities");
+		return null;
 	}
-
 }

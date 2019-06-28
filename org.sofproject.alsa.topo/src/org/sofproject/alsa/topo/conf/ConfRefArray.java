@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,54 +27,35 @@
  *
  */
 
-package org.sofproject.core.binfile;
+package org.sofproject.alsa.topo.conf;
 
-import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
-public class BinByteArray extends BinItem {
+/**
+ * Attribute that is a reference to another top level element (serialized as a
+ * uniquely named section). Value of the attribute is the unique name of
+ * referenced element.
+ */
+public class ConfRefArray extends ConfAttribute {
 
-	private byte[] value;
-	BinInteger dynSize;
-	int sizeAdjustment = 0;
+	private static final String TYPE_NAME = "reference[]";
 
-	public BinByteArray(String name, int length) {
-		super(name);
-		this.value = new byte[length];
+	/**
+	 * Array of references to another elements.
+	 */
+	private List<ConfElement> value = new ArrayList<>();
+
+	public ConfRefArray(String name) {
+		super(TYPE_NAME, name);
 	}
 
-	public BinByteArray(String name, BinInteger size) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
+	public void addRefValue(ConfElement value) {
+		this.value.add(value);
 	}
 
-	public BinByteArray(String name, BinInteger size, int sizeAdjustment) {
-		super(name);
-		// array not allocated yet, size known when 'size' is read
-		this.dynSize = size;
-		this.sizeAdjustment = sizeAdjustment;
-	}
-
-	@Override
-	public BinItem read(ByteBuffer bb) {
-		super.read(bb);
-		if (value == null) {
-			int size = dynSize.getValue();
-			size += sizeAdjustment;
-			value = new byte[size];
-		}
-		bb.get(value);
-		return this;
-	}
-
-	@Override
-	public String getValueString() {
-		StringBuffer s = new StringBuffer("[ ");
-		for (byte b : value) {
-			s.append(String.format("%02x " , b));
-		}
-		s.append("]");
-		return s.toString();
+	public int size() {
+		return value.size();
 	}
 
 	@Override
@@ -82,4 +63,8 @@ public class BinByteArray extends BinItem {
 		return value;
 	}
 
+	@Override
+	public void setValue(Object value) {
+		throw new RuntimeException("Unsupported");
+	}
 }
