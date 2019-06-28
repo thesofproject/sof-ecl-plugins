@@ -121,6 +121,8 @@ public class BinFileStructViewPart extends ViewPart {
 					IStructuredSelection sel = (IStructuredSelection) selection;
 					if (sel.getFirstElement() instanceof IBinStructHolder) {
 						BinStruct bin = (((IBinStructHolder) sel.getFirstElement()).getBinStruct());
+						if (bin == null)
+							return; // only nodes generated out of the bin file has bin items connected
 						TreePath path = new TreePath(bin.getFullPath().toArray());
 						treeViewer.setExpandedState(path, true);
 						treeViewer.setSelection(new TreeSelection(path), true);
