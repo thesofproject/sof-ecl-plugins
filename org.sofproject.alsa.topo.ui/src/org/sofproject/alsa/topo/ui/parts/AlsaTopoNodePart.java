@@ -33,7 +33,6 @@ import org.eclipse.gef.zest.fx.parts.NodePart;
 import org.sofproject.alsa.topo.ui.visuals.AlsaTopoNodeVisual;
 
 import javafx.scene.Group;
-import javafx.scene.text.Text;
 
 public class AlsaTopoNodePart extends NodePart {
 
@@ -43,17 +42,8 @@ public class AlsaTopoNodePart extends NodePart {
 	public static final String MODEL_ITEM_ATTR = "alsa-topo-node-model-item";
 	public static final String BIN_ITEM_ATTR = "alsa-topo-node-bin-item";
 
-	Text label;
-
 	@Override
 	protected Group doCreateVisual() {
-		label = new Text("?"); // TODO:
 		return new Group(new AlsaTopoNodeVisual(getContent()));
 	}
-
-	@Override
-	protected Text getLabelText() {
-		return label;
-	}
-
 }

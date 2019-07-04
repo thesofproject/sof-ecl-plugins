@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,39 +29,18 @@
 
 package org.sofproject.alsa.topo.ui.parts;
 
-import java.util.Map;
-
-import org.eclipse.gef.mvc.fx.parts.IContentPart;
 import org.eclipse.gef.zest.fx.parts.NodePart;
-import org.eclipse.gef.zest.fx.parts.ZestFxContentPartFactory;
-import org.sofproject.alsa.topo.ui.graph.AlsaTopoZestGraphBuilder.CollectionNode;
+import org.sofproject.alsa.topo.ui.visuals.AlsaTopoNodeCollectionVisual;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
+import javafx.scene.Group;
 
-import javafx.scene.Node;
+public class AlsaTopoNodeCollectionPart extends NodePart {
 
-public class AlsaTopoPartsFactory extends ZestFxContentPartFactory {
-	@Inject
-	private Injector injector;
+	public static final String MODEL_ITEM_ATTR = "alsa-topo-node-model-item";
 
 	@Override
-	public IContentPart<? extends Node> createContentPart(Object content, Map<Object, Object> contextMap) {
-		NodePart part = null;
-
-		if (content == null) {
-			throw new IllegalArgumentException("null content");
-		}
-
-		if (content instanceof CollectionNode) {
-			part = new AlsaTopoNodeCollectionPart();
-		} else if (content instanceof org.eclipse.gef.graph.Node) {
-			part = new AlsaTopoNodePart();
-		}
-		if (part != null) {
-			injector.injectMembers(part);
-			return part;
-		}
-		return super.createContentPart(content, contextMap);
+	protected Group doCreateVisual() {
+		return new Group(new AlsaTopoNodeCollectionVisual(getContent()));
 	}
+
 }

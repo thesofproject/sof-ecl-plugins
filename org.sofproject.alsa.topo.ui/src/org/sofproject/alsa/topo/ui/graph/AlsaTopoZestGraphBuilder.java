@@ -45,6 +45,7 @@ import org.sofproject.alsa.topo.model.AlsaTopoNodeCollection;
 import org.sofproject.alsa.topo.model.AlsaTopoNodeKcontrol;
 import org.sofproject.alsa.topo.model.AlsaTopoNodePcm;
 import org.sofproject.alsa.topo.model.AlsaTopoNodeWidget;
+import org.sofproject.alsa.topo.ui.parts.AlsaTopoNodeCollectionPart;
 import org.sofproject.alsa.topo.ui.parts.AlsaTopoNodePart;
 import org.sofproject.core.binfile.BinStruct;
 import org.sofproject.ui.editor.IBinStructHolder;
@@ -112,8 +113,16 @@ public class AlsaTopoZestGraphBuilder {
 
 	}
 
+	public class CollectionNode extends Node {
+		public CollectionNode(AlsaTopoNode modelNode) {
+			getAttributes().put(AlsaTopoNodeCollectionPart.MODEL_ITEM_ATTR, modelNode);
+			getAttributes().put(ZestProperties.TOOLTIP__N, "Dbl-click to open");
+		}
+	}
+
 	private Map<AlsaTopoItem, Node> nodes = new HashMap<>();
 
+	@SuppressWarnings("unchecked")
 	public Graph build(AlsaTopoGraph topoModel) {
 		Graph g = new Graph.Builder().attr(ZestProperties.LAYOUT_ALGORITHM__G, new AlsaTopoZestGraphLayout()).build();
 
@@ -121,7 +130,9 @@ public class AlsaTopoZestGraphBuilder {
 		// the second one creates the edges to make sure all nodes are already there
 
 		for (AlsaTopoItem item : topoModel.getChildElements()) {
-			if (item instanceof AlsaTopoNode) {
+			if (item instanceof AlsaTopoNodeCollection<?>)
+				g.getNodes().add(buildCollectionNode((AlsaTopoNodeCollection<AlsaTopoNode>) item));
+			else if (item instanceof AlsaTopoNode) {
 				g.getNodes().add(buildNode((AlsaTopoNode) item));
 			}
 		}
@@ -163,23 +174,21 @@ public class AlsaTopoZestGraphBuilder {
 		return (double) n.getAttributes().get(AlsaTopoNodePart.BORDER_WIDTH_ATTR);
 	}
 
-	@SuppressWarnings("unchecked")
 	private Node buildNode(AlsaTopoNode modelNode) {
 		BinFileNode n = new BinFileNode(modelNode);
-
-		if (modelNode instanceof AlsaTopoNodeCollection<?>) {
-			Graph sub = new Graph.Builder().attr(ZestProperties.LAYOUT_ALGORITHM__G, new AlsaTopoZestGraphLayout(6 /*items per row */))
-					.build();
-
-			AlsaTopoNodeCollection<AlsaTopoNode> col = (AlsaTopoNodeCollection<AlsaTopoNode>) modelNode;
-			for (AlsaTopoNode childNode : col.getElements()) {
-				sub.getNodes().add(buildNode(childNode));
-			}
-			n.setNestedGraph(sub);
-			// TODO: subgraph has no layout applied on the first entry (dbl-click).
-		}
-
 		nodes.put(modelNode, n);
+		return n;
+	}
+
+	private Node buildCollectionNode(AlsaTopoNodeCollection<AlsaTopoNode> colNode) {
+		CollectionNode n = new CollectionNode(colNode);
+		Graph sub = new Graph.Builder()
+				.attr(ZestProperties.LAYOUT_ALGORITHM__G, new AlsaTopoZestGraphLayout(6 /* items per row */)).build();
+
+		for (AlsaTopoNode childNode : colNode.getElements()) {
+			sub.getNodes().add(buildNode(childNode));
+		}
+		n.setNestedGraph(sub);
 		return n;
 	}
 
