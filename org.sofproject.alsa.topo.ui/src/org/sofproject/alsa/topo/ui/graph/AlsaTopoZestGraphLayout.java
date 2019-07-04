@@ -110,7 +110,6 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 		super.applyLayout(context, clean);
 	}
 
-	// move all unconnected widgets to row 0
 	/**
 	 * Moves all unconnected widgets to top.
 	 *
@@ -119,12 +118,12 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 	 */
 	private int layoutUnconnected(LayoutContext context) {
 		int row = 0;
-		int col = 1;
+		int col = 0;
 		for (Node n : context.getGraph().getNodes()) {
 			if (n.getIncomingEdges().isEmpty() && n.getOutgoingEdges().isEmpty()) {
 				addToGrid(n, col++, row);
 				if (col == unconnectedPerRow + 1) {
-					col = 1;
+					col = 0;
 					row++;
 				}
 			}
