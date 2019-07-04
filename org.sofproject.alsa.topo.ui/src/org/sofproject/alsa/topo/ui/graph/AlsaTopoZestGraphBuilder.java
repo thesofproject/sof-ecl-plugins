@@ -35,7 +35,6 @@ import java.util.Map;
 import org.eclipse.gef.graph.Edge;
 import org.eclipse.gef.graph.Graph;
 import org.eclipse.gef.graph.Node;
-import org.eclipse.gef.layout.algorithms.GridLayoutAlgorithm;
 import org.eclipse.gef.zest.fx.ZestProperties;
 import org.sofproject.alsa.topo.model.AlsaTopoConnection;
 import org.sofproject.alsa.topo.model.AlsaTopoGraph;
@@ -169,7 +168,8 @@ public class AlsaTopoZestGraphBuilder {
 		BinFileNode n = new BinFileNode(modelNode);
 
 		if (modelNode instanceof AlsaTopoNodeCollection<?>) {
-			Graph sub = new Graph.Builder().attr(ZestProperties.LAYOUT_ALGORITHM__G, new GridLayoutAlgorithm()).build();
+			Graph sub = new Graph.Builder().attr(ZestProperties.LAYOUT_ALGORITHM__G, new AlsaTopoZestGraphLayout(6 /*items per row */))
+					.build();
 
 			AlsaTopoNodeCollection<AlsaTopoNode> col = (AlsaTopoNodeCollection<AlsaTopoNode>) modelNode;
 			for (AlsaTopoNode childNode : col.getElements()) {
