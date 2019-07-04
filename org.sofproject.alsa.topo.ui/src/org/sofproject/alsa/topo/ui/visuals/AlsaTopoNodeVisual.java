@@ -73,7 +73,7 @@ public class AlsaTopoNodeVisual extends Region {
 		topBox.prefWidthProperty().bind(widthProperty());
 		topBox.prefHeightProperty().bind(heightProperty());
 
-		nameText = new Text(AlsaTopoZestGraphBuilder.getNodeName(node));
+		nameText = new Text(formatName(node));
 		nameText.setTextOrigin(VPos.TOP);
 		nameText.setFont(AlsaTopoResources.getGraphBoldFont());
 
@@ -158,5 +158,25 @@ public class AlsaTopoNodeVisual extends Region {
 			}
 			attrText.setText(attr);
 		}
+	}
+
+	private String formatName(org.eclipse.gef.graph.Node node) {
+		StringBuilder sb = new StringBuilder(AlsaTopoZestGraphBuilder.getNodeName(node));
+		int middleIdx = sb.length() / 2;
+		if (middleIdx < 6)
+			return sb.toString(); // do not try to break short labels
+		// find the one closer to the middle on the left or on the right
+		for (int i = 0; i < middleIdx; i++) {
+			if (sb.charAt(middleIdx - i) == ' ') {
+				sb.setCharAt(middleIdx - i, '\n');
+				break;
+			}
+			if (sb.charAt(middleIdx + i) == ' ') {
+				sb.setCharAt(middleIdx + i, '\n');
+				break;
+			}
+		}
+
+		return sb.toString();
 	}
 }
