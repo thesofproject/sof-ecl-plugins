@@ -45,7 +45,9 @@ import org.sofproject.ui.graph.SofXyZestGraphLayout;
 
 public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 
-	public static final int UNCONNECTED_PER_ROW = 8;
+	public static final int DEFAULT_UNCONNECTED_PER_ROW = 8;
+
+	private int unconnectedPerRow;
 
 	class GridPosition {
 		int col;
@@ -59,6 +61,14 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 		GridPosition max(GridPosition other) {
 			return new GridPosition(Integer.max(col, other.col), Integer.max(row, other.row));
 		}
+	}
+
+	public AlsaTopoZestGraphLayout() {
+		this(DEFAULT_UNCONNECTED_PER_ROW);
+	}
+
+	public AlsaTopoZestGraphLayout(int unconnectedPerRow) {
+		this.unconnectedPerRow = unconnectedPerRow;
 	}
 
 	@Override
@@ -113,7 +123,7 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 		for (Node n : context.getGraph().getNodes()) {
 			if (n.getIncomingEdges().isEmpty() && n.getOutgoingEdges().isEmpty()) {
 				addToGrid(n, col++, row);
-				if (col == UNCONNECTED_PER_ROW + 1) {
+				if (col == unconnectedPerRow + 1) {
 					col = 1;
 					row++;
 				}
