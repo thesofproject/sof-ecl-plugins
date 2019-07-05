@@ -66,18 +66,18 @@
    <extension
          point="org.eclipse.ui.commands">
       <category
-            description="Commands for SOF Graph Editor"
-            id="sofGraphEditor.category"
+            description="SOF Graph Editing"
+            id="org.sofproject.ui.category.graphEditing"
             name="SOF Graph Editor">
       </category>
       <command
-            categoryId="sofGraphEditor.category"
-            id="sofGraphEditor.fitToViewport.command"
+            categoryId="org.sofproject.ui.category.graphEditing"
+            id="org.sofproject.ui.fitToViewport.command"
             name="Fit to Viewport">
       </command>
       <command
-            categoryId="sofGraphEditor.category"
-            id="sofGraphEditor.resetZoom.command"
+            categoryId="org.sofproject.ui.category.graphEditing"
+            id="org.sofproject.ui.resetZoom.command"
             name="Reset Zoom">
       </command>
    </extension>
@@ -85,23 +85,23 @@
          point="org.eclipse.ui.handlers">
       <handler
             class="org.sofproject.ui.editor.actions.GraphEditorFitToViewportAd"
-            commandId="sofGraphEditor.fitToViewport.command">
+            commandId="org.sofproject.ui.fitToViewport.command">
       </handler>
       <handler
             class="org.sofproject.ui.editor.actions.GraphEditorResetZoomAd"
-            commandId="sofGraphEditor.resetZoom.command">
+            commandId="org.sofproject.ui.resetZoom.command">
       </handler>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
       <key
-            commandId="sofGraphEditor.fitToViewport.command"
+            commandId="org.sofproject.ui.fitToViewport.command"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+Shift+F">
       </key>
       <key
-            commandId="sofGraphEditor.resetZoom.command"
+            commandId="org.sofproject.ui.resetZoom.command"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+1">
