@@ -113,6 +113,10 @@ public class AlsaTopoEditor extends AbstractFXEditor implements IBinFileEditor {
 		getContentViewer().getContents().setAll(zestGraph);
 	}
 
+	public void serializeGraph() {
+		// TODO: add serialization
+	}
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(final Class key) {
