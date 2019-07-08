@@ -27,50 +27,51 @@
  *
  */
 
-package org.sofproject.alsa.topo.conf;
+package org.sofproject.alsa.topo.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.sofproject.alsa.topo.conf.ConfGraph;
+import org.sofproject.alsa.topo.ui.graph.ITopoCollectionNode;
+import org.sofproject.alsa.topo.ui.graph.ITopoNode;
 
 /**
- * Attribute that is a reference to another top level element (serialized as a
- * uniquely named section). Value of the attribute is the unique name of
- * referenced element.
+ * Pipeline is a list of connected widgets. Connected to ConfGraph to generate
+ * graph item (set of lines).
  */
-public class ConfRefArray extends ConfAttribute {
+public class AlsaTopoPipeline extends AlsaTopoNode implements ITopoCollectionNode {
 
-	private static final String TYPE_NAME = "reference[]";
+	private Map<String, AlsaTopoNode> widgets = new LinkedHashMap<>();
+	private Map<String, AlsaTopoConnection> connections = new HashMap<>();
 
-	/**
-	 * Array of references to another elements.
-	 */
-	private List<ConfElement> value = new ArrayList<>();
-
-	public ConfRefArray(String name) {
-		super(TYPE_NAME, name);
+	public AlsaTopoPipeline(ConfGraph confGraph) {
+		super(confGraph);
 	}
 
-	public void addRefValue(ConfElement value) {
-		this.value.add(value);
+	public void add(AlsaTopoNode widget) {
+		widgets.put(widget.getName(), widget);
 	}
 
+	public void add(AlsaTopoConnection connection) {
+		connections.put(connection.getName(), connection);
+	}
+
+	@Override
+	public boolean isVisible() {
+		return false;
+	}
+
+	@Override
 	public int size() {
-		return value.size();
+		return widgets.size();
 	}
 
 	@Override
-	public Object getValue() {
-		return value;
-	}
-
-	@Override
-	public void setValue(Object value) {
-		throw new RuntimeException("Unsupported");
-	}
-
-	@Override
-	public Type getNodeAtrributeType() {
-		return Type.NODE_A_OTHER;
+	public Collection<? extends ITopoNode> getChildren() {
+		return widgets.values();
 	}
 
 }

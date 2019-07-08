@@ -27,18 +27,43 @@
  *
  */
 
-package org.sofproject.alsa.topo.ui.editor;
+package org.sofproject.alsa.topo.ui.parts;
 
-import org.eclipse.gef.common.adapt.AdapterKey;
-import org.eclipse.gef.zest.fx.ZestFxModule;
-import org.sofproject.alsa.topo.ui.parts.AlsaTopoPartsFactory;
+import java.util.Map;
 
-import com.google.inject.multibindings.MapBinder;
+import org.eclipse.gef.mvc.fx.parts.AbstractContentPart;
+import org.eclipse.gef.mvc.fx.parts.IContentPart;
+import org.eclipse.gef.zest.fx.parts.ZestFxContentPartFactory;
+import org.sofproject.alsa.topo.ui.graph.GefTopoCollectionNode;
+import org.sofproject.alsa.topo.ui.graph.GefTopoNode;
 
-public class AlsaTopoModule extends ZestFxModule {
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+
+import javafx.scene.Node;
+
+public class TopoPartsFactory extends ZestFxContentPartFactory {
+	@Inject
+	private Injector injector;
 
 	@Override
-	protected void bindIContentPartFactoryAsContentViewerAdapter(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
-		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(AlsaTopoPartsFactory.class);
+	public IContentPart<? extends Node> createContentPart(Object content, Map<Object, Object> contextMap) {
+		AbstractContentPart<? extends Node> part = null;
+
+		if (content == null) {
+			throw new IllegalArgumentException("null content");
+		}
+		if (content instanceof org.eclipse.gef.graph.Graph) {
+			part = new TopoGraphPart();
+		} else if (content instanceof GefTopoCollectionNode) {
+			part = new TopoNodeCollectionPart();
+		} else if (content instanceof GefTopoNode) {
+			part = new TopoNodePart();
+		}
+		if (part != null) {
+			injector.injectMembers(part);
+			return part;
+		}
+		return super.createContentPart(content, contextMap);
 	}
 }

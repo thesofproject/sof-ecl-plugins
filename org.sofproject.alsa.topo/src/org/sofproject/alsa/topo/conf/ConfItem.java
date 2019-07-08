@@ -42,8 +42,18 @@ public class ConfItem {
 	 */
 	private String name;
 
+	private ConfItem parent;
+
 	public ConfItem(String name) {
 		this.name = name;
+	}
+
+	public void setParent(ConfItem parent) {
+		this.parent = parent;
+	}
+
+	public ConfItem getParent() {
+		return parent;
 	}
 
 	public String getName() {

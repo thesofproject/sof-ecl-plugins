@@ -29,36 +29,59 @@
 
 package org.sofproject.alsa.topo.model;
 
-public class AlsaTopoConnection extends AlsaTopoItem {
+import org.sofproject.alsa.topo.ui.graph.ITopoConnection;
+import org.sofproject.alsa.topo.ui.graph.ITopoNode;
+
+import javafx.scene.paint.Color;
+
+public class AlsaTopoConnection implements ITopoConnection {
 
 	public enum Type {
 		DAPM_PATH, STREAM_PATH, CONTROL_PATH,
 	}
 
 	private Type type;
+	private String name;
 
 	private AlsaTopoNode src;
 	private AlsaTopoNode tgt;
 
 	public AlsaTopoConnection(Type type, AlsaTopoNode src, AlsaTopoNode tgt) {
-		super(src.getName() + ".." + tgt.getName());
 		this.type = type;
 		this.src = src;
 		this.tgt = tgt;
 		src.addOutConn(this);
 		tgt.addInConn(this);
+		name = new StringBuilder(src.getName()).append("..").append(tgt.getName()).toString();
 	}
 
 	public Type getType() {
 		return type;
 	}
 
-	public AlsaTopoNode getSrc() {
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public ITopoNode getSource() {
 		return src;
 	}
 
-	public AlsaTopoNode getTgt() {
+	@Override
+	public ITopoNode getTarget() {
 		return tgt;
+	}
+
+	@Override
+	public boolean hasArrow() {
+		return type == Type.DAPM_PATH || type == Type.STREAM_PATH;
+	}
+
+	@Override
+	public Color getColor() {
+		// TODO: different by type?
+		return Color.BLACK;
 	}
 
 }

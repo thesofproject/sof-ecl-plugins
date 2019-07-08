@@ -30,10 +30,29 @@
 package org.sofproject.alsa.topo.model;
 
 import org.sofproject.alsa.topo.conf.ConfBackEnd;
+import org.sofproject.ui.resources.SofResources;
+
+import javafx.scene.paint.Color;
 
 public class AlsaTopoNodeBe extends AlsaTopoNode {
 
 	public AlsaTopoNodeBe(ConfBackEnd confBe) {
 		super(confBe);
+		setLast(true);
+	}
+
+	@Override
+	public Color getColor() {
+		return SofResources.SOF_RED;
+	}
+
+	@Override
+	public Color getBorderColor() {
+		return Color.BLACK;
+	}
+
+	@Override
+	public double getBorderWidth() {
+		return 2.0;
 	}
 }

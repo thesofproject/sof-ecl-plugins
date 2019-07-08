@@ -61,6 +61,11 @@ public abstract class ConfEnum extends ConfAttribute {
 	}
 
 	@Override
+	public Type getNodeAtrributeType() {
+		return Type.NODE_A_ENUM;
+	}
+
+	@Override
 	public void setValue(Object value) {
 		if (value instanceof Integer)
 			setIntValue((Integer) value);

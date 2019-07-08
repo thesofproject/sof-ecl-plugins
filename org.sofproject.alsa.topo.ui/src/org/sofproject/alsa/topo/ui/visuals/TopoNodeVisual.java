@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Intel Corporation
+ * Copyright (c) 2018, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,36 +29,45 @@
 
 package org.sofproject.alsa.topo.ui.visuals;
 
+import java.util.Map;
+
 import org.eclipse.gef.fx.nodes.GeometryNode;
 import org.eclipse.gef.geometry.planar.RoundedRectangle;
-import org.sofproject.alsa.topo.ui.graph.AlsaTopoZestGraphBuilder;
-import org.sofproject.alsa.topo.ui.resources.AlsaTopoResources;
+import org.sofproject.alsa.topo.ui.graph.GefTopoNode;
+import org.sofproject.alsa.topo.ui.graph.ITopoNode;
+import org.sofproject.alsa.topo.ui.resources.TopoResources;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
-public class AlsaTopoNodeCollectionVisual extends Region {
+public class TopoNodeVisual extends Region {
 	private static final double HORIZONTAL_PADDING = 7d;
 	private static final double VERTICAL_PADDING = 7d;
 	private static final double VERTICAL_SPACING = 5d;
 
 	private Text nameText;
+	private Text typeText;
 	private GeometryNode<RoundedRectangle> shape;
 	private VBox topBox;
+	private VBox attrBox;
 
-	public AlsaTopoNodeCollectionVisual(org.eclipse.gef.graph.Node node) {
-		GeometryNode<RoundedRectangle> shape = new GeometryNode<>(new RoundedRectangle(0, 0, 70, 30, 2, 2));
+	public TopoNodeVisual(org.eclipse.gef.graph.Node node) {
+		GeometryNode<RoundedRectangle> shape = new GeometryNode<>(new RoundedRectangle(0, 0, 70, 30, 8, 8));
 
-		shape.setFill(Color.WHITE);
-		shape.setStroke(Color.BLACK);
-		shape.setStrokeWidth(0.5d);
+		GefTopoNode gefNode = (GefTopoNode) node;
+		ITopoNode modelNode = gefNode.getTopoModelNode();
+
+		shape.setFill(modelNode.getColor());
+		shape.setStroke(modelNode.getBorderColor());
+		shape.setStrokeWidth(modelNode.getBorderWidth());
 
 		topBox = new VBox(VERTICAL_SPACING);
 		topBox.setPadding(new Insets(VERTICAL_PADDING, HORIZONTAL_PADDING, VERTICAL_PADDING, HORIZONTAL_PADDING));
@@ -68,11 +77,18 @@ public class AlsaTopoNodeCollectionVisual extends Region {
 		topBox.prefWidthProperty().bind(widthProperty());
 		topBox.prefHeightProperty().bind(heightProperty());
 
-		nameText = new Text(formatName(node));
+		nameText = new Text(formatName(modelNode));
 		nameText.setTextOrigin(VPos.TOP);
-		nameText.setFont(AlsaTopoResources.getGraphBoldFont());
+		nameText.setFont(TopoResources.getGraphBoldFont());
 
-		topBox.getChildren().add(nameText);
+		typeText = new Text(modelNode.getDescription());
+		typeText.setTextOrigin(VPos.TOP);
+		typeText.setFont(TopoResources.getGraphSmallFont());
+
+		attrBox = new VBox(VERTICAL_SPACING);
+		attrBox.setAlignment(Pos.CENTER);
+
+		topBox.getChildren().addAll(nameText, typeText, attrBox);
 		topBox.setAlignment(Pos.CENTER);
 
 		setMinSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
@@ -87,7 +103,12 @@ public class AlsaTopoNodeCollectionVisual extends Region {
 
 	@Override
 	public double computeMinWidth(double height) {
-		return nameText.getLayoutBounds().getWidth() + HORIZONTAL_PADDING * 2;
+		double maxW = nameText.getLayoutBounds().getWidth();
+		maxW = Double.max(maxW, typeText.getLayoutBounds().getWidth());
+		for (Node n : attrBox.getChildren()) {
+			maxW = Double.max(maxW, n.getLayoutBounds().getWidth());
+		}
+		return maxW + HORIZONTAL_PADDING * 2;
 	}
 
 	@Override
@@ -121,8 +142,30 @@ public class AlsaTopoNodeCollectionVisual extends Region {
 		this.nameText.setText(name);
 	}
 
-	private String formatName(org.eclipse.gef.graph.Node node) {
-		StringBuilder sb = new StringBuilder(AlsaTopoZestGraphBuilder.getNodeName(node));
+	public void setType(String type) {
+		this.typeText.setText(type);
+	}
+
+	public void setAttributes(Map<String, String> attributes) {
+		int textIdx = 0;
+		int textSize = attrBox.getChildren().size();
+		for (String attr : attributes.values()) {
+			Text attrText;
+			if (textIdx == textSize) {
+				attrText = new Text();
+				attrText.setTextOrigin(VPos.TOP);
+				attrText.setFont(TopoResources.getGraphMediumFont());
+				attrBox.getChildren().add(attrText);
+			} else {
+				attrText = (Text) attrBox.getChildren().get(textIdx);
+				textIdx++;
+			}
+			attrText.setText(attr);
+		}
+	}
+
+	private String formatName(ITopoNode node) {
+		StringBuilder sb = new StringBuilder(node.getName());
 		int middleIdx = sb.length() / 2;
 		if (middleIdx < 6)
 			return sb.toString(); // do not try to break short labels

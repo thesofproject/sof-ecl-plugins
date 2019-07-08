@@ -1,3 +1,5 @@
+package org.sofproject.alsa.topo.ui.editor;
+
 /*
  * Copyright (c) 2018, Intel Corporation
  * All rights reserved.
@@ -27,55 +29,24 @@
  *
  */
 
-package org.sofproject.alsa.topo.ui.outline;
+import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.sofproject.alsa.topo.ui.outline.TopoGraphContentOutlinePage;
 
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.sofproject.alsa.topo.conf.ConfItem;
-import org.sofproject.alsa.topo.model.AlsaTopoGraph;
-import org.sofproject.alsa.topo.model.AlsaTopoNode;
-import org.sofproject.alsa.topo.model.AlsaTopoNodeCollection;
-
-public class AlsaTopoGraphContentProvider implements ITreeContentProvider {
+public class TopoEditorToOutlineAdapterFactory implements IAdapterFactory {
 
 	@Override
-	public Object[] getElements(Object inputElement) {
-		if (inputElement instanceof AlsaTopoGraph) {
-			AlsaTopoGraph topo = (AlsaTopoGraph) inputElement;
-			return topo.getSections().toArray();
+	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
+		if (adapterType == IContentOutlinePage.class) {
+			TopoEditor editor = (TopoEditor) adaptableObject;
+			return adapterType.cast(new TopoGraphContentOutlinePage(editor));
 		}
 		return null;
 	}
 
 	@Override
-	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof AlsaTopoNodeCollection<?>) {
-			AlsaTopoNodeCollection<?> col = (AlsaTopoNodeCollection<?>) parentElement;
-			return col.getElements().toArray();
-		} else if (parentElement instanceof AlsaTopoNode) {
-			AlsaTopoNode node = (AlsaTopoNode) parentElement;
-			return node.getConfItems().toArray();
-		} else if (parentElement instanceof ConfItem) {
-			ConfItem item = (ConfItem) parentElement;
-			return item.getChildren().toArray();
-		}
-		return null;
+	public Class<?>[] getAdapterList() {
+		return new Class[] { IContentOutlinePage.class };
 	}
 
-	@Override
-	public Object getParent(Object element) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean hasChildren(Object element) {
-		if (element instanceof AlsaTopoNodeCollection<?>) {
-			return !((AlsaTopoNodeCollection<?>) element).getElements().isEmpty();
-		} else if (element instanceof AlsaTopoNode) {
-			return !((AlsaTopoNode) element).getConfItems().isEmpty();
-		} else if (element instanceof ConfItem) {
-			return ((ConfItem) element).hasChildren();
-		}
-		return false;
-	}
 }

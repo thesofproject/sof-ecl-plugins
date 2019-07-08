@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="org.sofproject.alsa.topo.provider"
+         name="Alsa Topology Provider"
+         point="org.sofproject.topo.providers">
+      <factory
+            class="org.sofproject.alsa.topo.model.AlsaTopoFactory"
+            file_extension="tplg">
+      </factory>
+   </extension>
+
+</plugin>

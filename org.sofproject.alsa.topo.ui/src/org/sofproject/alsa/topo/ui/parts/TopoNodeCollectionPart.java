@@ -27,50 +27,18 @@
  *
  */
 
-package org.sofproject.alsa.topo.conf;
+package org.sofproject.alsa.topo.ui.parts;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.eclipse.gef.zest.fx.parts.NodePart;
+import org.sofproject.alsa.topo.ui.visuals.TopoNodeCollectionVisual;
 
-/**
- * Attribute that is a reference to another top level element (serialized as a
- * uniquely named section). Value of the attribute is the unique name of
- * referenced element.
- */
-public class ConfRefArray extends ConfAttribute {
+import javafx.scene.Group;
 
-	private static final String TYPE_NAME = "reference[]";
-
-	/**
-	 * Array of references to another elements.
-	 */
-	private List<ConfElement> value = new ArrayList<>();
-
-	public ConfRefArray(String name) {
-		super(TYPE_NAME, name);
-	}
-
-	public void addRefValue(ConfElement value) {
-		this.value.add(value);
-	}
-
-	public int size() {
-		return value.size();
-	}
+public class TopoNodeCollectionPart extends NodePart {
 
 	@Override
-	public Object getValue() {
-		return value;
-	}
-
-	@Override
-	public void setValue(Object value) {
-		throw new RuntimeException("Unsupported");
-	}
-
-	@Override
-	public Type getNodeAtrributeType() {
-		return Type.NODE_A_OTHER;
+	protected Group doCreateVisual() {
+		return new Group(new TopoNodeCollectionVisual(getContent()));
 	}
 
 }

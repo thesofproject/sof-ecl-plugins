@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Intel Corporation
+ * Copyright (c) 2018, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,50 +27,39 @@
  *
  */
 
-package org.sofproject.alsa.topo.conf;
+package org.sofproject.alsa.topo.ui.resources;
 
-import java.util.ArrayList;
-import java.util.List;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 
-/**
- * Attribute that is a reference to another top level element (serialized as a
- * uniquely named section). Value of the attribute is the unique name of
- * referenced element.
- */
-public class ConfRefArray extends ConfAttribute {
+public class TopoResources {
 
-	private static final String TYPE_NAME = "reference[]";
+	private static Font boldFont;
+	private static Font mediumFont;
+	private static Font smallFont;
 
-	/**
-	 * Array of references to another elements.
-	 */
-	private List<ConfElement> value = new ArrayList<>();
-
-	public ConfRefArray(String name) {
-		super(TYPE_NAME, name);
+	public static Font getGraphBoldFont() {
+		if (boldFont == null) {
+			Font def = Font.getDefault();
+			boldFont = Font.font(def.getFamily(), FontWeight.BOLD, def.getSize() - 1);
+		}
+		return boldFont;
 	}
 
-	public void addRefValue(ConfElement value) {
-		this.value.add(value);
+	public static Font getGraphSmallFont() {
+		if (smallFont == null) {
+			Font def = Font.getDefault();
+			smallFont = Font.font(def.getFamily(), FontPosture.ITALIC, def.getSize() - 3);
+		}
+		return smallFont;
 	}
 
-	public int size() {
-		return value.size();
+	public static Font getGraphMediumFont() {
+		if (mediumFont == null) {
+			Font def = Font.getDefault();
+			mediumFont = Font.font(def.getFamily(), def.getSize() - 2);
+		}
+		return mediumFont;
 	}
-
-	@Override
-	public Object getValue() {
-		return value;
-	}
-
-	@Override
-	public void setValue(Object value) {
-		throw new RuntimeException("Unsupported");
-	}
-
-	@Override
-	public Type getNodeAtrributeType() {
-		return Type.NODE_A_OTHER;
-	}
-
 }

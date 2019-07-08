@@ -31,18 +31,30 @@ package org.sofproject.alsa.topo.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.sofproject.alsa.topo.conf.ConfElement;
 import org.sofproject.alsa.topo.conf.ConfItem;
+import org.sofproject.alsa.topo.ui.graph.ITopoCollectionNode;
+import org.sofproject.alsa.topo.ui.graph.ITopoElement;
+import org.sofproject.alsa.topo.ui.graph.ITopoNode;
+import org.sofproject.alsa.topo.ui.graph.ITopoNodeAttribute;
 import org.sofproject.core.binfile.BinStruct;
+import org.sofproject.ui.resources.SofResources;
+
+import javafx.scene.paint.Color;
 
 /**
  * Groups of attributes, common for all nodes: - general - vendor tuples
  */
-public class AlsaTopoNode extends AlsaTopoItem {
+public class AlsaTopoNode implements ITopoNode {
 
 	private String typeName = "";
+
+	private AlsaTopoNodeCollection<?> parent;
+
+	private List<AlsaTopoElement> elements = new LinkedList<>();
 
 	/**
 	 * Main model element, represented here as associated graph node. If the model
@@ -50,6 +62,9 @@ public class AlsaTopoNode extends AlsaTopoItem {
 	 * reference to part of the binary file. May give null otherwise.
 	 */
 	private ConfElement confElement;
+
+	boolean first = false;
+	boolean last = false;
 
 	private List<AlsaTopoConnection> inConn = new ArrayList<>();
 	private List<AlsaTopoConnection> outConn = new ArrayList<>();
@@ -59,10 +74,27 @@ public class AlsaTopoNode extends AlsaTopoItem {
 	 *                    binItem.
 	 */
 	public AlsaTopoNode(ConfElement confElement) {
-		super(confElement.getName());
 		this.confElement = confElement;
+		for (ConfItem child : confElement.getChildren()) {
+			if (child instanceof ConfElement) {
+				elements.add(new AlsaTopoElement((ConfElement) child));
+			}
+		}
 	}
 
+	protected void setFirst(boolean first) {
+		this.first = first;
+	}
+
+	protected void setLast(boolean last) {
+		this.last = last;
+	}
+
+	public void setParent(AlsaTopoNodeCollection<?> parent) {
+		this.parent = parent;
+	}
+
+	@Override
 	public BinStruct getBinStruct() {
 		return confElement.getBinSource();
 	}
@@ -105,6 +137,69 @@ public class AlsaTopoNode extends AlsaTopoItem {
 
 	public void removeOutgoingConnection(AlsaTopoConnection conn) {
 		outConn.remove(conn);
+	}
+
+	@Override
+	public String getName() {
+		return confElement.getName();
+	}
+
+	@Override
+	public String getDescription() {
+		return typeName;
+	}
+
+	@Override
+	public String getTooltip() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isFirst() {
+		return first;
+	}
+
+	@Override
+	public boolean isLast() {
+		return last;
+	}
+
+	@Override
+	public ITopoCollectionNode getParent() {
+		return parent;
+	}
+
+	@Override
+	public Collection<? extends ITopoElement> getChildElements() {
+		return elements;
+	}
+
+	@Override
+	public Color getColor() {
+		return SofResources.SOF_GREY;
+	}
+
+	@Override
+	public Color getBorderColor() {
+		return SofResources.SOF_GREY;
+	}
+
+	@Override
+	public double getBorderWidth() {
+		return 1.0;
+	}
+
+	@Override
+	public Collection<? extends ITopoNodeAttribute> getAttributes() {
+//		List<ConfAttribute> allAttribs = new LinkedList<>(confElement.getAttributes());
+//		for (ConfItem child : confElement.getChildren()) {
+//			if (child instanceof ConfElement) {
+//				allAttribs.addAll(((ConfElement)child).getAttributes());
+//			}
+//		}
+//		return allAttribs;
+		return confElement.getAttributes();
 	}
 
 }

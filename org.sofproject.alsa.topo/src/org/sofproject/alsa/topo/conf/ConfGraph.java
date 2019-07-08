@@ -29,14 +29,9 @@
 
 package org.sofproject.alsa.topo.conf;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 public class ConfGraph extends ConfElement {
-
-	private List<ConfWidget> widgets = new ArrayList<>();
 
 	/**
 	 * @param name
@@ -48,25 +43,9 @@ public class ConfGraph extends ConfElement {
 				new ConfArray<ConfLine>("lines")));
 	}
 
-	@Override
-	public boolean hasChildren() {
-		return super.hasChildren() || !widgets.isEmpty();
-	}
-
-	@Override
-	public Collection<ConfItem> getChildren() {
-		List<ConfItem> all = new ArrayList<>(widgets);
-		all.addAll(super.getChildren());
-		return all;
-	}
-
 	@SuppressWarnings("unchecked")
 	public void addLine(ConfLine line) {
 		((ConfArray<ConfLine>)getAttribute("lines")).add(line);
-	}
-
-	public void addWidget(ConfWidget widget) {
-		widgets.add(widget);
 	}
 
 }

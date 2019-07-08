@@ -77,4 +77,9 @@ public class ConfArray<T extends ConfItem> extends ConfAttribute {
 		return value.size();
 	}
 
+	@Override
+	public Type getNodeAtrributeType() {
+		return Type.NODE_A_OTHER;
+	}
+
 }

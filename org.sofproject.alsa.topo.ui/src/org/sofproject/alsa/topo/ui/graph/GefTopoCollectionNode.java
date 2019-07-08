@@ -27,50 +27,25 @@
  *
  */
 
-package org.sofproject.alsa.topo.conf;
+package org.sofproject.alsa.topo.ui.graph;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.eclipse.gef.graph.Node;
 
 /**
- * Attribute that is a reference to another top level element (serialized as a
- * uniquely named section). Value of the attribute is the unique name of
- * referenced element.
+ * Connects Gef graph collection nodes domain with the ITopoCollectionNode
+ * interface. Visuals may use the ITopoCollectionNode interface, obtained from
+ * getTopoModelCollectionNode(), directly to query visual attributes.
  */
-public class ConfRefArray extends ConfAttribute {
+public class GefTopoCollectionNode extends Node {
 
-	private static final String TYPE_NAME = "reference[]";
+	private ITopoCollectionNode topoModelCollectionNode;
 
-	/**
-	 * Array of references to another elements.
-	 */
-	private List<ConfElement> value = new ArrayList<>();
-
-	public ConfRefArray(String name) {
-		super(TYPE_NAME, name);
+	public GefTopoCollectionNode(ITopoCollectionNode topoModelCollectionNode) {
+		this.topoModelCollectionNode = topoModelCollectionNode;
 	}
 
-	public void addRefValue(ConfElement value) {
-		this.value.add(value);
-	}
-
-	public int size() {
-		return value.size();
-	}
-
-	@Override
-	public Object getValue() {
-		return value;
-	}
-
-	@Override
-	public void setValue(Object value) {
-		throw new RuntimeException("Unsupported");
-	}
-
-	@Override
-	public Type getNodeAtrributeType() {
-		return Type.NODE_A_OTHER;
+	public ITopoCollectionNode getTopoModelCollectionNode() {
+		return topoModelCollectionNode;
 	}
 
 }

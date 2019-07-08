@@ -33,7 +33,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.sofproject.alsa.topo.conf.ConfElement;
+import org.sofproject.alsa.topo.ui.graph.ITopoCollectionNode;
+import org.sofproject.alsa.topo.ui.graph.ITopoNode;
 
 /**
  * TODO: remove dummy ConfElement assigned as there is no real conf item below,
@@ -41,14 +42,19 @@ import org.sofproject.alsa.topo.conf.ConfElement;
  *
  * @param <T>
  */
-public class AlsaTopoNodeCollection<T extends AlsaTopoNode> extends AlsaTopoNode {
+public class AlsaTopoNodeCollection<T extends AlsaTopoNode> implements ITopoCollectionNode {
 
 	private String name;
+	private boolean visible;
 	private Map<String, T> elements = new LinkedHashMap<>();
 
 	public AlsaTopoNodeCollection(String name) {
-		super(new ConfElement(name, null));
+		this(name, true);
+	}
+
+	public AlsaTopoNodeCollection(String name, boolean visible) {
 		this.name = name;
+		this.visible = visible;
 	}
 
 	@Override
@@ -56,8 +62,14 @@ public class AlsaTopoNodeCollection<T extends AlsaTopoNode> extends AlsaTopoNode
 		return name;
 	}
 
+	@Override
+	public boolean isVisible() {
+		return visible;
+	}
+
 	public void add(T element) {
 		elements.put(element.getName(), element);
+		element.setParent(this);
 	}
 
 	public T get(String name) {
@@ -68,12 +80,19 @@ public class AlsaTopoNodeCollection<T extends AlsaTopoNode> extends AlsaTopoNode
 		return elements.values();
 	}
 
+	@Override
 	public int size() {
 		return elements.size();
+	}
+
+	@Override
+	public Collection<? extends ITopoNode> getChildren() {
+		return getElements();
 	}
 
 	@Override
 	public String toString() {
 		return name;
 	}
+
 }

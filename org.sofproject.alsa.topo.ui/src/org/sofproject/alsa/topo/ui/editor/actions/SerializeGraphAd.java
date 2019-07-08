@@ -33,15 +33,15 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.sofproject.alsa.topo.ui.editor.AlsaTopoEditor;
+import org.sofproject.alsa.topo.ui.editor.TopoEditor;
 
 public class SerializeGraphAd extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IEditorPart ed = HandlerUtil.getActiveEditor(event);
-		if (ed instanceof AlsaTopoEditor) {
-			((AlsaTopoEditor) ed).serializeGraph();
+		if (ed instanceof TopoEditor) {
+			((TopoEditor) ed).serializeGraph();
 		}
 		return null;
 	}

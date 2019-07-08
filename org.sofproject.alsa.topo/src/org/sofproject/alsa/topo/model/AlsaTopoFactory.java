@@ -33,12 +33,15 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.sofproject.alsa.topo.binfile.BinTopoBlockFactory;
+import org.sofproject.alsa.topo.ui.graph.ITopoFactory;
+import org.sofproject.alsa.topo.ui.graph.ITopoGraph;
 import org.sofproject.core.binfile.BinFile;
 import org.sofproject.core.binfile.BinFileReader;
 
-public class AlsaTopoFactory {
-	
-	public static AlsaTopoGraph readTopo(String fileName, int availableSize, InputStream inputStream) {
+public class AlsaTopoFactory implements ITopoFactory {
+
+	@Override
+	public ITopoGraph read(String fileName, int availableSize, InputStream inputStream) {
 		try {
 			BinFileReader reader = new BinFileReader(fileName, availableSize, inputStream);
 			BinFile tplg = reader.read(new BinTopoBlockFactory());

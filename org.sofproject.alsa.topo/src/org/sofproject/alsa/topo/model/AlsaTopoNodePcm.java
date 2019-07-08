@@ -30,10 +30,29 @@
 package org.sofproject.alsa.topo.model;
 
 import org.sofproject.alsa.topo.conf.ConfPcm;
+import org.sofproject.ui.resources.SofResources;
+
+import javafx.scene.paint.Color;
 
 public class AlsaTopoNodePcm extends AlsaTopoNode {
 
 	public AlsaTopoNodePcm(ConfPcm confPcm) {
 		super(confPcm);
+		setFirst(true);
+	}
+
+	@Override
+	public Color getColor() {
+		return SofResources.SOF_YELLOW;
+	}
+
+	@Override
+	public Color getBorderColor() {
+		return Color.BLACK;
+	}
+
+	@Override
+	public double getBorderWidth() {
+		return 2.0;
 	}
 }

@@ -36,14 +36,9 @@ import org.eclipse.gef.graph.Edge;
 import org.eclipse.gef.graph.Graph;
 import org.eclipse.gef.graph.Node;
 import org.eclipse.gef.layout.LayoutContext;
-import org.sofproject.alsa.topo.model.AlsaTopoConnection;
-import org.sofproject.alsa.topo.model.AlsaTopoConnection.Type;
-import org.sofproject.alsa.topo.model.AlsaTopoNode;
-import org.sofproject.alsa.topo.model.AlsaTopoNodeBe;
-import org.sofproject.alsa.topo.model.AlsaTopoNodePcm;
 import org.sofproject.ui.graph.SofXyZestGraphLayout;
 
-public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
+public class TopoZestGraphLayout extends SofXyZestGraphLayout {
 
 	public static final int DEFAULT_UNCONNECTED_PER_ROW = 8;
 
@@ -63,11 +58,11 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 		}
 	}
 
-	public AlsaTopoZestGraphLayout() {
+	public TopoZestGraphLayout() {
 		this(DEFAULT_UNCONNECTED_PER_ROW);
 	}
 
-	public AlsaTopoZestGraphLayout(int unconnectedPerRow) {
+	public TopoZestGraphLayout(int unconnectedPerRow) {
 		this.unconnectedPerRow = unconnectedPerRow;
 	}
 
@@ -76,32 +71,22 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 		if (isGridEmpty()) {
 
 			// create all paths that begins/ends with pcm node, from column 0
-			List<Node> pcmNodes = findPcmNodes(context.getGraph());
+			List<GefTopoNode> firstNodes = findFirstNodes(context.getGraph());
 
 			// layout unconnected nodes ...
 			int y = layoutUnconnected(context) + 1;
 
 			// ... and continue from the next row
-			for (Node pcm : pcmNodes) {
-				addToGrid(pcm, 0, y);
-				GridPosition outMaxPos = traverseOutgoing(pcm, new GridPosition(1, y));
+			for (GefTopoNode first : firstNodes) {
+				addToGrid(first, 0, y);
+				GridPosition outMaxPos = traverseOutgoing(first, new GridPosition(1, y));
 				// if there is an outgoing stream, move down
 				if (outMaxPos.col > 1) {
 					y = outMaxPos.row + 1;
 				}
-				GridPosition inMaxPos = traverseIncoming(pcm, new GridPosition(1, y));
+				GridPosition inMaxPos = traverseIncoming(first, new GridPosition(1, y));
 				if (inMaxPos.col > 1) {
 					y = inMaxPos.row + 1;
-				}
-			}
-
-			// create all paths that begins with siggen node, from column 1
-			List<Node> sigGenNodes = findSigGenNodes(context.getGraph());
-			for (Node sigNode : sigGenNodes) {
-				addToGrid(sigNode, 1, y);
-				GridPosition outMaxPos = traverseOutgoing(sigNode, new GridPosition(2, y));
-				if (outMaxPos.col > 1) {
-					y = outMaxPos.row + 1;
 				}
 			}
 
@@ -131,47 +116,35 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 		return row;
 	}
 
-	private List<Node> findPcmNodes(Graph g) {
-		List<Node> pcmNodes = new ArrayList<>();
+	private List<GefTopoNode> findFirstNodes(Graph g) {
+		List<GefTopoNode> firstNodes = new ArrayList<>();
 		for (Node n : g.getNodes()) {
-			AlsaTopoNode modelItem = AlsaTopoZestGraphBuilder.getModelNode(n);
-			if (modelItem instanceof AlsaTopoNodePcm) {
-				pcmNodes.add(n);
+			if (n instanceof GefTopoNode) {
+				GefTopoNode gefNode = (GefTopoNode) n;
+				if (gefNode.getTopoModelNode().isFirst()) {
+					firstNodes.add(gefNode);
+				}
 			}
 		}
-		return pcmNodes;
+		return firstNodes;
 	}
 
-	private List<Node> findSigGenNodes(Graph g) {
-		List<Node> sigGenNodes = new ArrayList<>();
-
-		// TODO:
-
-//		for (Node n : g.getNodes()) {
-//			AlsaTopoNode modelItem = AlsaTopoZestGraphBuilder.getModelNode(n);
-//			if (modelItem.getTypeName().equals("siggen")) {
-//				sigGenNodes.add(n);
-//			}
-//		}
-		return sigGenNodes;
-	}
-
-	private GridPosition traverseOutgoing(Node node, GridPosition pos) {
+	private GridPosition traverseOutgoing(GefTopoNode node, GridPosition pos) {
 		GridPosition ctrlPos = new GridPosition(pos.col - 1, pos.row + 1);
 		for (Edge e : node.getIncomingEdges()) {
-			AlsaTopoConnection topoConn = AlsaTopoZestGraphBuilder.getModelConnection(e);
-			if (topoConn.getType() == Type.CONTROL_PATH) {
+			GefTopoEdge topoEdge = (GefTopoEdge) e;
+			// check if this is undirected connection to a control node
+			if (!topoEdge.getTopoModelConnection().hasArrow()) {
 				Node ctrlNode = e.getSource();
 				addToGrid(ctrlNode, ctrlPos.col, ctrlPos.row);
 				ctrlPos.col++;
 			}
 		}
 		for (Edge e : node.getOutgoingEdges()) {
-			Node audioNode = e.getTarget();
-			AlsaTopoNode modelNode = AlsaTopoZestGraphBuilder.getModelNode(audioNode);
+			GefTopoNode audioNode = (GefTopoNode) e.getTarget();
 			// TODO: should request to remove empty columns before layouting
-			addToGrid(audioNode, modelNode instanceof AlsaTopoNodeBe ? 20 : pos.col, pos.row);
-			if (!(modelNode instanceof AlsaTopoNodeBe)) {
+			addToGrid(audioNode, audioNode.getTopoModelNode().isLast() ? 20 : pos.col, pos.row);
+			if (!audioNode.getTopoModelNode().isLast()) {
 				pos.col++;
 				pos = traverseOutgoing(audioNode, pos);
 			}
@@ -180,19 +153,20 @@ public class AlsaTopoZestGraphLayout extends SofXyZestGraphLayout {
 		return pos.max(ctrlPos);
 	}
 
-	private GridPosition traverseIncoming(Node node, GridPosition pos) {
+	private GridPosition traverseIncoming(GefTopoNode node, GridPosition pos) {
 		GridPosition ctrlPos = new GridPosition(pos.col - 1, pos.row + 1);
 		for (Edge e : node.getAllIncomingEdges()) {
-			AlsaTopoConnection topoConn = AlsaTopoZestGraphBuilder.getModelConnection(e);
-			if (topoConn.getType() == Type.CONTROL_PATH) {
+			GefTopoEdge topoEdge = (GefTopoEdge) e;
+			if (!topoEdge.getTopoModelConnection().hasArrow()) {
 				Node ctrlNode = e.getSource();
 				addToGrid(ctrlNode, ctrlPos.col, ctrlPos.row);
 				ctrlPos.col++;
 			} else {
-				Node audioNode = e.getSource();
-				AlsaTopoNode modelNode = AlsaTopoZestGraphBuilder.getModelNode(audioNode);
-				addToGrid(audioNode, modelNode instanceof AlsaTopoNodeBe ? 20 : pos.col, pos.row);
-				if (!(modelNode instanceof AlsaTopoNodeBe)) {
+				GefTopoNode audioNode = (GefTopoNode) e.getSource();
+				if (audioNode == null) //TODO: BUG? echo ref out_drv connection
+					continue;
+				addToGrid(audioNode, audioNode.getTopoModelNode().isLast() ? 20 : pos.col, pos.row);
+				if (!audioNode.getTopoModelNode().isLast()) {
 					pos.col++;
 					pos = traverseIncoming(audioNode, pos);
 				}

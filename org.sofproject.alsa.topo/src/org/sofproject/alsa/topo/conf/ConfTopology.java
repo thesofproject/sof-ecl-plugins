@@ -192,8 +192,6 @@ public class ConfTopology {
 	}
 
 	public void addWidget(ConfWidget widget) {
-		ConfGraph parentGraph = getGraph((Integer)widget.getAttributeValue("index"));
-		parentGraph.addWidget(widget);
 		widgets.add(widget);
 	}
 
