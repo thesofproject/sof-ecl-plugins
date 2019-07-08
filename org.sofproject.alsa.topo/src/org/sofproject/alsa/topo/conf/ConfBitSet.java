@@ -59,6 +59,11 @@ public class ConfBitSet extends ConfAttribute {
 	}
 
 	@Override
+	public Type getNodeAtrributeType() {
+		return Type.NODE_A_BITS;
+	}
+
+	@Override
 	public String getStringValue() {
 		StringBuilder sb = new StringBuilder();
 		long mask = 1;

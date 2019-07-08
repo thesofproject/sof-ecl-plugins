@@ -36,14 +36,17 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
-import org.sofproject.alsa.topo.conf.ConfAttribute;
-import org.sofproject.alsa.topo.model.AlsaTopoGraph;
-import org.sofproject.alsa.topo.ui.editor.AlsaTopoEditor;
+import org.sofproject.alsa.topo.ui.editor.TopoEditor;
+import org.sofproject.alsa.topo.ui.graph.ITopoCollectionNode;
+import org.sofproject.alsa.topo.ui.graph.ITopoElement;
+import org.sofproject.alsa.topo.ui.graph.ITopoGraph;
+import org.sofproject.alsa.topo.ui.graph.ITopoNode;
+import org.sofproject.alsa.topo.ui.graph.ITopoNodeAttribute;
 
-public class AlsaTopoGraphContentOutlinePage extends ContentOutlinePage {
-	AlsaTopoGraph topoModel;
+public class TopoGraphContentOutlinePage extends ContentOutlinePage {
+	ITopoGraph topoModel;
 
-	public AlsaTopoGraphContentOutlinePage(AlsaTopoEditor editor) {
+	public TopoGraphContentOutlinePage(TopoEditor editor) {
 		topoModel = editor.getTopoModel();
 	}
 
@@ -51,7 +54,7 @@ public class AlsaTopoGraphContentOutlinePage extends ContentOutlinePage {
 	public void createControl(Composite parent) {
 		super.createControl(parent);
 		TreeViewer viewer = getTreeViewer();
-		viewer.setContentProvider(new AlsaTopoGraphContentProvider());
+		viewer.setContentProvider(new TopoGraphContentProvider());
 		viewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new AlsaTopoGraphLabelProvider()));
 		viewer.addSelectionChangedListener(this);
 		viewer.setInput(topoModel);
@@ -61,10 +64,20 @@ public class AlsaTopoGraphContentOutlinePage extends ContentOutlinePage {
 
 		@Override
 		public StyledString getStyledText(Object element) {
-			if (element instanceof ConfAttribute) {
-				ConfAttribute ca = (ConfAttribute) element;
-				StyledString s = new StyledString(ca.getName());
-				s.append(" : " + ca.getStringValue(), StyledString.DECORATIONS_STYLER);
+
+			if (element instanceof ITopoCollectionNode) {
+				ITopoCollectionNode topoCol = (ITopoCollectionNode) element;
+				StyledString s = new StyledString(topoCol.getName()).append(" ");
+				s.append(String.format("[%d]", topoCol.size()), StyledString.DECORATIONS_STYLER);
+				return s;
+			} else if (element instanceof ITopoNode) {
+				return new StyledString(((ITopoNode) element).getName());
+			} else if (element instanceof ITopoElement) {
+				return new StyledString(((ITopoElement) element).getName());
+			} else if (element instanceof ITopoNodeAttribute) {
+				ITopoNodeAttribute attr = (ITopoNodeAttribute) element;
+				StyledString s = new StyledString(attr.getName()).append(" : ", StyledString.COUNTER_STYLER)
+						.append(attr.getStringValue(), StyledString.COUNTER_STYLER);
 				return s;
 			}
 

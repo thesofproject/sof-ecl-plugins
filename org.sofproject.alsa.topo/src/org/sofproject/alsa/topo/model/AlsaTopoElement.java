@@ -27,20 +27,30 @@
  *
  */
 
-package org.sofproject.alsa.topo.ui.parts;
+package org.sofproject.alsa.topo.model;
 
-import org.eclipse.gef.zest.fx.parts.NodePart;
-import org.sofproject.alsa.topo.ui.visuals.AlsaTopoNodeCollectionVisual;
+import java.util.Collection;
 
-import javafx.scene.Group;
+import org.sofproject.alsa.topo.conf.ConfElement;
+import org.sofproject.alsa.topo.ui.graph.ITopoElement;
+import org.sofproject.alsa.topo.ui.graph.ITopoNodeAttribute;
 
-public class AlsaTopoNodeCollectionPart extends NodePart {
+public class AlsaTopoElement implements ITopoElement {
 
-	public static final String MODEL_ITEM_ATTR = "alsa-topo-node-model-item";
+	private ConfElement confElement;
+
+	public AlsaTopoElement(ConfElement confElement) {
+		this.confElement = confElement;
+	}
 
 	@Override
-	protected Group doCreateVisual() {
-		return new Group(new AlsaTopoNodeCollectionVisual(getContent()));
+	public String getName() {
+		return confElement.getCategory(); //gives fully q-name
+	}
+
+	@Override
+	public Collection<? extends ITopoNodeAttribute> getAttributes() {
+		return confElement.getAttributes();
 	}
 
 }

@@ -49,6 +49,11 @@ public class ConfBoolean extends ConfAttribute {
 	}
 
 	@Override
+	public Type getNodeAtrributeType() {
+		return Type.NODE_A_BOOLEAN;
+	}
+
+	@Override
 	public void setValue(Object value) {
 		if (value instanceof Boolean)
 			setBooleanValue((Boolean) value);

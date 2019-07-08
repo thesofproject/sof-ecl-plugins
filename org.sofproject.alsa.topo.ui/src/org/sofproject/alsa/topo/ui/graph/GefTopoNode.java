@@ -1,7 +1,5 @@
-package org.sofproject.alsa.topo.ui.editor;
-
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,24 +27,31 @@ package org.sofproject.alsa.topo.ui.editor;
  *
  */
 
-import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
-import org.sofproject.alsa.topo.ui.outline.AlsaTopoGraphContentOutlinePage;
+package org.sofproject.alsa.topo.ui.graph;
 
-public class AlsaTopoEditorToOutlineAdapterFactory implements IAdapterFactory {
+import org.eclipse.gef.graph.Node;
+import org.sofproject.core.binfile.BinStruct;
+import org.sofproject.ui.editor.IBinStructHolder;
 
-	@Override
-	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
-		if (adapterType == IContentOutlinePage.class) {
-			AlsaTopoEditor editor = (AlsaTopoEditor) adaptableObject;
-			return adapterType.cast(new AlsaTopoGraphContentOutlinePage(editor));
-		}
-		return null;
+/**
+ * Connects Gef graph nodes domain with the ITopoNode interface. Visuals may use
+ * the ITopoNode interface, obtained from getTopoModelNode(), directly to query
+ * visual attributes.
+ */
+public class GefTopoNode extends Node implements IBinStructHolder {
+
+	private ITopoNode topoModelNode;
+
+	public GefTopoNode(ITopoNode topoModelNode) {
+		this.topoModelNode = topoModelNode;
+	}
+
+	public ITopoNode getTopoModelNode() {
+		return topoModelNode;
 	}
 
 	@Override
-	public Class<?>[] getAdapterList() {
-		return new Class[] { IContentOutlinePage.class };
+	public BinStruct getBinStruct() {
+		return topoModelNode.getBinStruct();
 	}
-
 }

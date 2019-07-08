@@ -68,4 +68,10 @@ public class ConfReference extends ConfAttribute {
 		setRefValue((ConfElement) value);
 
 	}
+
+	@Override
+	public Type getNodeAtrributeType() {
+		return Type.NODE_A_REFERENCE;
+	}
+
 }

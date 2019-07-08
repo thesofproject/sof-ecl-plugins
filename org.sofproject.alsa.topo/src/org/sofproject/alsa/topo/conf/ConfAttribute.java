@@ -29,7 +29,9 @@
 
 package org.sofproject.alsa.topo.conf;
 
-public abstract class ConfAttribute extends ConfItem {
+import org.sofproject.alsa.topo.ui.graph.ITopoNodeAttribute;
+
+public abstract class ConfAttribute extends ConfItem implements ITopoNodeAttribute {
 
 	public final String typeName;
 
@@ -38,8 +40,15 @@ public abstract class ConfAttribute extends ConfItem {
 		this.typeName = typeName;
 	}
 
+	@Override
+	public String getCategory() {
+		return ((ConfElement) getParent()).getCategory();
+	}
+
+	@Override
 	public abstract void setValue(Object value);
 
+	@Override
 	public abstract Object getValue();
 
 	public String getTypeName() {

@@ -30,59 +30,41 @@
 package org.sofproject.alsa.topo.ui.properties;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
-import org.sofproject.alsa.topo.conf.ConfAttribute;
-import org.sofproject.alsa.topo.conf.ConfElement;
-import org.sofproject.alsa.topo.conf.ConfInteger;
-import org.sofproject.alsa.topo.conf.ConfItem;
-import org.sofproject.alsa.topo.model.AlsaTopoNode;
-import org.sofproject.alsa.topo.ui.graph.AlsaTopoZestGraphBuilder;
-import org.sofproject.alsa.topo.ui.graph.AlsaTopoZestGraphBuilder.BinFileNode;
+import org.sofproject.alsa.topo.ui.graph.GefTopoNode;
+import org.sofproject.alsa.topo.ui.graph.ITopoElement;
+import org.sofproject.alsa.topo.ui.graph.ITopoNode;
+import org.sofproject.alsa.topo.ui.graph.ITopoNodeAttribute;
 
-public class AlsaTplgPropertySource implements IPropertySource {
+public class TopoNodePropertySource implements IPropertySource {
 
-	private AlsaTopoNode topoNode;
 	private List<IPropertyDescriptor> properties;
 
-	public AlsaTplgPropertySource(BinFileNode item) {
+	public TopoNodePropertySource(GefTopoNode item) {
 		properties = new ArrayList<IPropertyDescriptor>();
-		topoNode = AlsaTopoZestGraphBuilder.getModelNode(item);
-
-		addProperties(topoNode.getConfElement(), buildCategory(topoNode.getConfElement()));
-		for (ConfItem child : topoNode.getConfElement().getChildren()) {
-			if (child instanceof ConfElement) {
-				ConfElement embedded = (ConfElement) child;
-				addProperties(embedded, buildCategory(embedded));
-			}
+		ITopoNode modelNode = item.getTopoModelNode();
+		addAttributes(modelNode.getAttributes());
+		for (ITopoElement element : modelNode.getChildElements()) {
+			addAttributes(element.getAttributes());
 		}
-
 	}
 
-	private static String buildCategory(ConfElement element) {
-		String secName = element.getSectionName();
-		if (secName == null)
-			secName = "";
-		return new StringBuilder(secName).append(".\"").append(element.getName()).append("\"")
-				.toString();
-	}
-
-	private void addProperties(ConfElement element, String category) {
-		for (ConfAttribute attrib : element.getAttributes()) {
-			PropertyDescriptor pd = new PropertyDescriptor(attrib, attrib.getName());
-			pd.setCategory(category);
-			StringBuilder sb = new StringBuilder(attrib.getTypeName()).append(" : ").append(attrib.getName());
-			pd.setDescription(sb.toString());
+	private void addAttributes(Collection<? extends ITopoNodeAttribute> attributes) {
+		for (ITopoNodeAttribute attr : attributes) {
+			PropertyDescriptor pd = new PropertyDescriptor(attr, attr.getName());
+			pd.setCategory(attr.getCategory());
 			properties.add(pd);
 		}
 	}
 
 	@Override
 	public Object getEditableValue() {
-		return null;
+		return this;
 	}
 
 	@Override
@@ -92,8 +74,9 @@ public class AlsaTplgPropertySource implements IPropertySource {
 
 	@Override
 	public Object getPropertyValue(Object id) {
-		if (id instanceof ConfAttribute)
-			return ((ConfAttribute) id).getStringValue();
+		if (id instanceof ITopoNodeAttribute) {
+			return ((ITopoNodeAttribute) id).getValue();
+		}
 		return null;
 	}
 
@@ -112,10 +95,8 @@ public class AlsaTplgPropertySource implements IPropertySource {
 	@Override
 	public void setPropertyValue(Object id, Object value) {
 		// TODO: should go through some specialized validation method
-		if (id instanceof ConfInteger && value instanceof String) {
-			((ConfInteger) id).setIntValue(Integer.parseInt((String) value));
-		} else if (id instanceof ConfAttribute) {
-			((ConfAttribute) id).setValue(value);
+		if (id instanceof ITopoNodeAttribute) {
+			((ITopoNodeAttribute) id).setValue(value);
 		}
 	}
 }

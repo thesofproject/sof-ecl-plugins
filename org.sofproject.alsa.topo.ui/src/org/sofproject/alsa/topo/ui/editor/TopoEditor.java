@@ -32,7 +32,9 @@ package org.sofproject.alsa.topo.ui.editor;
 import java.io.IOException;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.gef.graph.Graph;
 import org.eclipse.gef.mvc.fx.ui.MvcFxUiModule;
 import org.eclipse.gef.mvc.fx.ui.parts.AbstractFXEditor;
@@ -41,9 +43,9 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
-import org.sofproject.alsa.topo.model.AlsaTopoFactory;
-import org.sofproject.alsa.topo.model.AlsaTopoGraph;
-import org.sofproject.alsa.topo.ui.graph.AlsaTopoZestGraphBuilder;
+import org.sofproject.alsa.topo.ui.graph.ITopoFactory;
+import org.sofproject.alsa.topo.ui.graph.ITopoGraph;
+import org.sofproject.alsa.topo.ui.graph.TopoZestGraphBuilder;
 import org.sofproject.core.binfile.BinFile;
 import org.sofproject.ui.editor.IBinFileEditor;
 import org.sofproject.ui.properties.SofPropertySheetPage;
@@ -51,13 +53,13 @@ import org.sofproject.ui.properties.SofPropertySheetPage;
 import com.google.inject.Guice;
 import com.google.inject.util.Modules;
 
-public class AlsaTopoEditor extends AbstractFXEditor implements IBinFileEditor {
+public class TopoEditor extends AbstractFXEditor implements IBinFileEditor {
 
-	private AlsaTopoGraph topoModel = null;
+	private ITopoGraph topoModel = null;
 	private Graph zestGraph;
 
-	public AlsaTopoEditor() {
-		super(Guice.createInjector(Modules.override(new AlsaTopoModule()).with(new MvcFxUiModule())));
+	public TopoEditor() {
+		super(Guice.createInjector(Modules.override(new TopoModule()).with(new MvcFxUiModule())));
 	}
 
 	@Override
@@ -93,14 +95,24 @@ public class AlsaTopoEditor extends AbstractFXEditor implements IBinFileEditor {
 			e1.printStackTrace();
 		}
 
-		setPartName("Alsa topo " + input.getName());
+		setPartName("Topology " + input.getName());
 
 		// TODO: should be run as runnable with progress, as non-blocking operation
 		if (input instanceof IFileEditorInput) {
 			IFileEditorInput fileInput = (IFileEditorInput) input;
 			try {
-				topoModel = AlsaTopoFactory.readTopo(fileInput.getName(), fileInput.getFile().getContents().available(),
-						fileInput.getFile().getContents());
+
+				for (IConfigurationElement cfg : Platform.getExtensionRegistry()
+						.getConfigurationElementsFor("org.sofproject.topo.providers")) {
+					if (!cfg.getAttribute("file_extension").equals(fileInput.getFile().getFileExtension()))
+						continue;
+					Object factory = cfg.createExecutableExtension("class");
+					if (factory instanceof ITopoFactory) {
+						topoModel = ((ITopoFactory) factory).read(fileInput.getName(),
+								fileInput.getFile().getContents().available(), fileInput.getFile().getContents());
+					}
+				}
+
 			} catch (CoreException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -108,7 +120,7 @@ public class AlsaTopoEditor extends AbstractFXEditor implements IBinFileEditor {
 		}
 
 		if (topoModel != null) {
-			zestGraph = new AlsaTopoZestGraphBuilder().build(topoModel);
+			zestGraph = new TopoZestGraphBuilder().build(topoModel);
 		}
 		getContentViewer().getContents().setAll(zestGraph);
 	}
@@ -126,7 +138,11 @@ public class AlsaTopoEditor extends AbstractFXEditor implements IBinFileEditor {
 		return super.getAdapter(key);
 	}
 
-	public AlsaTopoGraph getTopoModel() {
+	public Graph getGraph() {
+		return zestGraph;
+	}
+
+	public ITopoGraph getTopoModel() {
 		return topoModel;
 	}
 

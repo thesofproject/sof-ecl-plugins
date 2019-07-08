@@ -59,4 +59,10 @@ public class ConfString extends ConfAttribute {
 			throw new RuntimeException("Expected String value");
 		setStringValue((String) value);
 	}
+
+	@Override
+	public Type getNodeAtrributeType() {
+		return Type.NODE_A_STRING;
+	}
+
 }

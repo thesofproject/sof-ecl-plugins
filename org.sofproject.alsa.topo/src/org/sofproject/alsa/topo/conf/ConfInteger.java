@@ -58,6 +58,11 @@ public class ConfInteger extends ConfAttribute {
 	}
 
 	@Override
+	public Type getNodeAtrributeType() {
+		return Type.NODE_A_INTEGER;
+	}
+
+	@Override
 	public void setValue(Object value) {
 		if (value instanceof Integer)
 			setIntValue((Integer) value);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,40 +29,19 @@
 
 package org.sofproject.alsa.topo.ui.parts;
 
-import java.util.Map;
+import org.eclipse.gef.graph.Edge;
+import org.eclipse.gef.graph.Node;
+import org.eclipse.gef.zest.fx.parts.GraphPart;
 
-import org.eclipse.gef.mvc.fx.parts.AbstractContentPart;
-import org.eclipse.gef.mvc.fx.parts.IContentPart;
-import org.eclipse.gef.zest.fx.parts.ZestFxContentPartFactory;
-import org.sofproject.alsa.topo.ui.graph.AlsaTopoZestGraphBuilder.CollectionNode;
-
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-
-import javafx.scene.Node;
-
-public class AlsaTopoPartsFactory extends ZestFxContentPartFactory {
-	@Inject
-	private Injector injector;
+public class TopoGraphPart extends GraphPart {
 
 	@Override
-	public IContentPart<? extends Node> createContentPart(Object content, Map<Object, Object> contextMap) {
-		AbstractContentPart<? extends Node> part = null;
-
-		if (content == null) {
-			throw new IllegalArgumentException("null content");
+	protected void doRemoveContentChild(Object contentChild) {
+		if (contentChild instanceof Node) {
+			getContent().getNodes().remove(contentChild);
+		} else if (contentChild instanceof Edge) {
+			getContent().getEdges().remove(contentChild);
 		}
-		if (content instanceof org.eclipse.gef.graph.Graph) {
-			part = new AlsaTopoGraphPart();
-		} else if (content instanceof CollectionNode) {
-			part = new AlsaTopoNodeCollectionPart();
-		} else if (content instanceof org.eclipse.gef.graph.Node) {
-			part = new AlsaTopoNodePart();
-		}
-		if (part != null) {
-			injector.injectMembers(part);
-			return part;
-		}
-		return super.createContentPart(content, contextMap);
 	}
+
 }

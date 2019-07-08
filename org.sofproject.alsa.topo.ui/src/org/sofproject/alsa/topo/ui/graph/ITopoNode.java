@@ -27,50 +27,73 @@
  *
  */
 
-package org.sofproject.alsa.topo.conf;
+package org.sofproject.alsa.topo.ui.graph;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+
+import org.sofproject.core.binfile.BinStruct;
+
+import javafx.scene.paint.Color;
 
 /**
- * Attribute that is a reference to another top level element (serialized as a
- * uniquely named section). Value of the attribute is the unique name of
- * referenced element.
+ * A topology node interface implemented by nodes created by a specific topology
+ * binding.
+ *
+ * Each item is held by a GefTopoNode (inherited from Node) instance inserted
+ * directly into the graph.
  */
-public class ConfRefArray extends ConfAttribute {
-
-	private static final String TYPE_NAME = "reference[]";
+public interface ITopoNode extends ITopoElement {
 
 	/**
-	 * Array of references to another elements.
+	 * @return Short description of the node (displayed below the name).
 	 */
-	private List<ConfElement> value = new ArrayList<>();
+	public String getDescription();
 
-	public ConfRefArray(String name) {
-		super(TYPE_NAME, name);
-	}
+	/**
+	 * @return Tooltip for the node.
+	 */
+	public String getTooltip();
 
-	public void addRefValue(ConfElement value) {
-		this.value.add(value);
-	}
+	/**
+	 * @return true if node should be positioned in the first column
+	 */
+	public boolean isFirst();
 
-	public int size() {
-		return value.size();
-	}
+	/**
+	 * @return true if node should be positioned in the last column
+	 */
+	public boolean isLast();
 
-	@Override
-	public Object getValue() {
-		return value;
-	}
+	/**
+	 * @return Parent collection node or null.
+	 */
+	public ITopoCollectionNode getParent();
 
-	@Override
-	public void setValue(Object value) {
-		throw new RuntimeException("Unsupported");
-	}
+	/**
+	 * @return Child elements that are not visualized as separate nodes but have
+	 *         editable attributes.
+	 */
+	public Collection<? extends ITopoElement> getChildElements();
 
-	@Override
-	public Type getNodeAtrributeType() {
-		return Type.NODE_A_OTHER;
-	}
+	/**
+	 * @return Color used to fill the node.
+	 */
+	public Color getColor();
+
+	/**
+	 * @return Color of the border.
+	 */
+	public Color getBorderColor();
+
+	/**
+	 * @return Width of the border.
+	 */
+	public double getBorderWidth();
+
+	/**
+	 * @return Binary structure reference if there is a binary representation of the
+	 *         model already built, null otherwise.
+	 */
+	public BinStruct getBinStruct();
 
 }

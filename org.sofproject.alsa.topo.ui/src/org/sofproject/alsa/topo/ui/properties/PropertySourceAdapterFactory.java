@@ -31,17 +31,17 @@ package org.sofproject.alsa.topo.ui.properties;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.views.properties.IPropertySource;
-import org.sofproject.alsa.topo.ui.graph.AlsaTopoZestGraphBuilder.BinFileNode;
+import org.sofproject.alsa.topo.ui.graph.GefTopoNode;
 
 public class PropertySourceAdapterFactory implements IAdapterFactory {
 
 	@Override
 	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
 		if (IPropertySource.class.equals(adapterType)) {
-			if (adaptableObject instanceof BinFileNode) {
-				return adapterType.cast(new AlsaTplgPropertySource((BinFileNode) adaptableObject));
-
+			if (adaptableObject instanceof GefTopoNode) {
+				return adapterType.cast(new TopoNodePropertySource((GefTopoNode) adaptableObject));
 			}
+			// TODO: need support for properties of connections?
 		}
 		return null;
 	}

@@ -53,6 +53,12 @@ public class ConfBytes extends ConfAttribute {
 	}
 
 	@Override
+	public Type getNodeAtrributeType() {
+		// TODO:
+		return Type.NODE_A_OTHER;
+	}
+
+	@Override
 	public String getStringValue() {
 		StringBuilder sb = new StringBuilder();
 		int i = 0;

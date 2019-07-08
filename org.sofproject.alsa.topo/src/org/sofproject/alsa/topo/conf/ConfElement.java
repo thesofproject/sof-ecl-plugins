@@ -52,6 +52,8 @@ public class ConfElement extends ConfItem {
 	 */
 	private String sectionName;
 
+	private String categoryName;
+
 	/**
 	 * Map of attributes. References to external elements are represented as
 	 * attributes.
@@ -88,6 +90,7 @@ public class ConfElement extends ConfItem {
 	 */
 	public void setSectionName(String sectionName) {
 		this.sectionName = sectionName;
+		categoryName = new StringBuilder(sectionName).append(".\"").append(getName()).append("\"").toString();
 	}
 
 	protected ConfElement getChildElement(String sectionName, String name) {
@@ -105,6 +108,10 @@ public class ConfElement extends ConfItem {
 		return sectionName;
 	}
 
+	public String getCategory() {
+		return categoryName;
+	}
+
 	@Override
 	public boolean hasChildren() {
 		return !children.isEmpty();
@@ -117,6 +124,7 @@ public class ConfElement extends ConfItem {
 
 	protected void addChild(ConfItem child) {
 		children.add(child);
+		child.setParent(this);
 	}
 
 	protected void addAttribute(ConfAttribute attribute) {

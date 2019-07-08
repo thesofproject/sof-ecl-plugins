@@ -64,4 +64,10 @@ public class ConfLong extends ConfAttribute {
 		else
 			throw new RuntimeException("Expected Long value for " + getName() + ", got " + value.getClass());
 	}
+
+	@Override
+	public Type getNodeAtrributeType() {
+		return Type.NODE_A_LONG;
+	}
+
 }

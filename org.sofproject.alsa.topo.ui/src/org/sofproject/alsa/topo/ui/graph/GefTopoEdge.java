@@ -27,21 +27,38 @@
  *
  */
 
-package org.sofproject.alsa.topo.ui.parts;
+package org.sofproject.alsa.topo.ui.graph;
 
 import org.eclipse.gef.graph.Edge;
-import org.eclipse.gef.graph.Node;
-import org.eclipse.gef.zest.fx.parts.GraphPart;
+import org.eclipse.gef.zest.fx.ZestProperties;
 
-public class AlsaTopoGraphPart extends GraphPart {
+import javafx.scene.shape.Polygon;
 
-	@Override
-	protected void doRemoveContentChild(Object contentChild) {
-		if (contentChild instanceof Node) {
-			getContent().getNodes().remove(contentChild);
-		} else if (contentChild instanceof Edge) {
-			getContent().getEdges().remove(contentChild);
+/**
+ * Connects Gef graph edges domain with the ITopoConnection interface. Visuals
+ * may use the ITopoConnection interface, obtained from
+ * getTopoModelConnection(), directly to query visual attributes.
+ */
+public class GefTopoEdge extends Edge {
+
+	public static class EdgeArrow extends Polygon {
+		public EdgeArrow() {
+			super(0, 0, 5, 3, 5, -3);
 		}
+	}
+
+	private ITopoConnection topoModelConnection;
+
+	public GefTopoEdge(ITopoConnection topoModelConnection, GefTopoNode source, GefTopoNode target) {
+		super(source, target);
+		this.topoModelConnection = topoModelConnection;
+		if (topoModelConnection.hasArrow()) {
+			getAttributes().put(ZestProperties.TARGET_DECORATION__E, new EdgeArrow());
+		}
+	}
+
+	public ITopoConnection getTopoModelConnection() {
+		return topoModelConnection;
 	}
 
 }

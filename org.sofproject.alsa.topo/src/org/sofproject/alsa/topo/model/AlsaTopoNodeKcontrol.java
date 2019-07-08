@@ -31,6 +31,9 @@ package org.sofproject.alsa.topo.model;
 
 import org.sofproject.alsa.topo.conf.ConfControlBytes;
 import org.sofproject.alsa.topo.conf.ConfControlMixer;
+import org.sofproject.ui.resources.SofResources;
+
+import javafx.scene.paint.Color;
 
 public class AlsaTopoNodeKcontrol extends AlsaTopoNode {
 
@@ -42,6 +45,11 @@ public class AlsaTopoNodeKcontrol extends AlsaTopoNode {
 	public AlsaTopoNodeKcontrol(ConfControlBytes bytes) {
 		super(bytes);
 		setTypeName("kcontrol : bytes");
+	}
+
+	@Override
+	public Color getColor() {
+		return SofResources.SOF_LIGHT_RED;
 	}
 
 }

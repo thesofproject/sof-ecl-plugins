@@ -27,50 +27,25 @@
  *
  */
 
-package org.sofproject.alsa.topo.conf;
+package org.sofproject.alsa.topo.ui.graph;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 /**
- * Attribute that is a reference to another top level element (serialized as a
- * uniquely named section). Value of the attribute is the unique name of
- * referenced element.
+ * Interface for simple embedded elements, part of nodes. Embedded elements do
+ * not have their visuals like ITopoNode but are presented in structured form in
+ * places like Outline or Properties view.
  */
-public class ConfRefArray extends ConfAttribute {
-
-	private static final String TYPE_NAME = "reference[]";
+public interface ITopoElement {
 
 	/**
-	 * Array of references to another elements.
+	 * @return Name of the element.
 	 */
-	private List<ConfElement> value = new ArrayList<>();
+	public String getName();
 
-	public ConfRefArray(String name) {
-		super(TYPE_NAME, name);
-	}
-
-	public void addRefValue(ConfElement value) {
-		this.value.add(value);
-	}
-
-	public int size() {
-		return value.size();
-	}
-
-	@Override
-	public Object getValue() {
-		return value;
-	}
-
-	@Override
-	public void setValue(Object value) {
-		throw new RuntimeException("Unsupported");
-	}
-
-	@Override
-	public Type getNodeAtrributeType() {
-		return Type.NODE_A_OTHER;
-	}
+	/**
+	 * @return Attributes of the node.
+	 */
+	public Collection<? extends ITopoNodeAttribute> getAttributes();
 
 }

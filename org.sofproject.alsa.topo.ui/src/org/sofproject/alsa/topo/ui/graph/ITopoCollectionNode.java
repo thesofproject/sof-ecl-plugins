@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,39 +27,35 @@
  *
  */
 
-package org.sofproject.alsa.topo.ui.resources;
+package org.sofproject.alsa.topo.ui.graph;
 
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
+import java.util.Collection;
 
-public class AlsaTopoResources {
+/**
+ * Interface for topology nodes that represent floating collections of other
+ * nodes. For example nodes referenced by others (maybe shared) but not
+ * displayed in the main graph (excluded from the set returned by getNodes()).
+ */
+public interface ITopoCollectionNode {
 
-	private static Font boldFont;
-	private static Font mediumFont;
-	private static Font smallFont;
+	/**
+	 * @return Name of the collection of nodes.
+	 */
+	public String getName();
 
-	public static Font getGraphBoldFont() {
-		if (boldFont == null) {
-			Font def = Font.getDefault();
-			boldFont = Font.font(def.getFamily(), FontWeight.BOLD, def.getSize() - 1);
-		}
-		return boldFont;
-	}
+	/**
+	 * @return true if collection should be displayed in the graph.
+	 */
+	public boolean isVisible();
 
-	public static Font getGraphSmallFont() {
-		if (smallFont == null) {
-			Font def = Font.getDefault();
-			smallFont = Font.font(def.getFamily(), FontPosture.ITALIC, def.getSize() - 3);
-		}
-		return smallFont;
-	}
+	/**
+	 * @return Number of children.
+	 */
+	public int size();
 
-	public static Font getGraphMediumFont() {
-		if (mediumFont == null) {
-			Font def = Font.getDefault();
-			mediumFont = Font.font(def.getFamily(), def.getSize() - 2);
-		}
-		return mediumFont;
-	}
+	/**
+	 * @return Children nodes.
+	 */
+	public Collection<? extends ITopoNode> getChildren();
+
 }

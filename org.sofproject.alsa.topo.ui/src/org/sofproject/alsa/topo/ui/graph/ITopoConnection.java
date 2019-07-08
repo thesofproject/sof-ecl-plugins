@@ -27,50 +27,33 @@
  *
  */
 
-package org.sofproject.alsa.topo.conf;
+package org.sofproject.alsa.topo.ui.graph;
 
-import java.util.ArrayList;
-import java.util.List;
+import javafx.scene.paint.Color;
 
 /**
- * Attribute that is a reference to another top level element (serialized as a
- * uniquely named section). Value of the attribute is the unique name of
- * referenced element.
+ * Interface for topology connections.
  */
-public class ConfRefArray extends ConfAttribute {
-
-	private static final String TYPE_NAME = "reference[]";
+public interface ITopoConnection {
 
 	/**
-	 * Array of references to another elements.
+	 * @return Source node.
 	 */
-	private List<ConfElement> value = new ArrayList<>();
+	public ITopoNode getSource();
 
-	public ConfRefArray(String name) {
-		super(TYPE_NAME, name);
-	}
+	/**
+	 * @return Target node.
+	 */
+	public ITopoNode getTarget();
 
-	public void addRefValue(ConfElement value) {
-		this.value.add(value);
-	}
+	/**
+	 * @return true if this is directed connection.
+	 */
+	public boolean hasArrow();
 
-	public int size() {
-		return value.size();
-	}
-
-	@Override
-	public Object getValue() {
-		return value;
-	}
-
-	@Override
-	public void setValue(Object value) {
-		throw new RuntimeException("Unsupported");
-	}
-
-	@Override
-	public Type getNodeAtrributeType() {
-		return Type.NODE_A_OTHER;
-	}
+	/**
+	 * @return Color of the edge.
+	 */
+	public Color getColor();
 
 }

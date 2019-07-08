@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,23 +27,14 @@
  *
  */
 
-package org.sofproject.alsa.topo.ui.parts;
+package org.sofproject.alsa.topo.ui.graph;
 
-import org.eclipse.gef.zest.fx.parts.NodePart;
-import org.sofproject.alsa.topo.ui.visuals.AlsaTopoNodeVisual;
+import java.io.InputStream;
 
-import javafx.scene.Group;
-
-public class AlsaTopoNodePart extends NodePart {
-
-	public static final String COLOR_ATTR = "alsa-topo-node-color";
-	public static final String BORDER_COLOR_ATTR = "alsa-topo-node-border-color";
-	public static final String BORDER_WIDTH_ATTR = "alsa-topo-node-border-width";
-	public static final String MODEL_ITEM_ATTR = "alsa-topo-node-model-item";
-	public static final String BIN_ITEM_ATTR = "alsa-topo-node-bin-item";
-
-	@Override
-	protected Group doCreateVisual() {
-		return new Group(new AlsaTopoNodeVisual(getContent()));
-	}
+/**
+ * Topology graph factory, implemented by a specific topology binding.
+ *
+ */
+public interface ITopoFactory {
+	public ITopoGraph read(String fileName, int availableSize, InputStream inputStream);
 }
