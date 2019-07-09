@@ -29,7 +29,6 @@
 package org.sofproject.fw.keys;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class SimpleFwKeyResolver {
 
@@ -73,8 +72,8 @@ public class SimpleFwKeyResolver {
 		return instance;
 	}
 
-	public static String searchModulusName(List<byte[]> modulus) {
-		byte[] mod10 = Arrays.copyOf(modulus.get(0), 10);
+	public static String searchModulusName(byte[] modulus) {
+		byte[] mod10 = Arrays.copyOf(modulus, 10);
 		for (KeyEntry key : getInstance().keys) {
 			if (Arrays.equals(key.keyBegin, mod10))
 				return key.keyName;
@@ -82,10 +81,10 @@ public class SimpleFwKeyResolver {
 		return getFrontHex(modulus);
 	}
 
-	private static String getFrontHex(List<byte[]> modulus) {
+	private static String getFrontHex(byte[] modulus) {
 		int i = 0;
 		StringBuffer sb = new StringBuffer("[");
-		for (byte b : modulus.get(0)) {
+		for (byte b : modulus) {
 			sb.append(String.format("%02x ", b));
 			if (++i == 10) {
 				sb.append("...");

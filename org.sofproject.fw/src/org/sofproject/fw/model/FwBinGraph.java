@@ -138,7 +138,7 @@ public class FwBinGraph {
 		binBlock.setAttribute(FwBinBlock.AG_GRAPH, "version", hdr.getChildItem("ver").getValueString());
 		binBlock.setAttribute(FwBinBlock.AG_GRAPH, "date", hdr.getChildItem("date").getValueString());
 		binBlock.setAttribute(FwBinBlock.AG_GRAPH, "signing key",
-				SimpleFwKeyResolver.searchModulusName((List<byte[]>) hdr.getChildValue("modulus")));
+				SimpleFwKeyResolver.searchModulusName((byte[]) hdr.getChildValue("modulus")));
 	}
 
 	private static void addFwVersionAttribs(FwBinBlock binBlock, BinStructFwVersion fwVer) {
