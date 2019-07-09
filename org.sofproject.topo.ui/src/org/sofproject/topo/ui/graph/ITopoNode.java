@@ -27,51 +27,73 @@
  *
  */
 
-package org.sofproject.alsa.topo.model;
+package org.sofproject.topo.ui.graph;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
-import org.sofproject.alsa.topo.conf.ConfGraph;
-import org.sofproject.topo.ui.graph.ITopoCollectionNode;
-import org.sofproject.topo.ui.graph.ITopoNode;
+import org.sofproject.core.binfile.BinStruct;
+
+import javafx.scene.paint.Color;
 
 /**
- * Pipeline is a list of connected widgets. Connected to ConfGraph to generate
- * graph item (set of lines).
+ * A topology node interface implemented by nodes created by a specific topology
+ * binding.
+ *
+ * Each item is held by a GefTopoNode (inherited from Node) instance inserted
+ * directly into the graph.
  */
-public class AlsaTopoPipeline extends AlsaTopoNode implements ITopoCollectionNode {
+public interface ITopoNode extends ITopoElement {
 
-	private Map<String, AlsaTopoNode> widgets = new LinkedHashMap<>();
-	private Map<String, AlsaTopoConnection> connections = new HashMap<>();
+	/**
+	 * @return Short description of the node (displayed below the name).
+	 */
+	public String getDescription();
 
-	public AlsaTopoPipeline(ConfGraph confGraph) {
-		super(confGraph);
-	}
+	/**
+	 * @return Tooltip for the node.
+	 */
+	public String getTooltip();
 
-	public void add(AlsaTopoNode widget) {
-		widgets.put(widget.getName(), widget);
-	}
+	/**
+	 * @return true if node should be positioned in the first column
+	 */
+	public boolean isFirst();
 
-	public void add(AlsaTopoConnection connection) {
-		connections.put(connection.getName(), connection);
-	}
+	/**
+	 * @return true if node should be positioned in the last column
+	 */
+	public boolean isLast();
 
-	@Override
-	public boolean isVisible() {
-		return false;
-	}
+	/**
+	 * @return Parent collection node or null.
+	 */
+	public ITopoCollectionNode getParent();
 
-	@Override
-	public int size() {
-		return widgets.size();
-	}
+	/**
+	 * @return Child elements that are not visualized as separate nodes but have
+	 *         editable attributes.
+	 */
+	public Collection<? extends ITopoElement> getChildElements();
 
-	@Override
-	public Collection<? extends ITopoNode> getChildren() {
-		return widgets.values();
-	}
+	/**
+	 * @return Color used to fill the node.
+	 */
+	public Color getColor();
+
+	/**
+	 * @return Color of the border.
+	 */
+	public Color getBorderColor();
+
+	/**
+	 * @return Width of the border.
+	 */
+	public double getBorderWidth();
+
+	/**
+	 * @return Binary structure reference if there is a binary representation of the
+	 *         model already built, null otherwise.
+	 */
+	public BinStruct getBinStruct();
 
 }

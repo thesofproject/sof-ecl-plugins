@@ -29,7 +29,7 @@
 
 package org.sofproject.alsa.topo.conf;
 
-import org.sofproject.alsa.topo.ui.graph.ITopoNodeAttribute;
+import org.sofproject.topo.ui.graph.ITopoNodeAttribute;
 
 public abstract class ConfAttribute extends ConfItem implements ITopoNodeAttribute {
 

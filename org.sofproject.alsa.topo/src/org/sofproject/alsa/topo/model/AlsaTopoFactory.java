@@ -33,10 +33,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.sofproject.alsa.topo.binfile.BinTopoBlockFactory;
-import org.sofproject.alsa.topo.ui.graph.ITopoFactory;
-import org.sofproject.alsa.topo.ui.graph.ITopoGraph;
 import org.sofproject.core.binfile.BinFile;
 import org.sofproject.core.binfile.BinFileReader;
+import org.sofproject.topo.ui.graph.ITopoFactory;
+import org.sofproject.topo.ui.graph.ITopoGraph;
 
 public class AlsaTopoFactory implements ITopoFactory {
 

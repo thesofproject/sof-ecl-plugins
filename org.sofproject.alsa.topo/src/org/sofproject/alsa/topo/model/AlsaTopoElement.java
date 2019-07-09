@@ -32,8 +32,8 @@ package org.sofproject.alsa.topo.model;
 import java.util.Collection;
 
 import org.sofproject.alsa.topo.conf.ConfElement;
-import org.sofproject.alsa.topo.ui.graph.ITopoElement;
-import org.sofproject.alsa.topo.ui.graph.ITopoNodeAttribute;
+import org.sofproject.topo.ui.graph.ITopoElement;
+import org.sofproject.topo.ui.graph.ITopoNodeAttribute;
 
 public class AlsaTopoElement implements ITopoElement {
 

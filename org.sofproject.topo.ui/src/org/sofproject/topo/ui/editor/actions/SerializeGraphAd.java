@@ -26,52 +26,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+package org.sofproject.topo.ui.editor.actions;
 
-package org.sofproject.alsa.topo.model;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.handlers.HandlerUtil;
+import org.sofproject.topo.ui.editor.TopoEditor;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.sofproject.alsa.topo.conf.ConfGraph;
-import org.sofproject.topo.ui.graph.ITopoCollectionNode;
-import org.sofproject.topo.ui.graph.ITopoNode;
-
-/**
- * Pipeline is a list of connected widgets. Connected to ConfGraph to generate
- * graph item (set of lines).
- */
-public class AlsaTopoPipeline extends AlsaTopoNode implements ITopoCollectionNode {
-
-	private Map<String, AlsaTopoNode> widgets = new LinkedHashMap<>();
-	private Map<String, AlsaTopoConnection> connections = new HashMap<>();
-
-	public AlsaTopoPipeline(ConfGraph confGraph) {
-		super(confGraph);
-	}
-
-	public void add(AlsaTopoNode widget) {
-		widgets.put(widget.getName(), widget);
-	}
-
-	public void add(AlsaTopoConnection connection) {
-		connections.put(connection.getName(), connection);
-	}
+public class SerializeGraphAd extends AbstractHandler {
 
 	@Override
-	public boolean isVisible() {
-		return false;
-	}
-
-	@Override
-	public int size() {
-		return widgets.size();
-	}
-
-	@Override
-	public Collection<? extends ITopoNode> getChildren() {
-		return widgets.values();
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		IEditorPart ed = HandlerUtil.getActiveEditor(event);
+		if (ed instanceof TopoEditor) {
+			((TopoEditor) ed).serializeGraph();
+		}
+		return null;
 	}
 
 }

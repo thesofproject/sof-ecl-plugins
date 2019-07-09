@@ -27,51 +27,31 @@
  *
  */
 
-package org.sofproject.alsa.topo.model;
+package org.sofproject.topo.ui.graph;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.sofproject.alsa.topo.conf.ConfGraph;
-import org.sofproject.topo.ui.graph.ITopoCollectionNode;
-import org.sofproject.topo.ui.graph.ITopoNode;
+import org.eclipse.gef.graph.Node;
+import org.sofproject.core.binfile.BinStruct;
+import org.sofproject.ui.editor.IBinStructHolder;
 
 /**
- * Pipeline is a list of connected widgets. Connected to ConfGraph to generate
- * graph item (set of lines).
+ * Connects Gef graph nodes domain with the ITopoNode interface. Visuals may use
+ * the ITopoNode interface, obtained from getTopoModelNode(), directly to query
+ * visual attributes.
  */
-public class AlsaTopoPipeline extends AlsaTopoNode implements ITopoCollectionNode {
+public class GefTopoNode extends Node implements IBinStructHolder {
 
-	private Map<String, AlsaTopoNode> widgets = new LinkedHashMap<>();
-	private Map<String, AlsaTopoConnection> connections = new HashMap<>();
+	private ITopoNode topoModelNode;
 
-	public AlsaTopoPipeline(ConfGraph confGraph) {
-		super(confGraph);
+	public GefTopoNode(ITopoNode topoModelNode) {
+		this.topoModelNode = topoModelNode;
 	}
 
-	public void add(AlsaTopoNode widget) {
-		widgets.put(widget.getName(), widget);
-	}
-
-	public void add(AlsaTopoConnection connection) {
-		connections.put(connection.getName(), connection);
+	public ITopoNode getTopoModelNode() {
+		return topoModelNode;
 	}
 
 	@Override
-	public boolean isVisible() {
-		return false;
+	public BinStruct getBinStruct() {
+		return topoModelNode.getBinStruct();
 	}
-
-	@Override
-	public int size() {
-		return widgets.size();
-	}
-
-	@Override
-	public Collection<? extends ITopoNode> getChildren() {
-		return widgets.values();
-	}
-
 }

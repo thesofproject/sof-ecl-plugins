@@ -29,8 +29,8 @@
 
 package org.sofproject.alsa.topo.model;
 
-import org.sofproject.alsa.topo.ui.graph.ITopoConnection;
-import org.sofproject.alsa.topo.ui.graph.ITopoNode;
+import org.sofproject.topo.ui.graph.ITopoConnection;
+import org.sofproject.topo.ui.graph.ITopoNode;
 
 import javafx.scene.paint.Color;
 

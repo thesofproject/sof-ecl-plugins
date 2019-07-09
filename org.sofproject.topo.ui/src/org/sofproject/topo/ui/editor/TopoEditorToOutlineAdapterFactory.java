@@ -1,5 +1,7 @@
+package org.sofproject.topo.ui.editor;
+
 /*
- * Copyright (c) 2019, Intel Corporation
+ * Copyright (c) 2018, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,51 +29,24 @@
  *
  */
 
-package org.sofproject.alsa.topo.model;
+import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.sofproject.topo.ui.outline.TopoGraphContentOutlinePage;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+public class TopoEditorToOutlineAdapterFactory implements IAdapterFactory {
 
-import org.sofproject.alsa.topo.conf.ConfGraph;
-import org.sofproject.topo.ui.graph.ITopoCollectionNode;
-import org.sofproject.topo.ui.graph.ITopoNode;
-
-/**
- * Pipeline is a list of connected widgets. Connected to ConfGraph to generate
- * graph item (set of lines).
- */
-public class AlsaTopoPipeline extends AlsaTopoNode implements ITopoCollectionNode {
-
-	private Map<String, AlsaTopoNode> widgets = new LinkedHashMap<>();
-	private Map<String, AlsaTopoConnection> connections = new HashMap<>();
-
-	public AlsaTopoPipeline(ConfGraph confGraph) {
-		super(confGraph);
-	}
-
-	public void add(AlsaTopoNode widget) {
-		widgets.put(widget.getName(), widget);
-	}
-
-	public void add(AlsaTopoConnection connection) {
-		connections.put(connection.getName(), connection);
+	@Override
+	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
+		if (adapterType == IContentOutlinePage.class) {
+			TopoEditor editor = (TopoEditor) adaptableObject;
+			return adapterType.cast(new TopoGraphContentOutlinePage(editor));
+		}
+		return null;
 	}
 
 	@Override
-	public boolean isVisible() {
-		return false;
-	}
-
-	@Override
-	public int size() {
-		return widgets.size();
-	}
-
-	@Override
-	public Collection<? extends ITopoNode> getChildren() {
-		return widgets.values();
+	public Class<?>[] getAdapterList() {
+		return new Class[] { IContentOutlinePage.class };
 	}
 
 }

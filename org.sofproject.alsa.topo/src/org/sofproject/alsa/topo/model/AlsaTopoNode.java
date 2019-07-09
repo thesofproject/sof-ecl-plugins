@@ -36,11 +36,11 @@ import java.util.List;
 
 import org.sofproject.alsa.topo.conf.ConfElement;
 import org.sofproject.alsa.topo.conf.ConfItem;
-import org.sofproject.alsa.topo.ui.graph.ITopoCollectionNode;
-import org.sofproject.alsa.topo.ui.graph.ITopoElement;
-import org.sofproject.alsa.topo.ui.graph.ITopoNode;
-import org.sofproject.alsa.topo.ui.graph.ITopoNodeAttribute;
 import org.sofproject.core.binfile.BinStruct;
+import org.sofproject.topo.ui.graph.ITopoCollectionNode;
+import org.sofproject.topo.ui.graph.ITopoElement;
+import org.sofproject.topo.ui.graph.ITopoNode;
+import org.sofproject.topo.ui.graph.ITopoNodeAttribute;
 import org.sofproject.ui.resources.SofResources;
 
 import javafx.scene.paint.Color;

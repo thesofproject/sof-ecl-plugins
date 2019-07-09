@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Intel Corporation
+ * Copyright (c) 2018, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,51 +27,39 @@
  *
  */
 
-package org.sofproject.alsa.topo.model;
+package org.sofproject.topo.ui.resources;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 
-import org.sofproject.alsa.topo.conf.ConfGraph;
-import org.sofproject.topo.ui.graph.ITopoCollectionNode;
-import org.sofproject.topo.ui.graph.ITopoNode;
+public class TopoResources {
 
-/**
- * Pipeline is a list of connected widgets. Connected to ConfGraph to generate
- * graph item (set of lines).
- */
-public class AlsaTopoPipeline extends AlsaTopoNode implements ITopoCollectionNode {
+	private static Font boldFont;
+	private static Font mediumFont;
+	private static Font smallFont;
 
-	private Map<String, AlsaTopoNode> widgets = new LinkedHashMap<>();
-	private Map<String, AlsaTopoConnection> connections = new HashMap<>();
-
-	public AlsaTopoPipeline(ConfGraph confGraph) {
-		super(confGraph);
+	public static Font getGraphBoldFont() {
+		if (boldFont == null) {
+			Font def = Font.getDefault();
+			boldFont = Font.font(def.getFamily(), FontWeight.BOLD, def.getSize() - 1);
+		}
+		return boldFont;
 	}
 
-	public void add(AlsaTopoNode widget) {
-		widgets.put(widget.getName(), widget);
+	public static Font getGraphSmallFont() {
+		if (smallFont == null) {
+			Font def = Font.getDefault();
+			smallFont = Font.font(def.getFamily(), FontPosture.ITALIC, def.getSize() - 3);
+		}
+		return smallFont;
 	}
 
-	public void add(AlsaTopoConnection connection) {
-		connections.put(connection.getName(), connection);
+	public static Font getGraphMediumFont() {
+		if (mediumFont == null) {
+			Font def = Font.getDefault();
+			mediumFont = Font.font(def.getFamily(), def.getSize() - 2);
+		}
+		return mediumFont;
 	}
-
-	@Override
-	public boolean isVisible() {
-		return false;
-	}
-
-	@Override
-	public int size() {
-		return widgets.size();
-	}
-
-	@Override
-	public Collection<? extends ITopoNode> getChildren() {
-		return widgets.values();
-	}
-
 }
