@@ -33,8 +33,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.sofproject.alsa.topo.ui.graph.ITopoCollectionNode;
-import org.sofproject.alsa.topo.ui.graph.ITopoNode;
+import org.sofproject.topo.ui.graph.ITopoCollectionNode;
+import org.sofproject.topo.ui.graph.ITopoNode;
 
 /**
  * TODO: remove dummy ConfElement assigned as there is no real conf item below,

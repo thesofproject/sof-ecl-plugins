@@ -27,51 +27,23 @@
  *
  */
 
-package org.sofproject.alsa.topo.model;
+package org.sofproject.topo.ui.graph;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
-import org.sofproject.alsa.topo.conf.ConfGraph;
-import org.sofproject.topo.ui.graph.ITopoCollectionNode;
-import org.sofproject.topo.ui.graph.ITopoNode;
+import org.sofproject.core.binfile.BinFile;
 
 /**
- * Pipeline is a list of connected widgets. Connected to ConfGraph to generate
- * graph item (set of lines).
+ * Topology graph, implemented by a specific topology binding.
+ *
  */
-public class AlsaTopoPipeline extends AlsaTopoNode implements ITopoCollectionNode {
+public interface ITopoGraph {
 
-	private Map<String, AlsaTopoNode> widgets = new LinkedHashMap<>();
-	private Map<String, AlsaTopoConnection> connections = new HashMap<>();
+	public Collection<? extends ITopoCollectionNode> getCollections();
 
-	public AlsaTopoPipeline(ConfGraph confGraph) {
-		super(confGraph);
-	}
+	public Collection<? extends ITopoNode> getNodes();
 
-	public void add(AlsaTopoNode widget) {
-		widgets.put(widget.getName(), widget);
-	}
+	public Collection<? extends ITopoConnection> getConnections();
 
-	public void add(AlsaTopoConnection connection) {
-		connections.put(connection.getName(), connection);
-	}
-
-	@Override
-	public boolean isVisible() {
-		return false;
-	}
-
-	@Override
-	public int size() {
-		return widgets.size();
-	}
-
-	@Override
-	public Collection<? extends ITopoNode> getChildren() {
-		return widgets.values();
-	}
-
+	public BinFile getBinTopology();
 }

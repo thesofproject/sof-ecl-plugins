@@ -55,12 +55,12 @@ import org.sofproject.alsa.topo.conf.ConfVendorTokens;
 import org.sofproject.alsa.topo.conf.ConfVendorTuples;
 import org.sofproject.alsa.topo.conf.ConfWidget;
 import org.sofproject.alsa.topo.model.AlsaTopoConnection.Type;
-import org.sofproject.alsa.topo.ui.graph.ITopoCollectionNode;
-import org.sofproject.alsa.topo.ui.graph.ITopoConnection;
-import org.sofproject.alsa.topo.ui.graph.ITopoGraph;
-import org.sofproject.alsa.topo.ui.graph.ITopoNode;
 import org.sofproject.core.binfile.BinFile;
 import org.sofproject.core.binfile.BinItem;
+import org.sofproject.topo.ui.graph.ITopoCollectionNode;
+import org.sofproject.topo.ui.graph.ITopoConnection;
+import org.sofproject.topo.ui.graph.ITopoGraph;
+import org.sofproject.topo.ui.graph.ITopoNode;
 
 /**
  * Root container for the topology graph.

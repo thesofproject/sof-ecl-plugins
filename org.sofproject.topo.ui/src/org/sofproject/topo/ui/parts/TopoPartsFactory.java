@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Intel Corporation
+ * Copyright (c) 2018, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,51 +27,43 @@
  *
  */
 
-package org.sofproject.alsa.topo.model;
+package org.sofproject.topo.ui.parts;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.sofproject.alsa.topo.conf.ConfGraph;
-import org.sofproject.topo.ui.graph.ITopoCollectionNode;
-import org.sofproject.topo.ui.graph.ITopoNode;
+import org.eclipse.gef.mvc.fx.parts.AbstractContentPart;
+import org.eclipse.gef.mvc.fx.parts.IContentPart;
+import org.eclipse.gef.zest.fx.parts.ZestFxContentPartFactory;
+import org.sofproject.topo.ui.graph.GefTopoCollectionNode;
+import org.sofproject.topo.ui.graph.GefTopoNode;
 
-/**
- * Pipeline is a list of connected widgets. Connected to ConfGraph to generate
- * graph item (set of lines).
- */
-public class AlsaTopoPipeline extends AlsaTopoNode implements ITopoCollectionNode {
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 
-	private Map<String, AlsaTopoNode> widgets = new LinkedHashMap<>();
-	private Map<String, AlsaTopoConnection> connections = new HashMap<>();
+import javafx.scene.Node;
 
-	public AlsaTopoPipeline(ConfGraph confGraph) {
-		super(confGraph);
-	}
-
-	public void add(AlsaTopoNode widget) {
-		widgets.put(widget.getName(), widget);
-	}
-
-	public void add(AlsaTopoConnection connection) {
-		connections.put(connection.getName(), connection);
-	}
+public class TopoPartsFactory extends ZestFxContentPartFactory {
+	@Inject
+	private Injector injector;
 
 	@Override
-	public boolean isVisible() {
-		return false;
-	}
+	public IContentPart<? extends Node> createContentPart(Object content, Map<Object, Object> contextMap) {
+		AbstractContentPart<? extends Node> part = null;
 
-	@Override
-	public int size() {
-		return widgets.size();
+		if (content == null) {
+			throw new IllegalArgumentException("null content");
+		}
+		if (content instanceof org.eclipse.gef.graph.Graph) {
+			part = new TopoGraphPart();
+		} else if (content instanceof GefTopoCollectionNode) {
+			part = new TopoNodeCollectionPart();
+		} else if (content instanceof GefTopoNode) {
+			part = new TopoNodePart();
+		}
+		if (part != null) {
+			injector.injectMembers(part);
+			return part;
+		}
+		return super.createContentPart(content, contextMap);
 	}
-
-	@Override
-	public Collection<? extends ITopoNode> getChildren() {
-		return widgets.values();
-	}
-
 }

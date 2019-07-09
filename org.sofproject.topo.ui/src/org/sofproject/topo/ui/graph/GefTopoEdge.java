@@ -27,51 +27,38 @@
  *
  */
 
-package org.sofproject.alsa.topo.model;
+package org.sofproject.topo.ui.graph;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.eclipse.gef.graph.Edge;
+import org.eclipse.gef.zest.fx.ZestProperties;
 
-import org.sofproject.alsa.topo.conf.ConfGraph;
-import org.sofproject.topo.ui.graph.ITopoCollectionNode;
-import org.sofproject.topo.ui.graph.ITopoNode;
+import javafx.scene.shape.Polygon;
 
 /**
- * Pipeline is a list of connected widgets. Connected to ConfGraph to generate
- * graph item (set of lines).
+ * Connects Gef graph edges domain with the ITopoConnection interface. Visuals
+ * may use the ITopoConnection interface, obtained from
+ * getTopoModelConnection(), directly to query visual attributes.
  */
-public class AlsaTopoPipeline extends AlsaTopoNode implements ITopoCollectionNode {
+public class GefTopoEdge extends Edge {
 
-	private Map<String, AlsaTopoNode> widgets = new LinkedHashMap<>();
-	private Map<String, AlsaTopoConnection> connections = new HashMap<>();
-
-	public AlsaTopoPipeline(ConfGraph confGraph) {
-		super(confGraph);
+	public static class EdgeArrow extends Polygon {
+		public EdgeArrow() {
+			super(0, 0, 5, 3, 5, -3);
+		}
 	}
 
-	public void add(AlsaTopoNode widget) {
-		widgets.put(widget.getName(), widget);
+	private ITopoConnection topoModelConnection;
+
+	public GefTopoEdge(ITopoConnection topoModelConnection, GefTopoNode source, GefTopoNode target) {
+		super(source, target);
+		this.topoModelConnection = topoModelConnection;
+		if (topoModelConnection.hasArrow()) {
+			getAttributes().put(ZestProperties.TARGET_DECORATION__E, new EdgeArrow());
+		}
 	}
 
-	public void add(AlsaTopoConnection connection) {
-		connections.put(connection.getName(), connection);
-	}
-
-	@Override
-	public boolean isVisible() {
-		return false;
-	}
-
-	@Override
-	public int size() {
-		return widgets.size();
-	}
-
-	@Override
-	public Collection<? extends ITopoNode> getChildren() {
-		return widgets.values();
+	public ITopoConnection getTopoModelConnection() {
+		return topoModelConnection;
 	}
 
 }

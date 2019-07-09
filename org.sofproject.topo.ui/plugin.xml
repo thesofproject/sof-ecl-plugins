@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.sofproject.topo.ui.editor.TopoEditor"
+            default="false"
+            extensions="tplg"
+            id="org.sofproject.topo.ui.editor"
+            name="Alsa Topology Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.sofproject.topo.ui.editor.TopoEditor"
+            class="org.sofproject.topo.ui.editor.TopoEditorToOutlineAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.views.contentoutline.IContentOutlinePage">
+         </adapter>
+      </factory>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.sofproject.topo.ui.graph.GefTopoNode"
+            class="org.sofproject.topo.ui.properties.PropertySourceAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.views.properties.IPropertySource">
+         </adapter>
+      </factory>
+   </extension>
+   <extension-point id="org.sofproject.topo.providers" name="Topology Providers" schema="schema/topoproviders.exsd">
+   </extension-point>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.sofproject.ui.category.graphEditing"
+            id="org.sofproject.topo.ui.serializeGraph.command"
+            name="Serialize Graph">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.sofproject.topo.ui.editor.actions.SerializeGraphAd"
+            commandId="org.sofproject.topo.ui.serializeGraph.command">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.sofproject.topo.ui.serializeGraph.command"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+T">
+      </key>
+   </extension>
+</plugin>
