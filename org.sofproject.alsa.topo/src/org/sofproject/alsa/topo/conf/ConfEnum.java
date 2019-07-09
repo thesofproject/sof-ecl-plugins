@@ -36,6 +36,7 @@ public abstract class ConfEnum extends ConfAttribute {
 	private static final String TYPE_NAME = "enum";
 
 	private String value;
+	private int intValue = 0;
 
 	public ConfEnum(String name) {
 		super(TYPE_NAME, name);
@@ -45,10 +46,11 @@ public abstract class ConfEnum extends ConfAttribute {
 
 	public abstract void setIntValue(int value);
 
-	public void setStringValue(String value) {
+	public void setStringValue(String value, int intValue) {
 		if (value != null && !isValid(value))
 			throw new RuntimeException("Invalid value " + value + " for " + getName()); // TODO: custom exception
 		this.value = value;
+		this.intValue = intValue;
 	}
 
 	public boolean isValid(String value) {
@@ -58,6 +60,11 @@ public abstract class ConfEnum extends ConfAttribute {
 	@Override
 	public Object getValue() {
 		return value;
+	}
+
+	@Override
+	public boolean isChanged() {
+		return intValue != 0; // enum is stored as int where default is 0.
 	}
 
 	@Override

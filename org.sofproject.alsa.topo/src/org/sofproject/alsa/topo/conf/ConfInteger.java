@@ -58,6 +58,11 @@ public class ConfInteger extends ConfAttribute {
 	}
 
 	@Override
+	public boolean isChanged() {
+		return value != 0;
+	}
+
+	@Override
 	public Type getNodeAtrributeType() {
 		return Type.NODE_A_INTEGER;
 	}

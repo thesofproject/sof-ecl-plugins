@@ -58,6 +58,11 @@ public class ConfLong extends ConfAttribute {
 	}
 
 	@Override
+	public boolean isChanged() {
+		return value != 0;
+	}
+
+	@Override
 	public void setValue(Object value) {
 		if (value instanceof Long)
 			setLongValue((Long) value);

@@ -61,7 +61,7 @@ public class ConfOpsInfo extends ConfEnum {
 
 	@Override
 	public void setIntValue(int value) {
-		setStringValue(BIN_VALUE_MAP.get(value));
+		setStringValue(BIN_VALUE_MAP.get(value), value);
 	}
 
 }

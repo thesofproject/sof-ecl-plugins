@@ -49,6 +49,11 @@ public class ConfBoolean extends ConfAttribute {
 	}
 
 	@Override
+	public boolean isChanged() {
+		return value; // default is value set to false
+	}
+
+	@Override
 	public Type getNodeAtrributeType() {
 		return Type.NODE_A_BOOLEAN;
 	}

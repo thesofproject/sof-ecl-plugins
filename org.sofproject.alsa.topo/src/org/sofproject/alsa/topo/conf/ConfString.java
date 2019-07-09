@@ -54,6 +54,11 @@ public class ConfString extends ConfAttribute {
 	}
 
 	@Override
+	public boolean isChanged() {
+		return value != null;
+	}
+
+	@Override
 	public void setValue(Object value) {
 		if (!(value instanceof String))
 			throw new RuntimeException("Expected String value");

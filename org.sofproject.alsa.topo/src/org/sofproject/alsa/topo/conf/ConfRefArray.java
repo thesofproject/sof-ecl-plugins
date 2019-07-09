@@ -64,6 +64,11 @@ public class ConfRefArray extends ConfAttribute {
 	}
 
 	@Override
+	public boolean isChanged() {
+		return !value.isEmpty();
+	}
+
+	@Override
 	public void setValue(Object value) {
 		throw new RuntimeException("Unsupported");
 	}
