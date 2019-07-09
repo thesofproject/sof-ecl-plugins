@@ -52,4 +52,9 @@ public interface ITopoNodeAttribute {
 	public void setValue(Object value);
 
 	public String getStringValue();
+
+	/**
+	 * @return true if value is changed from the default value.
+	 */
+	public boolean isChanged();
 }

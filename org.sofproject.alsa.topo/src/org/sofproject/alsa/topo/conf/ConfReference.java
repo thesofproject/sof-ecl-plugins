@@ -62,6 +62,11 @@ public class ConfReference extends ConfAttribute {
 	}
 
 	@Override
+	public boolean isChanged() {
+		return value != null;
+	}
+
+	@Override
 	public void setValue(Object value) {
 		if (!(value instanceof ConfElement))
 			throw new RuntimeException("Expected ConfElement value");

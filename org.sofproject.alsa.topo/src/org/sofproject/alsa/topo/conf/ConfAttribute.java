@@ -51,10 +51,14 @@ public abstract class ConfAttribute extends ConfItem implements ITopoNodeAttribu
 	@Override
 	public abstract Object getValue();
 
+	@Override
+	public abstract boolean isChanged();
+
 	public String getTypeName() {
 		return typeName;
 	}
 
+	@Override
 	public String getStringValue() {
 		Object value = getValue();
 		return value != null ? value.toString() : "(null)";

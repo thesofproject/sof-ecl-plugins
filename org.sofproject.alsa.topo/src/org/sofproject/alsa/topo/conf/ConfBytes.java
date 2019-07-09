@@ -53,6 +53,11 @@ public class ConfBytes extends ConfAttribute {
 	}
 
 	@Override
+	public boolean isChanged() {
+		return value != null;
+	}
+
+	@Override
 	public Type getNodeAtrributeType() {
 		// TODO:
 		return Type.NODE_A_OTHER;

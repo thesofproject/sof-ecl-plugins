@@ -82,4 +82,9 @@ public class ConfArray<T extends ConfItem> extends ConfAttribute {
 		return Type.NODE_A_OTHER;
 	}
 
+	@Override
+	public boolean isChanged() {
+		return !value.isEmpty();
+	}
+
 }
