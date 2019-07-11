@@ -457,7 +457,7 @@ public class AlsaTopoBin2Conf {
 	public static ConfLine createLine(ConfTopology topology, BinStructDapmGraph connection, int blockIndex) {
 		ConfWidget sink = topology.findWidget((String) connection.getChildValue("sink"));
 		ConfWidget source = topology.findWidget((String) connection.getChildValue("source"));
-		ConfLine line = new ConfLine(String.format("%s..%s", source.getName(), sink.getName()));
+		ConfLine line = new ConfLine(String.format("%s, , %s", sink.getName(), source.getName()));
 		line.setAttributeValue("index", blockIndex);
 		topology.addLine(line);
 		return line;

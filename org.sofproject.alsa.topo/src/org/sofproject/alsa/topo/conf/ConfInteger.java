@@ -34,14 +34,25 @@ public class ConfInteger extends ConfAttribute {
 	private static final String TYPE_NAME = "integer";
 
 	private int value;
+	private boolean alwaysChanged = false;
 
 	public ConfInteger(String name) {
 		super(TYPE_NAME, name);
 	}
 
+	public ConfInteger(String name, boolean alwaysChanged) {
+		this(name);
+		this.alwaysChanged = alwaysChanged;
+	}
+
 	public ConfInteger(String name, int value) {
 		this(name);
 		setIntValue(value);
+	}
+
+	public ConfInteger(String name, boolean alwaysChanged, int value) {
+		this(name, value);
+		this.alwaysChanged = alwaysChanged;
 	}
 
 	public int getIntValue() {
@@ -59,7 +70,7 @@ public class ConfInteger extends ConfAttribute {
 
 	@Override
 	public boolean isChanged() {
-		return value != 0;
+		return alwaysChanged || value != 0;
 	}
 
 	@Override

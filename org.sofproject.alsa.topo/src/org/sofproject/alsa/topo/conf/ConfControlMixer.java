@@ -40,7 +40,7 @@ public class ConfControlMixer extends ConfElement {
 	 */
 	public ConfControlMixer(String name) {
 		super(name, Arrays.asList(
-				new ConfInteger("index"),
+				new ConfInteger("index", true /*0 is valid*/),
 				new ConfInteger("min"),
 				new ConfInteger("max"),
 				new ConfInteger("platform_max"),

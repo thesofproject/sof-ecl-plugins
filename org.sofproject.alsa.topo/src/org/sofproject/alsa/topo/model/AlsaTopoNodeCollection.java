@@ -29,6 +29,8 @@
 
 package org.sofproject.alsa.topo.model;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -93,6 +95,12 @@ public class AlsaTopoNodeCollection<T extends AlsaTopoNode> implements ITopoColl
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	public void serialize(Writer writer) throws IOException {
+		for (T element : elements.values()) {
+			element.serialize(writer, "");
+		}
 	}
 
 }

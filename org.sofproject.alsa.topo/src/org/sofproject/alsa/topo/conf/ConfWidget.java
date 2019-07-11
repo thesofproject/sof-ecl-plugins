@@ -46,7 +46,7 @@ public class ConfWidget extends ConfElementWithData {
 	public ConfWidget(String name) {
 		super(name,
 				Arrays.asList(
-						new ConfInteger("index"),
+						new ConfInteger("index", true /*0 is valid*/),
 						new ConfWidgetType("type"),
 						new ConfString("stream_name"),
 						new ConfInteger("reg"),

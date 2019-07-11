@@ -39,7 +39,7 @@ public class ConfHwConfig extends ConfElement {
 	 */
 	public ConfHwConfig(String name) {
 		super(name, Arrays.asList(
-				new ConfInteger("id"),
+				new ConfInteger("id", true /*0 is valid*/),
 				new ConfHwConfigFormat("format"),
 				new ConfHwConfigClkGated("pm_gate_clocks"),
 				new ConfBoolean("bclk_invert"),

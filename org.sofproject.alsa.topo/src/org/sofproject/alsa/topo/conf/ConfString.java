@@ -55,7 +55,7 @@ public class ConfString extends ConfAttribute {
 
 	@Override
 	public boolean isChanged() {
-		return value != null;
+		return value != null && !value.isEmpty();
 	}
 
 	@Override

@@ -29,6 +29,8 @@
 
 package org.sofproject.topo.ui.graph;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collection;
 
 import org.sofproject.core.binfile.BinFile;
@@ -46,4 +48,6 @@ public interface ITopoGraph {
 	public Collection<? extends ITopoConnection> getConnections();
 
 	public BinFile getBinTopology();
+
+	public void serialize(OutputStream outputStream) throws IOException;
 }

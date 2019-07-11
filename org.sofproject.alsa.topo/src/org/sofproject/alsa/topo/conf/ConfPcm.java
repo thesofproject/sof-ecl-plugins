@@ -40,11 +40,11 @@ public class ConfPcm extends ConfElement {
 	public static final String CAPTURE_CAPS_NAME = "capture";
 
 	public ConfPcm(String name) {
-		super(name, Arrays.asList(new ConfInteger("id")));
+		super(name, Arrays.asList(new ConfInteger("id", true /* 0 is valid id */)));
 	}
 
 	public void addFeDai(String name, int id) {
-		ConfInteger daiId = new ConfInteger("id");
+		ConfInteger daiId = new ConfInteger("id", true /* 0 is valid id */);
 		daiId.setIntValue(id);
 		ConfElement feDai = new ConfElement(name, Arrays.asList(daiId));
 		feDai.setSectionName("dai");

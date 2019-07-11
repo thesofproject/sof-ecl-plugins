@@ -29,6 +29,11 @@
 
 package org.sofproject.alsa.topo.model;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -348,6 +353,45 @@ public class AlsaTopoGraph implements ITopoGraph {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void serialize(OutputStream outputStream) throws IOException {
+		Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+		// tlv-s
+		tlvs.serialize(writer);
+
+		// vendor tokens
+		vTokensIndex.serialize(writer);
+
+		// vendor tuples
+		vTuplesIndex.serialize(writer);
+
+		// data
+		dataIndex.serialize(writer);
+
+		// control bytes
+		controlBytes.serialize(writer);
+
+		// control mixers
+		controlMixers.serialize(writer);
+
+		// pcm capabilities
+		pcmCapsIndex.serialize(writer);
+
+		// pcm-s
+		pcms.serialize(writer);
+
+		// be-s
+		beIndex.serialize(writer);
+
+		// hw-configs
+		hwConfigs.serialize(writer);
+
+		// pipelines (widgets + graphs)
+		pipelines.serialize(writer);
+
+		writer.close();
 	}
 
 }

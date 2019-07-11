@@ -29,6 +29,8 @@
 
 package org.sofproject.alsa.topo.model;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -200,6 +202,10 @@ public class AlsaTopoNode implements ITopoNode {
 //		}
 //		return allAttribs;
 		return confElement.getAttributes();
+	}
+
+	public void serialize(Writer writer, String indent) throws IOException {
+		confElement.serialize(writer, indent);
 	}
 
 }

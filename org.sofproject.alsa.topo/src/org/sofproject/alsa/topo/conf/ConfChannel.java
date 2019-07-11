@@ -50,7 +50,7 @@ public class ConfChannel extends ConfElement {
 	public ConfChannel(String name) {
 		super(name, Arrays.asList(
 				new ConfInteger("reg"),
-				new ConfInteger("shift")));
+				new ConfInteger("shift", true /*0 is valid */)));
 		setSectionName(SECTION_NAME);
 	}
 }

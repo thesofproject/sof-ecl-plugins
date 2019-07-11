@@ -29,6 +29,9 @@
 
 package org.sofproject.alsa.topo.conf;
 
+import java.io.IOException;
+import java.io.Writer;
+
 public class ConfCtlAccess extends ConfBitSet {
 
 	/**
@@ -69,5 +72,28 @@ public class ConfCtlAccess extends ConfBitSet {
 
 	public ConfCtlAccess(String name) {
 		super(name, BIT_NAMES);
+	}
+
+	@Override
+	public void serialize(Writer writer, String indent) throws IOException {
+		if (isChanged()) {
+			writer.write(indent);
+			writer.write(getName());
+			writer.write(" [\n");
+
+			long mask = 1;
+			String nameIndent = indent + "   ";
+			for (int i = 0; i < 64; i++) {
+				if ((mask & (Long)getValue()) != 0) {
+					writer.write(nameIndent);
+					writer.write(bitNames[i][0]);
+					writer.write('\n');
+				}
+				mask <<= 1;
+			}
+
+			writer.write(indent);
+			writer.write("]\n");
+		}
 	}
 }

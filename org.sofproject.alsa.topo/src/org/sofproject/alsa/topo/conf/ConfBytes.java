@@ -1,5 +1,8 @@
 package org.sofproject.alsa.topo.conf;
 
+import java.io.IOException;
+import java.io.Writer;
+
 /*
  * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
@@ -77,6 +80,25 @@ public class ConfBytes extends ConfAttribute {
 			}
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public void serialize(Writer writer, String indent) throws IOException {
+		if (isChanged()) {
+			writer.write(indent);
+			writer.write(getName());
+			writer.write(" \"");
+			for (int i = 0; i < value.length; i++) {
+				writer.write(String.format("0x%02x", value[i]));
+				if (i < value.length - 1) {
+					writer.write(',');
+					if (((i + 1) % 8) == 0) {
+						writer.write('\n');
+					}
+				}
+			}
+			writer.write("\"\n");
+		}
 	}
 
 }
