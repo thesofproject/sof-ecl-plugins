@@ -117,33 +117,33 @@ public class ConfTopology {
 
 		addVendorTokens(new ConfVendorTokens("sof_ssp_tokens",
 				Arrays.asList(
-						new ConfInteger("SOF_TKN_SSP_CLKS_CONTROL", 500),
-						new ConfInteger("SOF_TKN_SSP_MCLK_ID", 501),
-						new ConfInteger("SOF_TKN_SSP_SAMPLE_BITS", 502),
-						new ConfInteger("SOF_TKN_SSP_FRAME_PULSE_WIDTH", 503),
-						new ConfInteger("SOF_TKN_SSP_QUIRKS", 504),
-						new ConfInteger("SOF_TKN_SSP_TDM_PADDING_PER_SLOT", 505))));
+						new ConfInteger("SOF_TKN_INTEL_SSP_CLKS_CONTROL", 500),
+						new ConfInteger("SOF_TKN_INTEL_SSP_MCLK_ID", 501),
+						new ConfInteger("SOF_TKN_INTEL_SSP_SAMPLE_BITS", 502),
+						new ConfInteger("SOF_TKN_INTEL_SSP_FRAME_PULSE_WIDTH", 503),
+						new ConfInteger("SOF_TKN_INTEL_SSP_QUIRKS", 504),
+						new ConfInteger("SOF_TKN_INTEL_SSP_TDM_PADDING_PER_SLOT", 505))));
 
 		addVendorTokens(new ConfVendorTokens("sof_dmic_tokens",
 				Arrays.asList(
-						new ConfInteger("SOF_TKN_DMIC_DRIVER_VERSION", 600),
-						new ConfInteger("SOF_TKN_DMIC_CLK_MIN", 601),
-						new ConfInteger("SOF_TKN_DMIC_CLK_MAX", 602),
-						new ConfInteger("SOF_TKN_DMIC_DUTY_MIN", 603),
-						new ConfInteger("SOF_TKN_DMIC_DUTY_MAX", 604),
-						new ConfInteger("SOF_TKN_DMIC_NUM_PDM_ACTIVE", 605),
-						new ConfInteger("SOF_TKN_DMIC_SAMPLE_RATE", 608),
-						new ConfInteger("SOF_TKN_DMIC_FIFO_WORD_LENGTH", 609))));
+						new ConfInteger("SOF_TKN_INTEL_DMIC_DRIVER_VERSION", 600),
+						new ConfInteger("SOF_TKN_INTEL_DMIC_CLK_MIN", 601),
+						new ConfInteger("SOF_TKN_INTEL_DMIC_CLK_MAX", 602),
+						new ConfInteger("SOF_TKN_INTEL_DMIC_DUTY_MIN", 603),
+						new ConfInteger("SOF_TKN_INTEL_DMIC_DUTY_MAX", 604),
+						new ConfInteger("SOF_TKN_INTEL_DMIC_NUM_PDM_ACTIVE", 605),
+						new ConfInteger("SOF_TKN_INTEL_DMIC_SAMPLE_RATE", 608),
+						new ConfInteger("SOF_TKN_INTEL_DMIC_FIFO_WORD_LENGTH", 609))));
 
 		addVendorTokens(new ConfVendorTokens("sof_dmic_pdm_tokens",
 				Arrays.asList(
-						new ConfInteger("SOF_TKN_DMIC_PDM_CTRL_ID", 700),
-						new ConfInteger("SOF_TKN_DMIC_PDM_MIC_A_Enable", 701),
-						new ConfInteger("SOF_TKN_DMIC_PDM_MIC_B_Enable", 702),
-						new ConfInteger("SOF_TKN_DMIC_PDM_POLARITY_A", 703),
-						new ConfInteger("SOF_TKN_DMIC_PDM_POLARITY_B", 704),
-						new ConfInteger("SOF_TKN_DMIC_PDM_CLK_EDGE", 705),
-						new ConfInteger("SOF_TKN_DMIC_PDM_SKEW", 706))));
+						new ConfInteger("SOF_TKN_INTEL_DMIC_PDM_CTRL_ID", 700),
+						new ConfInteger("SOF_TKN_INTEL_DMIC_PDM_MIC_A_Enable", 701),
+						new ConfInteger("SOF_TKN_INTEL_DMIC_PDM_MIC_B_Enable", 702),
+						new ConfInteger("SOF_TKN_INTEL_DMIC_PDM_POLARITY_A", 703),
+						new ConfInteger("SOF_TKN_INTEL_DMIC_PDM_POLARITY_B", 704),
+						new ConfInteger("SOF_TKN_INTEL_DMIC_PDM_CLK_EDGE", 705),
+						new ConfInteger("SOF_TKN_INTEL_DMIC_PDM_SKEW", 706))));
 
 		addVendorTokens(new ConfVendorTokens("sof_tone_tokens",
 				Arrays.asList(
