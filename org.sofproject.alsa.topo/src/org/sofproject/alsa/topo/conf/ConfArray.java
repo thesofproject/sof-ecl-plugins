@@ -29,6 +29,8 @@
 
 package org.sofproject.alsa.topo.conf;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -85,6 +87,24 @@ public class ConfArray<T extends ConfItem> extends ConfAttribute {
 	@Override
 	public boolean isChanged() {
 		return !value.isEmpty();
+	}
+
+	@Override
+	public void serialize(Writer writer, String indent) throws IOException {
+		if (isChanged()) {
+			writer.write(indent);
+			writer.write(getName());
+			writer.write(" [\n");
+
+			String refIndent = indent + "   ";
+			for (ConfItem item : value) {
+				writer.write(refIndent);
+				writer.write("\"" + item.getName() + "\"\n");
+			}
+
+			writer.write(indent);
+			writer.write("]\n");
+		}
 	}
 
 }

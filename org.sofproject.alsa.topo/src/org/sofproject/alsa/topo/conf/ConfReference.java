@@ -29,6 +29,9 @@
 
 package org.sofproject.alsa.topo.conf;
 
+import java.io.IOException;
+import java.io.Writer;
+
 /**
  * Attribute that is a reference to another top level element (serialized as a
  * uniquely named section). Value of the attribute is the unique name of
@@ -77,6 +80,17 @@ public class ConfReference extends ConfAttribute {
 	@Override
 	public Type getNodeAtrributeType() {
 		return Type.NODE_A_REFERENCE;
+	}
+
+	@Override
+	public void serialize(Writer writer, String indent) throws IOException {
+		if (isChanged()) {
+			writer.write(indent);
+			writer.write(getName());
+			writer.write(" \"");
+			writer.write(value.getName()); // default getStringValue() incudes category name
+			writer.write("\"\n");
+		}
 	}
 
 }

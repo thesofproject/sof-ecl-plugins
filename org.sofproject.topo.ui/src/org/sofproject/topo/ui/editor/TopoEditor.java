@@ -29,10 +29,14 @@
 
 package org.sofproject.topo.ui.editor;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.gef.graph.Graph;
@@ -126,7 +130,34 @@ public class TopoEditor extends AbstractFXEditor implements IBinFileEditor {
 	}
 
 	public void serializeGraph() {
-		// TODO: add serialization
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		try {
+			topoModel.serialize(outputStream);
+			outputStream.close();
+		} catch (IOException e) {
+			// TODO:
+			e.printStackTrace();
+		}
+
+		// TODO: find a better way to build the output file name
+		IEditorInput input = getEditorInput();
+		if (input instanceof IFileEditorInput) {
+			IFileEditorInput fileInput = (IFileEditorInput) input;
+			IPath inputFilePath = fileInput.getFile().getProjectRelativePath();
+			IFile outputFile = fileInput.getFile().getProject().getFile(inputFilePath.addFileExtension("conf"));
+			try {
+				if (outputFile.exists()) {
+					outputFile.setContents(new ByteArrayInputStream(outputStream.toByteArray()), true, false, null);
+				} else {
+					outputFile.create(new ByteArrayInputStream(outputStream.toByteArray()), false, null);
+				}
+				outputFile.getParent().refreshLocal(1, null);
+			} catch (CoreException e) {
+				// TODO:
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	@SuppressWarnings("rawtypes")

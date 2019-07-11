@@ -29,6 +29,8 @@
 
 package org.sofproject.alsa.topo.model;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -72,6 +74,16 @@ public class AlsaTopoPipeline extends AlsaTopoNode implements ITopoCollectionNod
 	@Override
 	public Collection<? extends ITopoNode> getChildren() {
 		return widgets.values();
+	}
+
+	@Override
+	public void serialize(Writer writer, String indent) throws IOException {
+		// widgets
+		for (AlsaTopoNode widget : widgets.values()) {
+			widget.serialize(writer, indent);
+		}
+		// connections
+		getConfElement().serialize(writer, indent);
 	}
 
 }

@@ -29,13 +29,15 @@
 
 package org.sofproject.alsa.topo.conf;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Collection;
 
 /**
  * Base class for unified handling of attributes (ConfAttribute) and embedded
  * elements (ConfElement).
  */
-public class ConfItem {
+public abstract class ConfItem {
 
 	/**
 	 * Name of the configuration file item.
@@ -78,5 +80,7 @@ public class ConfItem {
 	public String toString() {
 		return getName();
 	}
+
+	public abstract void serialize(Writer writer, String indent) throws IOException;
 
 }

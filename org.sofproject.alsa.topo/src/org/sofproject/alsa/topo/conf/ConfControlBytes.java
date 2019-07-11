@@ -39,7 +39,7 @@ public class ConfControlBytes extends ConfElementWithData {
 	 */
 	public ConfControlBytes(String name) {
 		super(name, Arrays.asList(
-				new ConfInteger("index"),
+				new ConfInteger("index", true /*0 is valid */),
 				new ConfInteger("base"),
 				new ConfInteger("num_regs"),
 				new ConfInteger("max"),

@@ -29,6 +29,9 @@
 
 package org.sofproject.alsa.topo.conf;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import org.sofproject.topo.ui.graph.ITopoNodeAttribute;
 
 public abstract class ConfAttribute extends ConfItem implements ITopoNodeAttribute {
@@ -64,4 +67,14 @@ public abstract class ConfAttribute extends ConfItem implements ITopoNodeAttribu
 		return value != null ? value.toString() : "(null)";
 	}
 
+	@Override
+	public void serialize(Writer writer, String indent) throws IOException {
+		if (isChanged()) {
+			writer.write(indent);
+			writer.write(getName());
+			writer.write(" \"");
+			writer.write(getStringValue());
+			writer.write("\"\n");
+		}
+	}
 }

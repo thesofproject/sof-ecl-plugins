@@ -29,6 +29,8 @@
 
 package org.sofproject.alsa.topo.conf;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -170,5 +172,15 @@ public class ConfElement extends ConfItem {
 		}
 		sb.append(getName());
 		return sb.toString();
+	}
+
+	@Override
+	public void serialize(Writer writer, String indent) throws IOException {
+		writer.write(indent + getCategory());
+		writer.write(" {\n");
+		for (ConfItem child : children) {
+			child.serialize(writer, indent + "   ");
+		}
+		writer.write(indent + "}\n");
 	}
 }

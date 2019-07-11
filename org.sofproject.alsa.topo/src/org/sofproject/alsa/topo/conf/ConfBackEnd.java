@@ -41,8 +41,8 @@ public class ConfBackEnd extends ConfElementWithData {
 	 */
 	public ConfBackEnd(String name) {
 		super(name, Arrays.asList(
-				new ConfInteger("id"),
-				new ConfInteger("index"),
+				new ConfInteger("id", true /*0 is valid */),
+				new ConfInteger("index", true /*0 is valid */),
 				new ConfString("stream_name"),
 
 				/* TODO: symmetric_rates -> flags */
@@ -51,7 +51,7 @@ public class ConfBackEnd extends ConfElementWithData {
 				new ConfInteger("flag_mask"),
 				new ConfInteger("flags"),
 
-				new ConfInteger("default_hw_conf_id"),
+				new ConfInteger("default_hw_conf_id", true /*0 is valid */),
 				new ConfRefArray("hw_configs")));
 	}
 

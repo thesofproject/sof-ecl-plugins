@@ -39,7 +39,7 @@ public class ConfGraph extends ConfElement {
 	 */
 	public ConfGraph(String name) {
 		super(name, Arrays.asList(
-				new ConfInteger("index"),
+				new ConfInteger("index", true /*0 is valid*/),
 				new ConfArray<ConfLine>("lines")));
 	}
 
