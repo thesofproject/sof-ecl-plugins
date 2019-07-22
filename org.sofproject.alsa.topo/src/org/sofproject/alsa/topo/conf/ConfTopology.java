@@ -122,7 +122,8 @@ public class ConfTopology {
 						new ConfInteger("SOF_TKN_INTEL_SSP_SAMPLE_BITS", 502),
 						new ConfInteger("SOF_TKN_INTEL_SSP_FRAME_PULSE_WIDTH", 503),
 						new ConfInteger("SOF_TKN_INTEL_SSP_QUIRKS", 504),
-						new ConfInteger("SOF_TKN_INTEL_SSP_TDM_PADDING_PER_SLOT", 505))));
+						new ConfInteger("SOF_TKN_INTEL_SSP_TDM_PADDING_PER_SLOT", 505),
+						new ConfInteger("SOF_TKN_INTEL_SSP_BCLK_DELAY", 506))));
 
 		addVendorTokens(new ConfVendorTokens("sof_dmic_tokens",
 				Arrays.asList(
@@ -133,7 +134,8 @@ public class ConfTopology {
 						new ConfInteger("SOF_TKN_INTEL_DMIC_DUTY_MAX", 604),
 						new ConfInteger("SOF_TKN_INTEL_DMIC_NUM_PDM_ACTIVE", 605),
 						new ConfInteger("SOF_TKN_INTEL_DMIC_SAMPLE_RATE", 608),
-						new ConfInteger("SOF_TKN_INTEL_DMIC_FIFO_WORD_LENGTH", 609))));
+						new ConfInteger("SOF_TKN_INTEL_DMIC_FIFO_WORD_LENGTH", 609),
+						new ConfInteger("SOF_TKN_INTEL_DMIC_UNMUTE_RAMP_TIME_MS", 610))));
 
 		addVendorTokens(new ConfVendorTokens("sof_dmic_pdm_tokens",
 				Arrays.asList(
