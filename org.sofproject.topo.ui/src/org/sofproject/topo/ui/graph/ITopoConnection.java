@@ -56,4 +56,9 @@ public interface ITopoConnection {
 	 */
 	public Color getColor();
 
+	/**
+	 * @return true if the layout algo should follow this connection.
+	 */
+	public boolean followMe();
+
 }

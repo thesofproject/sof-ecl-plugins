@@ -54,7 +54,7 @@ public class AlsaTopoNode implements ITopoNode {
 
 	private String typeName = "";
 
-	private AlsaTopoNodeCollection<?> parent;
+	private ITopoCollectionNode parent;
 
 	private List<AlsaTopoElement> elements = new LinkedList<>();
 
@@ -92,7 +92,7 @@ public class AlsaTopoNode implements ITopoNode {
 		this.last = last;
 	}
 
-	public void setParent(AlsaTopoNodeCollection<?> parent) {
+	public void setParent(ITopoCollectionNode parent) {
 		this.parent = parent;
 	}
 
