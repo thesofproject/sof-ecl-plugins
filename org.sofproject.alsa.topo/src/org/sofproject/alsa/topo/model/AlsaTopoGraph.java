@@ -274,6 +274,15 @@ public class AlsaTopoGraph implements ITopoGraph {
 					if (srcNode.getParent() != tgtNode.getParent()) {
 						conn.setFollowMe(false);
 					}
+					// and no connection going out from the out_drv
+					if (srcNode.getTypeName().equals("out_drv")) {
+						conn.setFollowMe(false);
+					}
+					// but override all connections going towards out_drv even foreign ones
+					// (for example some virtual-dai mixed pipes stream)
+					if (tgtNode.getTypeName().equals("out_drv")) {
+						conn.setFollowMe(true);
+					}
 					connections.add(conn);
 					// TODO: there are lines connecting other pipelines, index=0, no widgets
 					getPipeline(blockIndex).add(conn);

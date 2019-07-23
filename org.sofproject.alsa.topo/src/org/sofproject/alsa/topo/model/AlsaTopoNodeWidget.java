@@ -39,6 +39,12 @@ public class AlsaTopoNodeWidget extends AlsaTopoNode {
 	public AlsaTopoNodeWidget(ConfWidget confWidget) {
 		super(confWidget);
 		setTypeName(confWidget.getType());
+
+		// out drv should begin another row (if connected)
+		if (getTypeName().equals("out_drv")) {
+			setFirst(true);
+			setPreferredColumn(2); // align with other widgets connecting to pcm caps
+		}
 	}
 
 	public String getSname() {
