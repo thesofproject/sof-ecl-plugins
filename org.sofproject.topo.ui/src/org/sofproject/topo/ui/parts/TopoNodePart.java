@@ -29,15 +29,53 @@
 
 package org.sofproject.topo.ui.parts;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import org.eclipse.gef.zest.fx.behaviors.GraphLayoutBehavior;
 import org.eclipse.gef.zest.fx.parts.NodePart;
+import org.sofproject.topo.ui.graph.GefTopoNode;
 import org.sofproject.topo.ui.visuals.TopoNodeVisual;
 
 import javafx.scene.Group;
 
-public class TopoNodePart extends NodePart {
+public class TopoNodePart extends NodePart implements PropertyChangeListener {
 
 	@Override
 	protected Group doCreateVisual() {
 		return new Group(new TopoNodeVisual(getContent()));
+	}
+
+	@Override
+	public GefTopoNode getContent() {
+		return (GefTopoNode) super.getContent();
+	}
+
+	@Override
+	protected void doActivate() {
+		super.doActivate();
+		getContent().addPropertyChangeListener(this);
+	}
+
+	@Override
+	protected void doDeactivate() {
+		super.doDeactivate();
+		getContent().removePropertyChangeListener(this);
+	}
+
+	@Override
+	protected void doRefreshVisual(Group visual) {
+		TopoNodeVisual tnv = (TopoNodeVisual) visual.getChildrenUnmodifiable().get(0);
+		tnv.setName(getContent().getTopoModelNode().getName());
+		super.doRefreshVisual(visual);
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent e) {
+		if (e.getPropertyName() == GefTopoNode.PROP_NODE_NAME) {
+			refreshVisual();
+			GraphLayoutBehavior glb = getParent().getAdapter(GraphLayoutBehavior.class);
+			glb.applyLayout(true, null);
+		}
 	}
 }

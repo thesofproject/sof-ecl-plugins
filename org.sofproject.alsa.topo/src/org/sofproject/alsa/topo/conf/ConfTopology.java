@@ -69,7 +69,6 @@ public class ConfTopology {
 
 	/**
 	 * @param name
-	 * @formatter:off
 	 */
 	public ConfTopology(String name) {
 		this.name = name;
@@ -214,8 +213,21 @@ public class ConfTopology {
 		pcms.add(pcm);
 	}
 
+	public ConfPcm createPcm() {
+		ConfPcm pcm = new ConfPcm(String.format("Pcm-%d", pcms.size()));
+		pcm.addFeDai("New Dai", 0);
+		addPcm(pcm);
+		return pcm;
+	}
+
 	public void addPcmCapabilities(ConfPcmCapabilities caps) {
 		pcmCaps.add(caps);
+	}
+
+	public ConfPcmCapabilities createPcmCapabilities() {
+		ConfPcmCapabilities newPcmCaps = new ConfPcmCapabilities(String.format("Pcm Caps %d", pcmCaps.size()));
+		addPcmCapabilities(newPcmCaps);
+		return newPcmCaps;
 	}
 
 	public void addBackEnd(ConfBackEnd backEnd) {
@@ -254,14 +266,26 @@ public class ConfTopology {
 		return String.format("pipeline-%d", index);
 	}
 
+	private static String interConnectionNameFromIndex(int index) {
+		return String.format("inter-connection-%d", index);
+	}
+
 	public ConfGraph getGraph(int index) {
-		String graphName = graphNameFromIndex(index);
-		ConfGraph graph = graphs.findElement(graphName);
+		return getGraph(index, graphNameFromIndex(index));
+	}
+
+	public ConfGraph getInterConnection(int index) {
+		return getGraph(index, interConnectionNameFromIndex(index));
+	}
+
+	private ConfGraph getGraph(int index, String name) {
+		ConfGraph graph = graphs.findElement(name);
 		if (graph == null) {
-			graph = new ConfGraph(graphName);
+			graph = new ConfGraph(index, name);
 			graphs.add(graph);
 		}
 		return graph;
+
 	}
 
 	public Collection<ConfGraph> getGraphs() {

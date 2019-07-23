@@ -29,6 +29,8 @@
 
 package org.sofproject.topo.ui.properties;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,12 +43,19 @@ import org.sofproject.topo.ui.graph.ITopoElement;
 import org.sofproject.topo.ui.graph.ITopoNode;
 import org.sofproject.topo.ui.graph.ITopoNodeAttribute;
 
-public class TopoNodePropertySource implements IPropertySource {
+public class TopoNodePropertySource implements IPropertySource, PropertyChangeListener {
 
+	private GefTopoNode item;
 	private List<IPropertyDescriptor> properties;
 
 	public TopoNodePropertySource(GefTopoNode item) {
+		this.item = item;
+		item.addPropertyChangeListener(this);
 		properties = new ArrayList<IPropertyDescriptor>();
+		buildProperties();
+	}
+
+	private void buildProperties() {
 		ITopoNode modelNode = item.getTopoModelNode();
 		addAttributes(modelNode.getAttributes());
 		for (ITopoElement element : modelNode.getChildElements()) {
@@ -98,5 +107,10 @@ public class TopoNodePropertySource implements IPropertySource {
 		if (id instanceof ITopoNodeAttribute) {
 			((ITopoNodeAttribute) id).setValue(value);
 		}
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent arg0) {
+		// TODO: any way to refresh the properties?
 	}
 }

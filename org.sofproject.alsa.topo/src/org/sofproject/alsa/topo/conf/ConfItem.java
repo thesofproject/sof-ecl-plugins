@@ -62,6 +62,10 @@ public abstract class ConfItem {
 		return name;
 	}
 
+	public void setName(String newName) {
+		name = newName;
+	}
+
 	public boolean hasChildren() {
 		return false;
 	}

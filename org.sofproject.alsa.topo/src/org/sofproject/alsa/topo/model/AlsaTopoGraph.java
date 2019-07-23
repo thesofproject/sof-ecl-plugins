@@ -29,6 +29,8 @@
 
 package org.sofproject.alsa.topo.model;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,7 +39,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sofproject.alsa.topo.binfile.BinBlock;
 import org.sofproject.alsa.topo.binfile.BinEnumBlockType;
@@ -72,6 +76,12 @@ import org.sofproject.topo.ui.graph.ITopoNode;
  */
 public class AlsaTopoGraph implements ITopoGraph {
 
+	public static final String PROP_GRAPH = "graph";
+
+	private static final String[] nodeTypes = { AlsaTopoNodePcm.NODE_TYPE, AlsaTopoNodePcmCaps.NODE_TYPE };
+
+	private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+
 	/**
 	 * All child nodes to be displayed in the main graph.
 	 */
@@ -84,7 +94,7 @@ public class AlsaTopoGraph implements ITopoGraph {
 
 	private AlsaTopoNodeCollection<AlsaTopoNodePcm> pcms = new AlsaTopoNodeCollection<>("PCMs", false);
 	private AlsaTopoNodeCollection<AlsaTopoNode> pcmCapsIndex = new AlsaTopoNodeCollection<>("PCM Capabilities", false);
-	private AlsaTopoNodeCollection<AlsaTopoNodeWidget> widgetIndex = new AlsaTopoNodeCollection<>("Widgets", false);
+	private Map<String, AlsaTopoNodeWidget> widgetIndex = new HashMap<>();
 	private AlsaTopoNodeCollection<AlsaTopoNodeBe> beIndex = new AlsaTopoNodeCollection<>("BackEnds", false);
 	private AlsaTopoNodeCollection<AlsaTopoNodeHwConfig> hwConfigs = new AlsaTopoNodeCollection<>("HW Configurations");
 	private AlsaTopoNodeCollection<AlsaTopoNodeTlv> tlvs = new AlsaTopoNodeCollection<>("TLVs");
@@ -98,7 +108,11 @@ public class AlsaTopoGraph implements ITopoGraph {
 
 	// graph collection to fully model the topology
 	private AlsaTopoNodeCollection<AlsaTopoPipeline> pipelines = new AlsaTopoNodeCollection<>("Pipelines",
-			false /* exclude from graph */);
+			false /* do not display in graph */);
+
+	// not shown in graph, not shown in outline
+	private AlsaTopoNodeCollection<AlsaTopoPipeline> interConnections = new AlsaTopoNodeCollection<>(
+			"Inter Connections", false);
 
 	private BinFile binTplg;
 
@@ -133,9 +147,122 @@ public class AlsaTopoGraph implements ITopoGraph {
 		return childNodes;
 	}
 
+	private void addNode(ITopoNode node) {
+		AlsaTopoNode atn = (AlsaTopoNode) node;
+		atn.setParentGraph(this);
+		childNodes.add(atn);
+		// FIXME: find a better way to dispatch to the parent collection
+		if (node instanceof AlsaTopoNodeWidget) {
+			widgetIndex.put(node.getName(), (AlsaTopoNodeWidget) node);
+		} else if (node instanceof AlsaTopoNodeControlMixer) {
+			controlMixers.add((AlsaTopoNodeControlMixer) node);
+		} else if (node instanceof AlsaTopoNodeControlBytes) {
+			controlBytes.add((AlsaTopoNodeControlBytes) node);
+		} else if (node instanceof AlsaTopoNodePcm) {
+			pcms.add((AlsaTopoNodePcm) node);
+		} else if (node instanceof AlsaTopoNodePcmCaps) {
+			pcmCapsIndex.add((AlsaTopoNodePcmCaps) node);
+		} else if (node instanceof AlsaTopoNodeBe) {
+			beIndex.add((AlsaTopoNodeBe) node);
+		}
+	}
+
+	@Override
+	public void removeNode(ITopoNode node) {
+		ITopoCollectionNode parent = node.getParent();
+		if (parent != null) {
+			parent.remove(node);
+		}
+		childNodes.remove(node);
+		pcs.firePropertyChange(PROP_GRAPH, 0, 1);
+	}
+
 	@Override
 	public Collection<? extends ITopoConnection> getConnections() {
 		return connections;
+	}
+
+	private void addConnection(ITopoConnection connection) {
+		AlsaTopoConnection atc = (AlsaTopoConnection) connection;
+		atc.setParentGraph(this);
+
+		// if source and target nodes belong to the same pipeline, the connection
+		// index should equal the one of the nodes.
+		// otherwise, as inter-pipeline connection, the index is set to 0.
+		if (atc.getSource().getParent() == atc.getTarget().getParent()) {
+			int index = (Integer) ((AlsaTopoPipeline) atc.getSource().getParent()).getConfElement()
+					.getAttributeValue("index");
+			getPipeline(index).add(atc);
+		} else if (atc.getType() == AlsaTopoConnection.Type.DAPM_PATH) {
+			newInterConnection().add(atc);
+		}
+
+		connections.add(atc);
+	}
+
+	@Override
+	public void removeConnection(ITopoConnection connection) {
+		connections.remove(connection);
+		AlsaTopoConnection atc = (AlsaTopoConnection) connection;
+		atc.setParentGraph(null);
+		if (atc.getParentPipeline() != null) {
+			atc.getParentPipeline().remove(atc);
+		}
+		if (atc.getTarget() != null) {
+			((AlsaTopoNode) atc.getTarget()).removeInConn(atc);
+		}
+		if (atc.getSource() != null) {
+			((AlsaTopoNode) atc.getSource()).removeOutConn(atc);
+		}
+		pcs.firePropertyChange(PROP_GRAPH, 0, 1);
+	}
+
+	@Override
+	public String[] getNodeTypeIds() {
+		return nodeTypes;
+	}
+
+	@Override
+	public String getNodeDisplayName(String nodeId) {
+		switch (nodeId) {
+		case AlsaTopoNodePcm.NODE_TYPE:
+			return "PCM";
+		case AlsaTopoNodePcmCaps.NODE_TYPE:
+			return "PCM Capabilities";
+		default:
+			return "Unknown?";
+		}
+	}
+
+	@Override
+	public ITopoNode createNode(String nodeId) {
+		ITopoNode node = null;
+		switch (nodeId) {
+		case AlsaTopoNodePcm.NODE_TYPE:
+			node = new AlsaTopoNodePcm(confTplg.createPcm());
+			break;
+		case AlsaTopoNodePcmCaps.NODE_TYPE:
+			node = new AlsaTopoNodePcmCaps(confTplg.createPcmCapabilities());
+			break;
+		}
+		if (node != null) {
+			addNode(node);
+		}
+		pcs.firePropertyChange(PROP_GRAPH, 0, 1);
+		return node;
+	}
+
+	@Override
+	public ITopoConnection createConnection(ITopoNode source, ITopoNode target) {
+		AlsaTopoConnection.Type type = AlsaTopoConnection.Type.DAPM_PATH;
+		if (source instanceof AlsaTopoNodePcm || target instanceof AlsaTopoNodePcm || source instanceof AlsaTopoNodeBe
+				|| target instanceof AlsaTopoNodeBe) {
+			type = AlsaTopoConnection.Type.STREAM_PATH;
+		}
+		AlsaTopoConnection conn = new AlsaTopoConnection(type, (AlsaTopoNode) source, (AlsaTopoNode) target);
+		addConnection(conn);
+		pcs.firePropertyChange(PROP_GRAPH, 0, 1);
+		return conn;
 	}
 
 	@Override
@@ -183,6 +310,13 @@ public class AlsaTopoGraph implements ITopoGraph {
 		return pipeline;
 	}
 
+	private AlsaTopoPipeline newInterConnection() {
+		ConfGraph confGraph = confTplg.getInterConnection(interConnections.size()); // always new one
+		AlsaTopoPipeline interConn = new AlsaTopoPipeline(confGraph);
+		interConnections.add(interConn);
+		return interConn;
+	}
+
 	@SuppressWarnings("unchecked")
 	private void createWidgets(Collection<BinItem> items, int blockIndex) {
 		for (BinItem item : items) {
@@ -191,24 +325,21 @@ public class AlsaTopoGraph implements ITopoGraph {
 				ConfWidget confWidget = AlsaTopoBin2Conf.createConfWidget(confTplg, binWidget, blockIndex);
 				AlsaTopoNodeWidget node = new AlsaTopoNodeWidget(confWidget);
 
-				widgetIndex.add(node);
-				childNodes.add(node);
-
 				// add the node to its parent pipeline, create one if this is first item
 				// note: the parent from general widgetIndex is overridden by pipeline here
 				getPipeline(blockIndex).add(node);
 
+				addNode(node);
+
 				for (ConfControlMixer mixer : (Collection<ConfControlMixer>) confWidget.getAttributeValue("mixer")) {
-					AlsaTopoNodeKcontrol mixerNode = new AlsaTopoNodeKcontrol(mixer);
-					childNodes.add(mixerNode);
-					controlMixers.add(mixerNode);
-					connections.add(new AlsaTopoConnection(Type.CONTROL_PATH, mixerNode, node));
+					AlsaTopoNodeControlMixer mixerNode = new AlsaTopoNodeControlMixer(mixer);
+					addNode(mixerNode);
+					addConnection(new AlsaTopoConnection(Type.CONTROL_PATH, mixerNode, node));
 				}
 				for (ConfControlBytes bytes : (Collection<ConfControlBytes>) confWidget.getAttributeValue("bytes")) {
-					AlsaTopoNodeKcontrol bytesNode = new AlsaTopoNodeKcontrol(bytes);
-					childNodes.add(bytesNode);
-					controlBytes.add(bytesNode);
-					connections.add(new AlsaTopoConnection(Type.CONTROL_PATH, bytesNode, node));
+					AlsaTopoNodeControlBytes bytesNode = new AlsaTopoNodeControlBytes(bytes);
+					addNode(bytesNode);
+					addConnection(new AlsaTopoConnection(Type.CONTROL_PATH, bytesNode, node));
 				}
 			}
 		}
@@ -220,23 +351,20 @@ public class AlsaTopoGraph implements ITopoGraph {
 				BinStructPcm binPcm = (BinStructPcm) item;
 				ConfPcm confPcm = AlsaTopoBin2Conf.createConfPcm(confTplg, binPcm);
 				AlsaTopoNodePcm node = new AlsaTopoNodePcm(confPcm);
-				childNodes.add(node);
-				pcms.add(node);
+				addNode(node);
 
 				// create a node for each supported capability and create connections
 				ConfPcmCapabilities playbackCaps = confPcm.getPlaybackCaps();
 				if (playbackCaps != null) {
-					AlsaTopoNode pcNode = new AlsaTopoNode(playbackCaps);
-					childNodes.add(pcNode);
-					pcmCapsIndex.add(pcNode);
-					connections.add(new AlsaTopoConnection(Type.STREAM_PATH, node, pcNode));
+					AlsaTopoNodePcmCaps pcNode = new AlsaTopoNodePcmCaps(playbackCaps);
+					addNode(pcNode);
+					addConnection(new AlsaTopoConnection(Type.STREAM_PATH, node, pcNode));
 				}
 				ConfPcmCapabilities captureCaps = confPcm.getCaptureCaps();
 				if (captureCaps != null) {
-					AlsaTopoNode ccNode = new AlsaTopoNode(captureCaps);
-					childNodes.add(ccNode);
-					pcmCapsIndex.add(ccNode);
-					connections.add(new AlsaTopoConnection(Type.STREAM_PATH, ccNode, node));
+					AlsaTopoNodePcmCaps ccNode = new AlsaTopoNodePcmCaps(captureCaps);
+					addNode(ccNode);
+					addConnection(new AlsaTopoConnection(Type.STREAM_PATH, ccNode, node));
 				}
 			}
 		}
@@ -250,12 +378,10 @@ public class AlsaTopoGraph implements ITopoGraph {
 				BinStructLinkConfig binLinkConfig = (BinStructLinkConfig) item;
 				ConfBackEnd confBe = AlsaTopoBin2Conf.createConfBackEnd(confTplg, binLinkConfig, index++);
 				AlsaTopoNodeBe node = new AlsaTopoNodeBe(confBe);
-				beIndex.add(node);
-				childNodes.add(node);
+				addNode(node);
 
 				for (ConfHwConfig hwConfig : (Collection<ConfHwConfig>) confBe.getAttributeValue("hw_configs")) {
-					AlsaTopoNodeHwConfig hwConfigNode = new AlsaTopoNodeHwConfig(hwConfig);
-					hwConfigs.add(hwConfigNode);
+					hwConfigs.add(new AlsaTopoNodeHwConfig(hwConfig));
 				}
 			}
 		}
@@ -266,8 +392,8 @@ public class AlsaTopoGraph implements ITopoGraph {
 			if (item instanceof BinStructDapmGraph) {
 				BinStructDapmGraph binGraph = (BinStructDapmGraph) item;
 				AlsaTopoBin2Conf.createLine(confTplg, binGraph, blockIndex);
-				AlsaTopoNode srcNode = widgetIndex.get((String) binGraph.getChildValue("source"));
-				AlsaTopoNode tgtNode = widgetIndex.get((String) binGraph.getChildValue("sink"));
+				AlsaTopoNode srcNode = widgetIndex.get(binGraph.getChildValue("source"));
+				AlsaTopoNode tgtNode = widgetIndex.get(binGraph.getChildValue("sink"));
 				if (srcNode != null && tgtNode != null) {
 					AlsaTopoConnection conn = new AlsaTopoConnection(Type.DAPM_PATH, srcNode, tgtNode);
 					// tell the layout to not follow connections between pipelines
@@ -283,9 +409,7 @@ public class AlsaTopoGraph implements ITopoGraph {
 					if (tgtNode.getTypeName().equals("out_drv")) {
 						conn.setFollowMe(true);
 					}
-					connections.add(conn);
-					// TODO: there are lines connecting other pipelines, index=0, no widgets
-					getPipeline(blockIndex).add(conn);
+					addConnection(conn);
 				}
 			}
 		}
@@ -317,14 +441,14 @@ public class AlsaTopoGraph implements ITopoGraph {
 	}
 
 	private void connectOthers() {
-		for (AlsaTopoNodeWidget widget : widgetIndex.getElements()) {
+		for (AlsaTopoNodeWidget widget : widgetIndex.values()) {
 			if (widget.getTypeName().equals("dai_in") || widget.getTypeName().equals("dai_out")) {
 				AlsaTopoNodeBe be = beIndex.get(widget.getSname());
 				if (be != null) {
 					if (widget.getTypeName().equals("dai_in")) {
-						connections.add(new AlsaTopoConnection(Type.STREAM_PATH, widget, be));
+						addConnection(new AlsaTopoConnection(Type.STREAM_PATH, widget, be));
 					} else {
-						connections.add(new AlsaTopoConnection(Type.STREAM_PATH, be, widget));
+						addConnection(new AlsaTopoConnection(Type.STREAM_PATH, be, widget));
 					}
 				}
 			} else if (widget.getTypeName().equals("aif_in") || widget.getTypeName().equals("aif_out")) {
@@ -336,15 +460,15 @@ public class AlsaTopoGraph implements ITopoGraph {
 				AlsaTopoNode pcmCaps = pcmCapsIndex.get(widget.getSname());
 				if (pcmCaps != null) {
 					if (widget.getTypeName().equals("aif_in")) {
-						connections.add(new AlsaTopoConnection(Type.STREAM_PATH, pcmCaps, widget));
+						addConnection(new AlsaTopoConnection(Type.STREAM_PATH, pcmCaps, widget));
 					} else {
-						connections.add(new AlsaTopoConnection(Type.STREAM_PATH, widget, pcmCaps));
+						addConnection(new AlsaTopoConnection(Type.STREAM_PATH, widget, pcmCaps));
 					}
 				}
 			} else if (widget.getTypeName().equals("scheduler")) {
 				AlsaTopoNode node = widgetIndex.get(widget.getSname());
 				if (node != null) { // some tplg-s declare schedulers with no stream name set
-					connections.add(new AlsaTopoConnection(Type.CONTROL_PATH, widget, node));
+					addConnection(new AlsaTopoConnection(Type.CONTROL_PATH, widget, node));
 				}
 			}
 		}
@@ -385,8 +509,19 @@ public class AlsaTopoGraph implements ITopoGraph {
 
 		// pipelines (widgets + graphs)
 		pipelines.serialize(writer);
+		interConnections.serialize(writer);
 
 		writer.close();
+	}
+
+	@Override
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		pcs.addPropertyChangeListener(listener);
+	}
+
+	@Override
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		pcs.removePropertyChangeListener(listener);
 	}
 
 }

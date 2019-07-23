@@ -29,22 +29,15 @@
 
 package org.sofproject.alsa.topo.model;
 
-import org.sofproject.alsa.topo.conf.ConfControlBytes;
-import org.sofproject.alsa.topo.conf.ConfControlMixer;
+import org.sofproject.alsa.topo.conf.ConfElement;
 import org.sofproject.ui.resources.SofResources;
 
 import javafx.scene.paint.Color;
 
 public class AlsaTopoNodeKcontrol extends AlsaTopoNode {
 
-	public AlsaTopoNodeKcontrol(ConfControlMixer mixer) {
-		super(mixer);
-		setTypeName("kcontrol : mixer");
-	}
-
-	public AlsaTopoNodeKcontrol(ConfControlBytes bytes) {
-		super(bytes);
-		setTypeName("kcontrol : bytes");
+	public AlsaTopoNodeKcontrol(ConfElement kcontrol) {
+		super(kcontrol);
 	}
 
 	@Override

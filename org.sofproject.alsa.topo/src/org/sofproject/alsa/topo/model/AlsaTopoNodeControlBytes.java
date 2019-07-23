@@ -27,51 +27,13 @@
  *
  */
 
-package org.sofproject.topo.ui.graph;
+package org.sofproject.alsa.topo.model;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import org.sofproject.alsa.topo.conf.ConfControlBytes;
 
-import org.eclipse.gef.graph.Node;
-import org.sofproject.core.binfile.BinStruct;
-import org.sofproject.ui.editor.IBinStructHolder;
-
-/**
- * Connects Gef graph nodes domain with the ITopoNode interface. Visuals may use
- * the ITopoNode interface, obtained from getTopoModelNode(), directly to query
- * visual attributes.
- */
-public class GefTopoNode extends Node implements IBinStructHolder {
-
-	private ITopoNode topoModelNode;
-
-	protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-	public static final String PROP_NODE_NAME = "node-name";
-
-	public GefTopoNode(ITopoNode topoModelNode) {
-		this.topoModelNode = topoModelNode;
-	}
-
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
-		pcs.addPropertyChangeListener(listener);
-	}
-
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
-		pcs.removePropertyChangeListener(listener);
-	}
-
-	public ITopoNode getTopoModelNode() {
-		return topoModelNode;
-	}
-
-	@Override
-	public BinStruct getBinStruct() {
-		return topoModelNode.getBinStruct();
-	}
-
-	public void setName(String newName) {
-		String oldName = topoModelNode.getName();
-		topoModelNode.setName(newName);
-		pcs.firePropertyChange(PROP_NODE_NAME, oldName, newName);
+public class AlsaTopoNodeControlBytes extends AlsaTopoNodeKcontrol {
+	public AlsaTopoNodeControlBytes(ConfControlBytes bytes) {
+		super(bytes);
+		setTypeName("kcontrol : bytes");
 	}
 }

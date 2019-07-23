@@ -27,51 +27,57 @@
  *
  */
 
-package org.sofproject.topo.ui.graph;
+package org.sofproject.topo.ui.models;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import org.sofproject.topo.ui.parts.TopoNodePart;
 
-import org.eclipse.gef.graph.Node;
-import org.sofproject.core.binfile.BinStruct;
-import org.sofproject.ui.editor.IBinStructHolder;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
-/**
- * Connects Gef graph nodes domain with the ITopoNode interface. Visuals may use
- * the ITopoNode interface, obtained from getTopoModelNode(), directly to query
- * visual attributes.
- */
-public class GefTopoNode extends Node implements IBinStructHolder {
+public class TopoItemCreationModel {
 
-	private ITopoNode topoModelNode;
+	public enum Type {
+		None, Node, Connection
+	};
 
-	protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-	public static final String PROP_NODE_NAME = "node-name";
+	private ObjectProperty<Type> typeProperty = new SimpleObjectProperty<TopoItemCreationModel.Type>(Type.None);
+	private ObjectProperty<String> objectIdProperty = new SimpleObjectProperty<>();
+	private ObjectProperty<TopoNodePart> sourceProperty = new SimpleObjectProperty<>();
 
-	public GefTopoNode(ITopoNode topoModelNode) {
-		this.topoModelNode = topoModelNode;
+	public ObjectProperty<Type> getTypeProperty() {
+		return typeProperty;
 	}
 
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
-		pcs.addPropertyChangeListener(listener);
+	public Type getType() {
+		return typeProperty.getValue();
 	}
 
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
-		pcs.removePropertyChangeListener(listener);
+	public void setType(Type type) {
+		this.typeProperty.setValue(type);
 	}
 
-	public ITopoNode getTopoModelNode() {
-		return topoModelNode;
+	public ObjectProperty<String> getObjectIdProperty() {
+		return objectIdProperty;
 	}
 
-	@Override
-	public BinStruct getBinStruct() {
-		return topoModelNode.getBinStruct();
+	public String getObjectId() {
+		return objectIdProperty.getValue();
 	}
 
-	public void setName(String newName) {
-		String oldName = topoModelNode.getName();
-		topoModelNode.setName(newName);
-		pcs.firePropertyChange(PROP_NODE_NAME, oldName, newName);
+	public void setObjectId(String objectId) {
+		this.objectIdProperty.setValue(objectId);
 	}
+
+	public ObjectProperty<TopoNodePart> getSourceProperty() {
+		return sourceProperty;
+	}
+
+	public TopoNodePart getSource() {
+		return sourceProperty.getValue();
+	}
+
+	public void setSource(TopoNodePart source) {
+		this.sourceProperty.setValue(source);
+	}
+
 }

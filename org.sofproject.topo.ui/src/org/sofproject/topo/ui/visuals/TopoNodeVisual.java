@@ -77,7 +77,7 @@ public class TopoNodeVisual extends Region {
 		topBox.prefWidthProperty().bind(widthProperty());
 		topBox.prefHeightProperty().bind(heightProperty());
 
-		nameText = new Text(formatName(modelNode));
+		nameText = new Text(formatName(modelNode.getName()));
 		nameText.setTextOrigin(VPos.TOP);
 		nameText.setFont(TopoResources.getGraphBoldFont());
 
@@ -139,7 +139,7 @@ public class TopoNodeVisual extends Region {
 	}
 
 	public void setName(String name) {
-		this.nameText.setText(name);
+		this.nameText.setText(formatName(name));
 	}
 
 	public void setType(String type) {
@@ -164,8 +164,8 @@ public class TopoNodeVisual extends Region {
 		}
 	}
 
-	private String formatName(ITopoNode node) {
-		StringBuilder sb = new StringBuilder(node.getName());
+	private static String formatName(String text) {
+		StringBuilder sb = new StringBuilder(text);
 		int middleIdx = sb.length() / 2;
 		if (middleIdx < 6)
 			return sb.toString(); // do not try to break short labels

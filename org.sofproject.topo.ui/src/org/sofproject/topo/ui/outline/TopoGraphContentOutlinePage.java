@@ -29,6 +29,9 @@
 
 package org.sofproject.topo.ui.outline;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -43,11 +46,12 @@ import org.sofproject.topo.ui.graph.ITopoGraph;
 import org.sofproject.topo.ui.graph.ITopoNode;
 import org.sofproject.topo.ui.graph.ITopoNodeAttribute;
 
-public class TopoGraphContentOutlinePage extends ContentOutlinePage {
+public class TopoGraphContentOutlinePage extends ContentOutlinePage implements PropertyChangeListener {
 	ITopoGraph topoModel;
 
 	public TopoGraphContentOutlinePage(TopoEditor editor) {
 		topoModel = editor.getTopoModel();
+		topoModel.addPropertyChangeListener(this);
 	}
 
 	@Override
@@ -58,6 +62,13 @@ public class TopoGraphContentOutlinePage extends ContentOutlinePage {
 		viewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new AlsaTopoGraphLabelProvider()));
 		viewer.addSelectionChangedListener(this);
 		viewer.setInput(topoModel);
+	}
+
+	@Override
+	public void dispose() {
+		topoModel.removePropertyChangeListener(this);
+		topoModel = null;
+		super.dispose();
 	}
 
 	class AlsaTopoGraphLabelProvider extends LabelProvider implements IStyledLabelProvider {
@@ -83,6 +94,13 @@ public class TopoGraphContentOutlinePage extends ContentOutlinePage {
 
 			return new StyledString(element.toString());
 		}
+
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent arg0) {
+		// TODO: narrow down the changed area
+		getTreeViewer().refresh();
 
 	}
 }

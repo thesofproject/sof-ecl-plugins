@@ -27,51 +27,51 @@
  *
  */
 
-package org.sofproject.topo.ui.graph;
+package org.sofproject.topo.ui.parts;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import org.eclipse.gef.common.adapt.IAdaptable;
+import org.eclipse.gef.fx.anchors.DynamicAnchor;
+import org.eclipse.gef.fx.anchors.DynamicAnchor.AnchorageReferenceGeometry;
+import org.eclipse.gef.fx.anchors.IAnchor;
+import org.eclipse.gef.geometry.planar.IGeometry;
+import org.eclipse.gef.mvc.fx.parts.IVisualPart;
 
-import org.eclipse.gef.graph.Node;
-import org.sofproject.core.binfile.BinStruct;
-import org.sofproject.ui.editor.IBinStructHolder;
+import com.google.common.reflect.TypeToken;
+import com.google.inject.Provider;
 
-/**
- * Connects Gef graph nodes domain with the ITopoNode interface. Visuals may use
- * the ITopoNode interface, obtained from getTopoModelNode(), directly to query
- * visual attributes.
- */
-public class GefTopoNode extends Node implements IBinStructHolder {
+import javafx.beans.binding.ObjectBinding;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.scene.Node;
 
-	private ITopoNode topoModelNode;
+public class TopoGraphAnchorProvider extends IAdaptable.Bound.Impl<IVisualPart<? extends Node>>
+		implements Provider<IAnchor> {
 
-	protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-	public static final String PROP_NODE_NAME = "node-name";
+	private DynamicAnchor anchor;
 
-	public GefTopoNode(ITopoNode topoModelNode) {
-		this.topoModelNode = topoModelNode;
-	}
-
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
-		pcs.addPropertyChangeListener(listener);
-	}
-
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
-		pcs.removePropertyChangeListener(listener);
-	}
-
-	public ITopoNode getTopoModelNode() {
-		return topoModelNode;
+	@Override
+	public ReadOnlyObjectProperty<IVisualPart<? extends Node>> adaptableProperty() {
+		return null;
 	}
 
 	@Override
-	public BinStruct getBinStruct() {
-		return topoModelNode.getBinStruct();
-	}
+	public IAnchor get() {
+		if (anchor == null) {
+			Node anchorage = getAdaptable().getVisual();
+			anchor = new DynamicAnchor(anchorage);
+			anchor.getComputationParameter(AnchorageReferenceGeometry.class).bind(new ObjectBinding<IGeometry>() {
+				{
+					bind(anchorage.layoutBoundsProperty());
+				}
 
-	public void setName(String newName) {
-		String oldName = topoModelNode.getName();
-		topoModelNode.setName(newName);
-		pcs.firePropertyChange(PROP_NODE_NAME, oldName, newName);
+				@Override
+				protected IGeometry computeValue() {
+					@SuppressWarnings("serial")
+					Provider<IGeometry> geomProvider = getAdaptable().getAdapter(new TypeToken<Provider<IGeometry>>() {
+					});
+					return geomProvider.get();
+				}
+			});
+		}
+		return anchor;
 	}
 }

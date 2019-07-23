@@ -45,6 +45,11 @@ import javafx.scene.paint.Color;
 public interface ITopoNode extends ITopoElement {
 
 	/**
+	 * @param newName New name
+	 */
+	public void setName(String newName);
+
+	/**
 	 * @return Short description of the node (displayed below the name).
 	 */
 	public String getDescription();
@@ -63,6 +68,11 @@ public interface ITopoNode extends ITopoElement {
 	 * @return true if node should be positioned in the last column
 	 */
 	public boolean isLast();
+
+	/**
+	 * @return Parent graph.
+	 */
+	public ITopoGraph getParentGraph();
 
 	/**
 	 * @return Parent collection node or null.

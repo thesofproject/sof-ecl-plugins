@@ -55,6 +55,7 @@ public class GefTopoEdge extends Edge {
 		if (topoModelConnection.hasArrow()) {
 			getAttributes().put(ZestProperties.TARGET_DECORATION__E, new EdgeArrow());
 		}
+		getAttributes().put(ZestProperties.TOOLTIP__E, topoModelConnection.getTooltip());
 	}
 
 	public ITopoConnection getTopoModelConnection() {
