@@ -96,4 +96,9 @@ public interface ITopoNode extends ITopoElement {
 	 */
 	public BinStruct getBinStruct();
 
+	/**
+	 * @return Index of preferred column for layout algorithm, -1 if none.
+	 */
+	public int getPreferredColumn();
+
 }
