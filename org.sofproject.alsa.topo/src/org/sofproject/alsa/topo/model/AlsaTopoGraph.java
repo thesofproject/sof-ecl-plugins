@@ -96,11 +96,6 @@ public class AlsaTopoGraph implements ITopoGraph {
 	private AlsaTopoNodeCollection<AlsaTopoNodeVendorTuples> vTuplesIndex = new AlsaTopoNodeCollection<>(
 			"Vendor Tuples");
 
-	// some collections to hide never-connected nodes from the top level
-	private AlsaTopoNodeCollection<AlsaTopoNodeWidget> inputWidgets = new AlsaTopoNodeCollection<>("input Widgets");
-	private AlsaTopoNodeCollection<AlsaTopoNodeWidget> outputWidgets = new AlsaTopoNodeCollection<>("output Widgets");
-	private AlsaTopoNodeCollection<AlsaTopoNodeWidget> outDrvWidgets = new AlsaTopoNodeCollection<>("out_drv Widgets");
-
 	// graph collection to fully model the topology
 	private AlsaTopoNodeCollection<AlsaTopoPipeline> pipelines = new AlsaTopoNodeCollection<>("Pipelines",
 			false /* exclude from graph */);
@@ -197,21 +192,7 @@ public class AlsaTopoGraph implements ITopoGraph {
 				AlsaTopoNodeWidget node = new AlsaTopoNodeWidget(confWidget);
 
 				widgetIndex.add(node);
-
-				switch (node.getTypeName()) {
-				case "input":
-					inputWidgets.add(node);
-					break;
-				case "output":
-					outputWidgets.add(node);
-					break;
-				case "out_drv":
-					outDrvWidgets.add(node);
-					break;
-				default:
-					childNodes.add(node);
-					break;
-				}
+				childNodes.add(node);
 
 				// add the node to its parent pipeline, create one if this is first item
 				// note: the parent from general widgetIndex is overridden by pipeline here
