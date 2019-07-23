@@ -142,6 +142,10 @@ public class TopoZestGraphLayout extends SofXyZestGraphLayout {
 		}
 		for (Edge e : node.getOutgoingEdges()) {
 			GefTopoNode audioNode = (GefTopoNode) e.getTarget();
+
+			if (!((GefTopoEdge)e).getTopoModelConnection().followMe())
+				continue;
+
 			// TODO: should request to remove empty columns before layouting
 			addToGrid(audioNode, audioNode.getTopoModelNode().isLast() ? 20 : pos.col, pos.row);
 			if (!audioNode.getTopoModelNode().isLast()) {
@@ -157,6 +161,10 @@ public class TopoZestGraphLayout extends SofXyZestGraphLayout {
 		GridPosition ctrlPos = new GridPosition(pos.col - 1, pos.row + 1);
 		for (Edge e : node.getAllIncomingEdges()) {
 			GefTopoEdge topoEdge = (GefTopoEdge) e;
+
+			if (!topoEdge.getTopoModelConnection().followMe())
+				continue;
+
 			if (!topoEdge.getTopoModelConnection().hasArrow()) {
 				Node ctrlNode = e.getSource();
 				addToGrid(ctrlNode, ctrlPos.col, ctrlPos.row);

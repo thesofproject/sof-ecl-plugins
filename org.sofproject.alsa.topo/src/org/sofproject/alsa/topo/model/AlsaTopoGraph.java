@@ -214,6 +214,7 @@ public class AlsaTopoGraph implements ITopoGraph {
 				}
 
 				// add the node to its parent pipeline, create one if this is first item
+				// note: the parent from general widgetIndex is overridden by pipeline here
 				getPipeline(blockIndex).add(node);
 
 				for (ConfControlMixer mixer : (Collection<ConfControlMixer>) confWidget.getAttributeValue("mixer")) {
@@ -288,6 +289,10 @@ public class AlsaTopoGraph implements ITopoGraph {
 				AlsaTopoNode tgtNode = widgetIndex.get((String) binGraph.getChildValue("sink"));
 				if (srcNode != null && tgtNode != null) {
 					AlsaTopoConnection conn = new AlsaTopoConnection(Type.DAPM_PATH, srcNode, tgtNode);
+					// tell the layout to not follow connections between pipelines
+					if (srcNode.getParent() != tgtNode.getParent()) {
+						conn.setFollowMe(false);
+					}
 					connections.add(conn);
 					// TODO: there are lines connecting other pipelines, index=0, no widgets
 					getPipeline(blockIndex).add(conn);

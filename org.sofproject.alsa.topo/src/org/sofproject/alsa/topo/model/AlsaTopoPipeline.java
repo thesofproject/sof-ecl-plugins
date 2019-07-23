@@ -55,6 +55,7 @@ public class AlsaTopoPipeline extends AlsaTopoNode implements ITopoCollectionNod
 
 	public void add(AlsaTopoNode widget) {
 		widgets.put(widget.getName(), widget);
+		widget.setParent(this);
 	}
 
 	public void add(AlsaTopoConnection connection) {

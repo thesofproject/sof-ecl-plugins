@@ -46,6 +46,8 @@ public class AlsaTopoConnection implements ITopoConnection {
 	private AlsaTopoNode src;
 	private AlsaTopoNode tgt;
 
+	private boolean followMe = true;
+
 	public AlsaTopoConnection(Type type, AlsaTopoNode src, AlsaTopoNode tgt) {
 		this.type = type;
 		this.src = src;
@@ -82,6 +84,15 @@ public class AlsaTopoConnection implements ITopoConnection {
 	public Color getColor() {
 		// TODO: different by type?
 		return Color.BLACK;
+	}
+
+	@Override
+	public boolean followMe() {
+		return followMe;
+	}
+
+	public void setFollowMe(boolean followMe) {
+		this.followMe = followMe;
 	}
 
 }
