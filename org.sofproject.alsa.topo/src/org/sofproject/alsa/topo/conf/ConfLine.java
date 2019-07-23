@@ -34,8 +34,7 @@ import java.util.Arrays;
 public class ConfLine extends ConfElement {
 
 	/**
-	 * @param sink
-	 * @param source
+	 * @param name Name of the element
 	 * @formatter:off
 	 */
 	public ConfLine(String name) {

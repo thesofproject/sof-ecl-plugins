@@ -58,4 +58,6 @@ public interface ITopoCollectionNode {
 	 */
 	public Collection<? extends ITopoNode> getChildren();
 
+	public void remove(ITopoNode node);
+
 }

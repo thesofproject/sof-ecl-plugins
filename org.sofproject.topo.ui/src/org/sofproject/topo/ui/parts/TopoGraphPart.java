@@ -29,19 +29,66 @@
 
 package org.sofproject.topo.ui.parts;
 
-import org.eclipse.gef.graph.Edge;
-import org.eclipse.gef.graph.Node;
+import java.util.List;
+
+import org.eclipse.gef.mvc.fx.parts.IVisualPart;
 import org.eclipse.gef.zest.fx.parts.GraphPart;
+import org.sofproject.topo.ui.graph.GefTopoEdge;
+import org.sofproject.topo.ui.graph.GefTopoNode;
+import org.sofproject.topo.ui.graph.ITopoConnection;
+import org.sofproject.topo.ui.graph.ITopoNode;
+
+import javafx.scene.Node;
 
 public class TopoGraphPart extends GraphPart {
 
+	private Object lastChildAdded = null;
+
+	@Override
+	protected void doAddContentChild(Object contentChild, int index) {
+		if (contentChild instanceof GefTopoNode) {
+			getContent().getNodes().add((GefTopoNode) contentChild);
+			lastChildAdded = contentChild;
+		} else if (contentChild instanceof GefTopoEdge) {
+			getContent().getEdges().add((GefTopoEdge) contentChild);
+		}
+	}
+
 	@Override
 	protected void doRemoveContentChild(Object contentChild) {
-		if (contentChild instanceof Node) {
+		if (contentChild instanceof GefTopoNode) {
+
+			ITopoNode topoNode = ((GefTopoNode) contentChild).getTopoModelNode();
+			topoNode.getParentGraph().removeNode(topoNode);
+
 			getContent().getNodes().remove(contentChild);
-		} else if (contentChild instanceof Edge) {
+		} else if (contentChild instanceof GefTopoEdge) {
+			ITopoConnection topoConnection = ((GefTopoEdge) contentChild).getTopoModelConnection();
+			topoConnection.getParentGraph().removeConnection(topoConnection);
+
 			getContent().getEdges().remove(contentChild);
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	protected List<? extends Object> doGetContentChildren() {
+		// FIXME: dirty hack to w/a GraphPart behavior
+		// It returns nodes than edges while add() action
+		// requires the new element to be returned on the last position
+
+		List<Object> cc = (List<Object>) super.doGetContentChildren();
+
+		if (lastChildAdded != null) {
+			cc.remove(lastChildAdded);
+			cc.add(lastChildAdded);
+			lastChildAdded = null;
+		}
+		return cc;
+	}
+
+	@Override
+	public void reorderChild(IVisualPart<? extends Node> child, int index) {
+		// FIXME: do nothing here, there is annother hack above to satisfy add().
+	}
 }

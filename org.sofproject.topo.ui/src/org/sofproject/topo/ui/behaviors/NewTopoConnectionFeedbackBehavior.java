@@ -27,51 +27,39 @@
  *
  */
 
-package org.sofproject.topo.ui.graph;
+package org.sofproject.topo.ui.behaviors;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import org.eclipse.gef.mvc.fx.behaviors.AbstractBehavior;
+import org.eclipse.gef.mvc.fx.parts.IFeedbackPartFactory;
+import org.eclipse.gef.mvc.fx.viewer.IViewer;
+import org.sofproject.topo.ui.models.TopoItemCreationModel;
+import org.sofproject.topo.ui.parts.TopoNodePart;
 
-import org.eclipse.gef.graph.Node;
-import org.sofproject.core.binfile.BinStruct;
-import org.sofproject.ui.editor.IBinStructHolder;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
-/**
- * Connects Gef graph nodes domain with the ITopoNode interface. Visuals may use
- * the ITopoNode interface, obtained from getTopoModelNode(), directly to query
- * visual attributes.
- */
-public class GefTopoNode extends Node implements IBinStructHolder {
+public class NewTopoConnectionFeedbackBehavior extends AbstractBehavior {
 
-	private ITopoNode topoModelNode;
+	public static final String NEW_TOPO_CONNECTION_FEEDBACK_PART_FACTORY = "NEW_TOPO_CONNECTION_FEEDBACK_PART_FACTORY";
 
-	protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-	public static final String PROP_NODE_NAME = "node-name";
-
-	public GefTopoNode(ITopoNode topoModelNode) {
-		this.topoModelNode = topoModelNode;
-	}
-
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
-		pcs.addPropertyChangeListener(listener);
-	}
-
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
-		pcs.removePropertyChangeListener(listener);
-	}
-
-	public ITopoNode getTopoModelNode() {
-		return topoModelNode;
+	@Override
+	protected IFeedbackPartFactory getFeedbackPartFactory(IViewer viewer) {
+		return getFeedbackPartFactory(viewer, NEW_TOPO_CONNECTION_FEEDBACK_PART_FACTORY);
 	}
 
 	@Override
-	public BinStruct getBinStruct() {
-		return topoModelNode.getBinStruct();
-	}
-
-	public void setName(String newName) {
-		String oldName = topoModelNode.getName();
-		topoModelNode.setName(newName);
-		pcs.firePropertyChange(PROP_NODE_NAME, oldName, newName);
+	protected void doActivate() {
+		TopoItemCreationModel model = getHost().getRoot().getViewer().getAdapter(TopoItemCreationModel.class);
+		model.getSourceProperty().addListener(new ChangeListener<TopoNodePart>() {
+			@Override
+			public void changed(ObservableValue<? extends TopoNodePart> o, TopoNodePart oldVal, TopoNodePart newVal) {
+				if (newVal != null) {
+					addFeedback(newVal);
+				} else {
+					clearFeedback();
+				}
+			}
+		});
+		super.doActivate();
 	}
 }

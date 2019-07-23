@@ -36,6 +36,8 @@ import javafx.scene.paint.Color;
 
 public class AlsaTopoNodeWidget extends AlsaTopoNode {
 
+	public static final String NODE_TYPE = "org.sofproject.alsa.topo.widget";
+
 	public AlsaTopoNodeWidget(ConfWidget confWidget) {
 		super(confWidget);
 		setTypeName(confWidget.getType());

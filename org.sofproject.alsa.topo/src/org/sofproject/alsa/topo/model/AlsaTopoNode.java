@@ -41,6 +41,7 @@ import org.sofproject.alsa.topo.conf.ConfItem;
 import org.sofproject.core.binfile.BinStruct;
 import org.sofproject.topo.ui.graph.ITopoCollectionNode;
 import org.sofproject.topo.ui.graph.ITopoElement;
+import org.sofproject.topo.ui.graph.ITopoGraph;
 import org.sofproject.topo.ui.graph.ITopoNode;
 import org.sofproject.topo.ui.graph.ITopoNodeAttribute;
 import org.sofproject.ui.resources.SofResources;
@@ -53,6 +54,8 @@ import javafx.scene.paint.Color;
 public class AlsaTopoNode implements ITopoNode {
 
 	private String typeName = "";
+
+	private AlsaTopoGraph parentGraph;
 
 	private ITopoCollectionNode parent;
 
@@ -97,6 +100,15 @@ public class AlsaTopoNode implements ITopoNode {
 		this.preferredColumn = preferredColumn;
 	}
 
+	public void setParentGraph(AlsaTopoGraph parentGraph) {
+		this.parentGraph = parentGraph;
+	}
+
+	@Override
+	public ITopoGraph getParentGraph() {
+		return parentGraph;
+	}
+
 	public void setParent(ITopoCollectionNode parent) {
 		this.parent = parent;
 	}
@@ -118,8 +130,16 @@ public class AlsaTopoNode implements ITopoNode {
 		inConn.add(conn);
 	}
 
+	public void removeInConn(AlsaTopoConnection conn) {
+		inConn.remove(conn);
+	}
+
 	public void addOutConn(AlsaTopoConnection conn) {
 		outConn.add(conn);
+	}
+
+	public void removeOutConn(AlsaTopoConnection conn) {
+		outConn.remove(conn);
 	}
 
 	public List<AlsaTopoConnection> getInConns() {
@@ -138,17 +158,14 @@ public class AlsaTopoNode implements ITopoNode {
 		this.typeName = typeName;
 	}
 
-	public void removeIncomingConnection(AlsaTopoConnection conn) {
-		inConn.remove(conn);
-	}
-
-	public void removeOutgoingConnection(AlsaTopoConnection conn) {
-		outConn.remove(conn);
-	}
-
 	@Override
 	public String getName() {
 		return confElement.getName();
+	}
+
+	@Override
+	public void setName(String newName) {
+		confElement.setName(newName);
 	}
 
 	@Override
@@ -204,14 +221,12 @@ public class AlsaTopoNode implements ITopoNode {
 
 	@Override
 	public Collection<? extends ITopoNodeAttribute> getAttributes() {
-//		List<ConfAttribute> allAttribs = new LinkedList<>(confElement.getAttributes());
-//		for (ConfItem child : confElement.getChildren()) {
-//			if (child instanceof ConfElement) {
-//				allAttribs.addAll(((ConfElement)child).getAttributes());
-//			}
-//		}
-//		return allAttribs;
 		return confElement.getAttributes();
+	}
+
+	@Override
+	public String toString() {
+		return confElement.getName();
 	}
 
 	public void serialize(Writer writer, String indent) throws IOException {

@@ -36,9 +36,41 @@ import javafx.scene.paint.Color;
 
 public class AlsaTopoNodePcm extends AlsaTopoNode {
 
+	public static final String NODE_TYPE = "org.sofproject.alsa.topo.pcm";
+
 	public AlsaTopoNodePcm(ConfPcm confPcm) {
 		super(confPcm);
 		setFirst(true);
+	}
+
+	public ConfPcm getConfPcm() {
+		return (ConfPcm) super.getConfElement();
+	}
+
+	@Override
+	public void addInConn(AlsaTopoConnection conn) {
+		if (!getInConns().isEmpty())
+			throw new IllegalStateException("Capture PCM Capabilities already assigned");
+		super.addInConn(conn);
+		// TODO: set capture capabilities from the source node
+	}
+
+	@Override
+	public void removeInConn(AlsaTopoConnection connection) {
+		super.removeInConn(connection);
+	}
+
+	@Override
+	public void addOutConn(AlsaTopoConnection conn) {
+		if (!getOutConns().isEmpty())
+			throw new IllegalStateException("Playback PCM Capabilities already assigned");
+		super.addOutConn(conn);
+		// TODO: set playback capabilities from the target node
+	}
+
+	@Override
+	public void removeOutConn(AlsaTopoConnection conn) {
+		super.removeOutConn(conn);
 	}
 
 	@Override

@@ -29,6 +29,7 @@
 
 package org.sofproject.topo.ui.graph;
 
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
@@ -45,8 +46,25 @@ public interface ITopoGraph {
 
 	public Collection<? extends ITopoNode> getNodes();
 
+	public ITopoNode createNode(String nodeId);
+
+	public void removeNode(ITopoNode node);
+
 	public Collection<? extends ITopoConnection> getConnections();
 
+	public ITopoConnection createConnection(ITopoNode source, ITopoNode target);
+
+	public void removeConnection(ITopoConnection connection);
+
+	public String[] getNodeTypeIds();
+
+	public String getNodeDisplayName(String nodeId);
+
+	public void addPropertyChangeListener(PropertyChangeListener listener);
+
+	public void removePropertyChangeListener(PropertyChangeListener listener);
+
+	// TODO: optional, move to a separate interface
 	public BinFile getBinTopology();
 
 	public void serialize(OutputStream outputStream) throws IOException;

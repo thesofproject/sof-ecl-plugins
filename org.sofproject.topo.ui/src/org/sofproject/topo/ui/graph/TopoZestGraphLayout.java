@@ -68,34 +68,36 @@ public class TopoZestGraphLayout extends SofXyZestGraphLayout {
 
 	@Override
 	public void applyLayout(LayoutContext context, boolean clean) {
-		if (isGridEmpty()) {
+		clearGrid();
+//		if (isGridEmpty()) {
 
-			// create all paths that begins/ends with pcm node, from column 0
-			List<GefTopoNode> firstNodes = findFirstNodes(context.getGraph());
+		// create all paths that begins/ends with pcm node, from column 0
+		List<GefTopoNode> firstNodes = findFirstNodes(context.getGraph());
 
-			// layout unconnected nodes ...
-			int y = layoutUnconnected(context) + 1;
+		// layout unconnected nodes ...
+		int y = layoutUnconnected(context) + 1;
 
-			// ... and continue from the next row
-			for (GefTopoNode first : firstNodes) {
-				int prefCol = first.getTopoModelNode().getPreferredColumn();
-				if (prefCol == -1) {
-					prefCol = 0;
-				}
-				addToGrid(first, prefCol, y);
-				GridPosition outMaxPos = traverseOutgoing(first, new GridPosition(prefCol + 1, y));
-				// if there is an outgoing stream, move down
-				if (outMaxPos.col > prefCol + 1) {
-					y = outMaxPos.row + 1;
-				}
-				GridPosition inMaxPos = traverseIncoming(first, new GridPosition(prefCol + 1, y));
-				if (inMaxPos.col > prefCol + 1) {
-					y = inMaxPos.row + 1;
-				}
+		// ... and continue from the next row
+		for (GefTopoNode first : firstNodes) {
+			int prefCol = first.getTopoModelNode().getPreferredColumn();
+			if (prefCol == -1) {
+				prefCol = 0;
 			}
-
-			gridComplete();
+			addToGrid(first, prefCol, y);
+			GridPosition outMaxPos = traverseOutgoing(first, new GridPosition(prefCol + 1, y));
+			// if there is an outgoing stream, move down
+			if (outMaxPos.col > prefCol + 1) {
+				y = outMaxPos.row + 1;
+			}
+			GridPosition inMaxPos = traverseIncoming(first, new GridPosition(prefCol + 1, y));
+			if (inMaxPos.col > prefCol + 1) {
+				y = inMaxPos.row + 1;
+			}
 		}
+
+		gridComplete();
+//		}
+
 		super.applyLayout(context, clean);
 	}
 

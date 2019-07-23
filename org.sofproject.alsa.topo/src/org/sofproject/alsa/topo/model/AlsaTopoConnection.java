@@ -30,6 +30,7 @@
 package org.sofproject.alsa.topo.model;
 
 import org.sofproject.topo.ui.graph.ITopoConnection;
+import org.sofproject.topo.ui.graph.ITopoGraph;
 import org.sofproject.topo.ui.graph.ITopoNode;
 
 import javafx.scene.paint.Color;
@@ -40,8 +41,16 @@ public class AlsaTopoConnection implements ITopoConnection {
 		DAPM_PATH, STREAM_PATH, CONTROL_PATH,
 	}
 
+	public static String DAPM_TOOLTIP = "DAPM";
+	public static String STREAM_TOOLTIP = "Stream";
+	public static String CONTROL_TOOLTIP = "Control";
+	public static String UNKNOWN_TOOLTIP = "?";
+
 	private Type type;
 	private String name;
+
+	private AlsaTopoGraph parentGraph;
+	private AlsaTopoPipeline parentPipeline;
 
 	private AlsaTopoNode src;
 	private AlsaTopoNode tgt;
@@ -55,6 +64,23 @@ public class AlsaTopoConnection implements ITopoConnection {
 		src.addOutConn(this);
 		tgt.addInConn(this);
 		name = new StringBuilder(src.getName()).append("..").append(tgt.getName()).toString();
+	}
+
+	public void setParentGraph(AlsaTopoGraph parentGraph) {
+		this.parentGraph = parentGraph;
+	}
+
+	@Override
+	public ITopoGraph getParentGraph() {
+		return parentGraph;
+	}
+
+	public AlsaTopoPipeline getParentPipeline() {
+		return parentPipeline;
+	}
+
+	public void setParentPipeline(AlsaTopoPipeline parentPipeline) {
+		this.parentPipeline = parentPipeline;
 	}
 
 	public Type getType() {
@@ -87,6 +113,20 @@ public class AlsaTopoConnection implements ITopoConnection {
 	}
 
 	@Override
+	public String getTooltip() {
+		switch (type) {
+		case DAPM_PATH:
+			return DAPM_TOOLTIP;
+		case STREAM_PATH:
+			return STREAM_TOOLTIP;
+		case CONTROL_PATH:
+			return CONTROL_TOOLTIP;
+		default:
+			return UNKNOWN_TOOLTIP;
+		}
+	}
+
+	@Override
 	public boolean followMe() {
 		return followMe;
 	}
@@ -95,4 +135,8 @@ public class AlsaTopoConnection implements ITopoConnection {
 		this.followMe = followMe;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("%s (%s)", name, type);
+	}
 }

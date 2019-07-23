@@ -37,10 +37,15 @@ import org.eclipse.gef.zest.fx.ZestProperties;
 
 public class TopoZestGraphBuilder {
 
+	public static String TOPO_MODEL_ATTR = "org-sofproject-topo-model";
+
 	private Map<ITopoNode, GefTopoNode> nodes = new HashMap<>();
 
 	public Graph build(ITopoGraph topoModel) {
 		Graph g = new Graph.Builder().attr(ZestProperties.LAYOUT_ALGORITHM__G, new TopoZestGraphLayout()).build();
+
+		// attach the model to the graph, may be used through the interface where graph is available
+		g.getAttributes().put(TopoZestGraphBuilder.TOPO_MODEL_ATTR, topoModel);
 
 		// create graph objects in two iterations
 		// the second one creates the edges to make sure all nodes are already there

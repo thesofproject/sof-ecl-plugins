@@ -107,6 +107,12 @@ public class SofXyZestGraphLayout implements ILayoutAlgorithm {
 		return grid.isEmpty();
 	}
 
+	protected void clearGrid() {
+		grid.clear();
+		colSizes.clear();
+		rowSizes.clear();
+	}
+
 	protected void gridComplete() {
 		computeOffsets();
 	}

@@ -34,13 +34,15 @@ import java.util.Arrays;
 public class ConfGraph extends ConfElement {
 
 	/**
-	 * @param name
+	 * @param index Index of the graph
+	 * @param name Name of the graph
 	 * @formatter:off
 	 */
-	public ConfGraph(String name) {
+	public ConfGraph(int index, String name) {
 		super(name, Arrays.asList(
 				new ConfInteger("index", true /*0 is valid*/),
 				new ConfArray<ConfLine>("lines")));
+		setAttributeValue("index", index);
 	}
 
 	@SuppressWarnings("unchecked")

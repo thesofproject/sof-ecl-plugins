@@ -27,51 +27,37 @@
  *
  */
 
-package org.sofproject.topo.ui.graph;
+package org.sofproject.topo.ui.parts.feedback;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import java.util.List;
+import java.util.Map;
 
-import org.eclipse.gef.graph.Node;
-import org.sofproject.core.binfile.BinStruct;
-import org.sofproject.ui.editor.IBinStructHolder;
+import org.eclipse.gef.mvc.fx.parts.IFeedbackPart;
+import org.eclipse.gef.mvc.fx.parts.IFeedbackPartFactory;
+import org.eclipse.gef.mvc.fx.parts.IVisualPart;
+import org.sofproject.topo.ui.parts.TopoNodePart;
 
-/**
- * Connects Gef graph nodes domain with the ITopoNode interface. Visuals may use
- * the ITopoNode interface, obtained from getTopoModelNode(), directly to query
- * visual attributes.
- */
-public class GefTopoNode extends Node implements IBinStructHolder {
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 
-	private ITopoNode topoModelNode;
+import javafx.scene.Node;
 
-	protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-	public static final String PROP_NODE_NAME = "node-name";
-
-	public GefTopoNode(ITopoNode topoModelNode) {
-		this.topoModelNode = topoModelNode;
-	}
-
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
-		pcs.addPropertyChangeListener(listener);
-	}
-
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
-		pcs.removePropertyChangeListener(listener);
-	}
-
-	public ITopoNode getTopoModelNode() {
-		return topoModelNode;
-	}
+public class NewTopoConnectionFeedbackPartFactory implements IFeedbackPartFactory {
+	@Inject
+	private Injector injector;
 
 	@Override
-	public BinStruct getBinStruct() {
-		return topoModelNode.getBinStruct();
+	public List<IFeedbackPart<? extends Node>> createFeedbackParts(List<? extends IVisualPart<? extends Node>> targets,
+			Map<Object, Object> contextMap) {
+		List<IFeedbackPart<? extends Node>> parts = Lists.newArrayList();
+
+		if (!targets.isEmpty() && targets.get(0) instanceof TopoNodePart) {
+			NewTopoConnectionFeedbackPart part = injector.getInstance(NewTopoConnectionFeedbackPart.class);
+			parts.add(part);
+		}
+
+		return parts;
 	}
 
-	public void setName(String newName) {
-		String oldName = topoModelNode.getName();
-		topoModelNode.setName(newName);
-		pcs.firePropertyChange(PROP_NODE_NAME, oldName, newName);
-	}
 }

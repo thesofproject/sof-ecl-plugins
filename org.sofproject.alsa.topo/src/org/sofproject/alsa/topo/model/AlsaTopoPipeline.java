@@ -33,7 +33,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.sofproject.alsa.topo.conf.ConfGraph;
@@ -46,11 +47,16 @@ import org.sofproject.topo.ui.graph.ITopoNode;
  */
 public class AlsaTopoPipeline extends AlsaTopoNode implements ITopoCollectionNode {
 
-	private Map<String, AlsaTopoNode> widgets = new LinkedHashMap<>();
-	private Map<String, AlsaTopoConnection> connections = new HashMap<>();
+	private Map<String, AlsaTopoNode> widgets = new HashMap<>();
+	private List<AlsaTopoConnection> connections = new LinkedList<>();
 
 	public AlsaTopoPipeline(ConfGraph confGraph) {
 		super(confGraph);
+	}
+
+	@Override
+	public ConfGraph getConfElement() {
+		return (ConfGraph) super.getConfElement();
 	}
 
 	public void add(AlsaTopoNode widget) {
@@ -58,8 +64,20 @@ public class AlsaTopoPipeline extends AlsaTopoNode implements ITopoCollectionNod
 		widget.setParent(this);
 	}
 
+	@Override
+	public void remove(ITopoNode widget) {
+		widgets.remove(widget.getName());
+		((AlsaTopoNode) widget).setParent(null);
+	}
+
 	public void add(AlsaTopoConnection connection) {
-		connections.put(connection.getName(), connection);
+		connections.add(connection);
+		connection.setParentPipeline(this);
+	}
+
+	public void remove(AlsaTopoConnection connection) {
+		connection.setParentPipeline(null);
+		connections.remove(connection);
 	}
 
 	@Override
@@ -84,6 +102,9 @@ public class AlsaTopoPipeline extends AlsaTopoNode implements ITopoCollectionNod
 			widget.serialize(writer, indent);
 		}
 		// connections
+		// TODO: rebuild the connection list traversing the widgets
+		// if there are no widgets, 'connections' should contain just one
+		// element interconnecting pipelines, so use this one
 		getConfElement().serialize(writer, indent);
 	}
 

@@ -47,6 +47,11 @@ public interface ITopoConnection {
 	public ITopoNode getTarget();
 
 	/**
+	 * @return Parent graph.
+	 */
+	public ITopoGraph getParentGraph();
+
+	/**
 	 * @return true if this is directed connection.
 	 */
 	public boolean hasArrow();
@@ -55,6 +60,11 @@ public interface ITopoConnection {
 	 * @return Color of the edge.
 	 */
 	public Color getColor();
+
+	/**
+	 * @return Tooltip.
+	 */
+	public String getTooltip();
 
 	/**
 	 * @return true if the layout algo should follow this connection.

@@ -74,6 +74,12 @@ public class AlsaTopoNodeCollection<T extends AlsaTopoNode> implements ITopoColl
 		element.setParent(this);
 	}
 
+	@Override
+	public void remove(ITopoNode element) {
+		elements.remove(element.getName());
+		((AlsaTopoNode) element).setParent(null);
+	}
+
 	public T get(String name) {
 		return elements.get(name);
 	}
