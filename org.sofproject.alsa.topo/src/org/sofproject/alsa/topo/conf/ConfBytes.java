@@ -68,6 +68,9 @@ public class ConfBytes extends ConfAttribute {
 
 	@Override
 	public String getStringValue() {
+		if (value == null) {
+			return "(null)";
+		}
 		StringBuilder sb = new StringBuilder();
 		int i = 0;
 		for (byte b : value) {
