@@ -65,7 +65,7 @@ public class FwBinFactory {
 			f.dispose();
 
 			DspMemLayout memLayout = null;
-			if (fileName.indexOf("sof-apl") != -1) {
+			if (fileName.indexOf("sof-apl") != -1 || fileName.indexOf("sof-glk") != -1) {
 				memLayout = new AplMemLayout();
 			} else if (fileName.indexOf("sof-cnl") != -1) {
 				memLayout = new CnlMemLayout();
