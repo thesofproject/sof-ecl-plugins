@@ -67,6 +67,7 @@ public class AlsaTopoNode implements ITopoNode {
 
 	boolean first = false;
 	boolean last = false;
+	int preferredColumn = -1;
 
 	private List<AlsaTopoConnection> inConn = new ArrayList<>();
 	private List<AlsaTopoConnection> outConn = new ArrayList<>();
@@ -90,6 +91,10 @@ public class AlsaTopoNode implements ITopoNode {
 
 	protected void setLast(boolean last) {
 		this.last = last;
+	}
+
+	protected void setPreferredColumn(int preferredColumn) {
+		this.preferredColumn = preferredColumn;
 	}
 
 	public void setParent(ITopoCollectionNode parent) {
@@ -165,6 +170,11 @@ public class AlsaTopoNode implements ITopoNode {
 	@Override
 	public boolean isLast() {
 		return last;
+	}
+
+	@Override
+	public int getPreferredColumn() {
+		return preferredColumn;
 	}
 
 	@Override

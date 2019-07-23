@@ -78,14 +78,18 @@ public class TopoZestGraphLayout extends SofXyZestGraphLayout {
 
 			// ... and continue from the next row
 			for (GefTopoNode first : firstNodes) {
-				addToGrid(first, 0, y);
-				GridPosition outMaxPos = traverseOutgoing(first, new GridPosition(1, y));
+				int prefCol = first.getTopoModelNode().getPreferredColumn();
+				if (prefCol == -1) {
+					prefCol = 0;
+				}
+				addToGrid(first, prefCol, y);
+				GridPosition outMaxPos = traverseOutgoing(first, new GridPosition(prefCol + 1, y));
 				// if there is an outgoing stream, move down
-				if (outMaxPos.col > 1) {
+				if (outMaxPos.col > prefCol + 1) {
 					y = outMaxPos.row + 1;
 				}
-				GridPosition inMaxPos = traverseIncoming(first, new GridPosition(1, y));
-				if (inMaxPos.col > 1) {
+				GridPosition inMaxPos = traverseIncoming(first, new GridPosition(prefCol + 1, y));
+				if (inMaxPos.col > prefCol + 1) {
 					y = inMaxPos.row + 1;
 				}
 			}
@@ -143,7 +147,7 @@ public class TopoZestGraphLayout extends SofXyZestGraphLayout {
 		for (Edge e : node.getOutgoingEdges()) {
 			GefTopoNode audioNode = (GefTopoNode) e.getTarget();
 
-			if (!((GefTopoEdge)e).getTopoModelConnection().followMe())
+			if (!((GefTopoEdge) e).getTopoModelConnection().followMe())
 				continue;
 
 			// TODO: should request to remove empty columns before layouting
@@ -171,7 +175,7 @@ public class TopoZestGraphLayout extends SofXyZestGraphLayout {
 				ctrlPos.col++;
 			} else {
 				GefTopoNode audioNode = (GefTopoNode) e.getSource();
-				if (audioNode == null) //TODO: BUG? echo ref out_drv connection
+				if (audioNode == null) // TODO: BUG? echo ref out_drv connection
 					continue;
 				addToGrid(audioNode, audioNode.getTopoModelNode().isLast() ? 20 : pos.col, pos.row);
 				if (!audioNode.getTopoModelNode().isLast()) {
