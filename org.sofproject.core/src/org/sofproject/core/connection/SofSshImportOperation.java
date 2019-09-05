@@ -78,9 +78,13 @@ public class SofSshImportOperation extends SofRemoteOperation {
 				Object en = remoteFiles.elementAt(i);
 				if (en instanceof ChannelSftp.LsEntry) {
 					ChannelSftp.LsEntry entry = (ChannelSftp.LsEntry) en;
+					if (entry.getAttrs().isDir())
+						continue;
 					Path remotePath = new Path(entry.getFilename());
 					// filter out files other than fw binaries and topology files
 					IFile localFile = null;
+					if (remotePath.getFileExtension() == null)
+						continue;
 					if (remotePath.getFileExtension().equals(ISofNodeConst.FW_BIN_FILE_EXT)) {
 						localFile = proj.getBinFolder().getFile(entry.getFilename());
 					} else if (remotePath.getFileExtension().equals(ISofNodeConst.TPLG_FILE_EXT)) {
