@@ -30,6 +30,7 @@
 package org.sofproject.topo.ui.outline;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -46,6 +47,12 @@ import org.sofproject.topo.ui.graph.ITopoNode;
  */
 public class TopoGraphContentProvider implements ITreeContentProvider {
 
+	private TopoGraphContentOutlinePage parentPage;
+
+	public TopoGraphContentProvider(TopoGraphContentOutlinePage parentPage) {
+		this.parentPage = parentPage;
+	}
+
 	@Override
 	public Object[] getElements(Object inputElement) {
 		if (inputElement instanceof ITopoGraph) {
@@ -58,9 +65,16 @@ public class TopoGraphContentProvider implements ITreeContentProvider {
 	public Object[] getChildren(Object parentElement) {
 
 		if (parentElement instanceof ITopoCollectionNode) {
-			return ((ITopoCollectionNode) parentElement).getChildren().toArray();
+			Collection<? extends ITopoNode> nodes = ((ITopoCollectionNode)parentElement).getChildren();
+			for (ITopoNode node : nodes) {
+				node.addPropertyChangeListener(parentPage);
+			}
+			return nodes.toArray();
 		} else if (parentElement instanceof ITopoNode) {
+
 			ITopoNode node = (ITopoNode) parentElement;
+			node.addPropertyChangeListener(parentPage);
+
 			List<Object> all = new ArrayList<>(node.getChildElements().size() + node.getAttributes().size());
 			all.addAll(node.getChildElements());
 			all.addAll(node.getAttributes());
