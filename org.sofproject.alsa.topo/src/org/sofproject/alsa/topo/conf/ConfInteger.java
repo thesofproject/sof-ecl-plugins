@@ -86,7 +86,10 @@ public class ConfInteger extends ConfAttribute {
 			setIntValue((Short) value);
 		else if (value instanceof Byte)
 			setIntValue((Byte) value);
-		else
+		else if (value instanceof String) {
+			setIntValue(Integer.parseInt((String)value));
+		} else
 			throw new RuntimeException("Expected Integer value for " + getName() + ", got " + value.getClass());
+		((ConfElement)getParent()).onAttributeChange(this);
 	}
 }

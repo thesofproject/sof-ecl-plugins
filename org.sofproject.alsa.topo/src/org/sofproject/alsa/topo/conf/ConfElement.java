@@ -37,6 +37,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sofproject.alsa.topo.model.AlsaTopoNode;
 import org.sofproject.core.binfile.BinStruct;
 
 /**
@@ -55,6 +56,8 @@ public class ConfElement extends ConfItem {
 	private String sectionName;
 
 	private String categoryName;
+
+	private AlsaTopoNode parentNode;
 
 	/**
 	 * Map of attributes. References to external elements are represented as
@@ -85,6 +88,10 @@ public class ConfElement extends ConfItem {
 		}
 	}
 
+	public void setParentNode(AlsaTopoNode parentNode) {
+		this.parentNode = parentNode;
+	}
+
 	/**
 	 * Used to serialize embedded elements.
 	 *
@@ -92,6 +99,16 @@ public class ConfElement extends ConfItem {
 	 */
 	public void setSectionName(String sectionName) {
 		this.sectionName = sectionName;
+		rebuildCategoryName();
+	}
+
+	@Override
+	public void setName(String newName) {
+		super.setName(newName);
+		rebuildCategoryName();
+	}
+
+	private void rebuildCategoryName() {
 		categoryName = new StringBuilder(sectionName).append(".\"").append(getName()).append("\"").toString();
 	}
 
@@ -154,6 +171,13 @@ public class ConfElement extends ConfItem {
 
 	public Collection<ConfAttribute> getAttributes() {
 		return attribs.values();
+	}
+
+	public void onAttributeChange(ConfAttribute attrib) {
+		// if there is already a parent node assigned, notify it
+		if (parentNode != null) {
+			parentNode.notifyAttributeChanged(attrib);
+		}
 	}
 
 	public void setBinSource(BinStruct binSource) {

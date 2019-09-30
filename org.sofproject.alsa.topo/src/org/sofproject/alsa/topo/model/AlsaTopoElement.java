@@ -29,6 +29,8 @@
 
 package org.sofproject.alsa.topo.model;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Collection;
 
 import org.sofproject.alsa.topo.conf.ConfElement;
@@ -38,6 +40,7 @@ import org.sofproject.topo.ui.graph.ITopoNodeAttribute;
 public class AlsaTopoElement implements ITopoElement {
 
 	private ConfElement confElement;
+	private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
 	public AlsaTopoElement(ConfElement confElement) {
 		this.confElement = confElement;
@@ -51,6 +54,16 @@ public class AlsaTopoElement implements ITopoElement {
 	@Override
 	public Collection<? extends ITopoNodeAttribute> getAttributes() {
 		return confElement.getAttributes();
+	}
+
+	@Override
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		pcs.addPropertyChangeListener(listener);
+	}
+
+	@Override
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		pcs.addPropertyChangeListener(listener);
 	}
 
 }
