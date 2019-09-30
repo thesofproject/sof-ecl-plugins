@@ -35,18 +35,26 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
+import org.eclipse.ui.views.properties.PropertySheet;
+import org.eclipse.ui.views.properties.PropertySheetPage;
+import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 import org.sofproject.topo.ui.graph.GefTopoNode;
 import org.sofproject.topo.ui.graph.ITopoElement;
 import org.sofproject.topo.ui.graph.ITopoNode;
 import org.sofproject.topo.ui.graph.ITopoNodeAttribute;
+import org.sofproject.topo.ui.graph.ITopoNodeAttribute.Type;
 
 public class TopoNodePropertySource implements IPropertySource, PropertyChangeListener {
 
 	private GefTopoNode item;
 	private List<IPropertyDescriptor> properties;
+	boolean changed = false;
 
 	public TopoNodePropertySource(GefTopoNode item) {
 		this.item = item;
@@ -65,9 +73,30 @@ public class TopoNodePropertySource implements IPropertySource, PropertyChangeLi
 
 	private void addAttributes(Collection<? extends ITopoNodeAttribute> attributes) {
 		for (ITopoNodeAttribute attr : attributes) {
-			PropertyDescriptor pd = new PropertyDescriptor(attr, attr.getName());
-			pd.setCategory(attr.getCategory());
-			properties.add(pd);
+			PropertyDescriptor pd = null;
+			if (attr.isReadOnly()) {
+				pd = new PropertyDescriptor(attr, attr.getName());
+			} else {
+				switch (attr.getNodeAtrributeType()) {
+				case NODE_A_STRING:
+				case NODE_A_INTEGER:
+					pd = new TextPropertyDescriptor(attr, attr.getName());
+					break;
+				case NODE_A_BOOLEAN:
+					String[] values = { "false", "true" };
+					pd = new ComboBoxPropertyDescriptor(attr, attr.getName(),
+							values);
+					break;
+				// TODO: other types
+				default:
+					pd = new PropertyDescriptor(attr, attr.getName());
+					break;
+				}
+			}
+			if (pd != null) {
+				pd.setCategory(attr.getCategory());
+				properties.add(pd);
+			}
 		}
 	}
 
@@ -78,13 +107,22 @@ public class TopoNodePropertySource implements IPropertySource, PropertyChangeLi
 
 	@Override
 	public IPropertyDescriptor[] getPropertyDescriptors() {
+		if (changed) {
+			properties.clear();
+			buildProperties();
+			changed = false;
+		}
 		return properties.toArray(new IPropertyDescriptor[0]);
 	}
 
 	@Override
 	public Object getPropertyValue(Object id) {
 		if (id instanceof ITopoNodeAttribute) {
-			return ((ITopoNodeAttribute) id).getValue();
+			ITopoNodeAttribute attr = (ITopoNodeAttribute) id;
+			if (attr.getNodeAtrributeType() == Type.NODE_A_BOOLEAN)
+				return (Boolean)attr.getValue() ? 1 : 0;
+			else
+				return attr.getStringValue();
 		}
 		return null;
 	}
@@ -106,11 +144,18 @@ public class TopoNodePropertySource implements IPropertySource, PropertyChangeLi
 		// TODO: should go through some specialized validation method
 		if (id instanceof ITopoNodeAttribute) {
 			((ITopoNodeAttribute) id).setValue(value);
+			// TODO: refresh outline via notification
 		}
 	}
 
 	@Override
 	public void propertyChange(PropertyChangeEvent arg0) {
-		// TODO: any way to refresh the properties?
+		changed = true;
+		String id = "org.eclipse.ui.views.PropertySheet";
+		IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(id);
+		if (view instanceof PropertySheet) {
+			PropertySheet propertySheet = (PropertySheet) view;
+			((PropertySheetPage) propertySheet.getCurrentPage()).refresh();
+		}
 	}
 }
