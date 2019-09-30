@@ -57,4 +57,9 @@ public interface ITopoNodeAttribute {
 	 * @return true if value is changed from the default value.
 	 */
 	public boolean isChanged();
+
+	/**
+	 * @return true if attribute is read-only
+	 */
+	public boolean isReadOnly();
 }

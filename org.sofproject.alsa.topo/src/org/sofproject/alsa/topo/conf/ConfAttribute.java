@@ -37,10 +37,16 @@ import org.sofproject.topo.ui.graph.ITopoNodeAttribute;
 public abstract class ConfAttribute extends ConfItem implements ITopoNodeAttribute {
 
 	public final String typeName;
+	boolean readOnly = false;
 
 	public ConfAttribute(String typeName, String name) {
+		this(typeName, name, false);
+	}
+
+	public ConfAttribute(String typeName, String name, boolean readOnly) {
 		super(name);
 		this.typeName = typeName;
+		this.readOnly = readOnly;
 	}
 
 	@Override
@@ -56,6 +62,11 @@ public abstract class ConfAttribute extends ConfItem implements ITopoNodeAttribu
 
 	@Override
 	public abstract boolean isChanged();
+
+	@Override
+	public boolean isReadOnly() {
+		return readOnly;
+	}
 
 	public String getTypeName() {
 		return typeName;
