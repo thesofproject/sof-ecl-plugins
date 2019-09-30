@@ -63,6 +63,7 @@ public class ConfString extends ConfAttribute {
 		if (!(value instanceof String))
 			throw new RuntimeException("Expected String value");
 		setStringValue((String) value);
+		((ConfElement)getParent()).onAttributeChange(this);
 	}
 
 	@Override

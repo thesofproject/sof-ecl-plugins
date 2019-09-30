@@ -29,6 +29,8 @@
 
 package org.sofproject.alsa.topo.model;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.sofproject.alsa.topo.conf.ConfAttribute;
 import org.sofproject.alsa.topo.conf.ConfElement;
 import org.sofproject.alsa.topo.conf.ConfItem;
 import org.sofproject.core.binfile.BinStruct;
@@ -67,6 +70,7 @@ public class AlsaTopoNode implements ITopoNode {
 	 * reference to part of the binary file. May give null otherwise.
 	 */
 	private ConfElement confElement;
+	private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
 	boolean first = false;
 	boolean last = false;
@@ -81,9 +85,12 @@ public class AlsaTopoNode implements ITopoNode {
 	 */
 	public AlsaTopoNode(ConfElement confElement) {
 		this.confElement = confElement;
+		confElement.setParentNode(this);
 		for (ConfItem child : confElement.getChildren()) {
 			if (child instanceof ConfElement) {
-				elements.add(new AlsaTopoElement((ConfElement) child));
+				ConfElement confChild = (ConfElement) child;
+				elements.add(new AlsaTopoElement(confChild));
+				confChild.setParentNode(this);
 			}
 		}
 	}
@@ -165,7 +172,9 @@ public class AlsaTopoNode implements ITopoNode {
 
 	@Override
 	public void setName(String newName) {
+		String oldName = confElement.getName();
 		confElement.setName(newName);
+		pcs.firePropertyChange(PROP_NAME, oldName, newName);
 	}
 
 	@Override
@@ -222,6 +231,20 @@ public class AlsaTopoNode implements ITopoNode {
 	@Override
 	public Collection<? extends ITopoNodeAttribute> getAttributes() {
 		return confElement.getAttributes();
+	}
+
+	@Override
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		pcs.addPropertyChangeListener(listener);
+	}
+
+	@Override
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		pcs.addPropertyChangeListener(listener);
+	}
+
+	public void notifyAttributeChanged(ConfAttribute attrib) {
+		pcs.firePropertyChange(PROP_ATTRIB, null, attrib);
 	}
 
 	@Override

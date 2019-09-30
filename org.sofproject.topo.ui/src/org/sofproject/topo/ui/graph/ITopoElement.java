@@ -29,6 +29,7 @@
 
 package org.sofproject.topo.ui.graph;
 
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 
 /**
@@ -37,6 +38,9 @@ import java.util.Collection;
  * places like Outline or Properties view.
  */
 public interface ITopoElement {
+
+	public static final String PROP_NAME = "name";
+	public static final String PROP_ATTRIB = "attrib";
 
 	/**
 	 * @return Name of the element.
@@ -47,5 +51,9 @@ public interface ITopoElement {
 	 * @return Attributes of the node.
 	 */
 	public Collection<? extends ITopoNodeAttribute> getAttributes();
+
+	public void addPropertyChangeListener(PropertyChangeListener listener);
+
+	public void removePropertyChangeListener(PropertyChangeListener listener);
 
 }
