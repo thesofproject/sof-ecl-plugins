@@ -58,7 +58,7 @@ public class TopoGraphContentOutlinePage extends ContentOutlinePage implements P
 	public void createControl(Composite parent) {
 		super.createControl(parent);
 		TreeViewer viewer = getTreeViewer();
-		viewer.setContentProvider(new TopoGraphContentProvider());
+		viewer.setContentProvider(new TopoGraphContentProvider(this));
 		viewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new AlsaTopoGraphLabelProvider()));
 		viewer.addSelectionChangedListener(this);
 		viewer.setInput(topoModel);
