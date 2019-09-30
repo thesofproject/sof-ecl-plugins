@@ -30,6 +30,7 @@
 package org.sofproject.topo.ui.editor.policies;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import org.eclipse.gef.mvc.fx.handlers.AbstractHandler;
 import org.eclipse.gef.mvc.fx.handlers.IOnClickHandler;
@@ -42,6 +43,7 @@ import org.eclipse.gef.mvc.fx.policies.DeletionPolicy;
 import org.eclipse.gef.mvc.fx.viewer.IViewer;
 import org.eclipse.gef.mvc.fx.viewer.InfiniteCanvasViewer;
 import org.eclipse.gef.zest.fx.parts.EdgePart;
+import org.eclipse.swt.widgets.Display;
 import org.sofproject.topo.ui.graph.GefTopoEdge;
 import org.sofproject.topo.ui.graph.GefTopoNode;
 import org.sofproject.topo.ui.graph.ITopoGraph;
@@ -59,6 +61,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseEvent;
 
 public class TopoNodeOnClickHandler extends AbstractHandler implements IOnClickHandler {
@@ -79,6 +82,27 @@ public class TopoNodeOnClickHandler extends AbstractHandler implements IOnClickH
 					TopoItemCreationModel cm = viewer.getAdapter(TopoItemCreationModel.class);
 					cm.setType(TopoItemCreationModel.Type.Connection);
 					cm.setSource((TopoNodePart) getHost());
+				}
+			});
+
+			MenuItem renameNodeItem = new MenuItem("Rename Node...");
+			renameNodeItem.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					Display.getDefault().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							GefTopoNode gefNode = ((TopoNodePart) getHost()).getContent();
+							TextInputDialog dlg = new TextInputDialog(gefNode.getTopoModelNode().getName());
+							dlg.setTitle("Rename Node");
+							dlg.setGraphic(null);
+							dlg.setHeaderText("");
+							Optional<String> newName = dlg.showAndWait();
+							if (newName.isPresent()) {
+								gefNode.setName(newName.get());
+							}
+						}
+					});
 				}
 			});
 
@@ -106,7 +130,8 @@ public class TopoNodeOnClickHandler extends AbstractHandler implements IOnClickH
 
 			});
 
-			ContextMenu menu = new ContextMenu(newConnectionItem, new SeparatorMenuItem(), deleteNodeItem);
+			ContextMenu menu = new ContextMenu(newConnectionItem, new SeparatorMenuItem(), renameNodeItem,
+					deleteNodeItem);
 			menu.show(((InfiniteCanvasViewer) viewer).getScene().getWindow(), e.getScreenX(), e.getScreenY());
 
 		} else if (e.isPrimaryButtonDown()) {
@@ -126,8 +151,7 @@ public class TopoNodeOnClickHandler extends AbstractHandler implements IOnClickH
 							.get(TopoZestGraphBuilder.TOPO_MODEL_ATTR));
 					GefTopoNode gefSource = source.getContent();
 					GefTopoNode gefTarget = target.getContent();
-					try
-					{
+					try {
 						GefTopoEdge conn = new GefTopoEdge(
 								topoModel.createConnection(gefSource.getTopoModelNode(), gefTarget.getTopoModelNode()),
 								gefSource, gefTarget);
