@@ -33,13 +33,11 @@ import java.util.Collection;
 
 public abstract class ConfEnum extends ConfAttribute {
 
-	private static final String TYPE_NAME = "enum";
-
 	private String value;
 	private int intValue = 0;
 
 	public ConfEnum(String name) {
-		super(TYPE_NAME, name);
+		super(name);
 	}
 
 	public abstract Collection<String> getValueSet();

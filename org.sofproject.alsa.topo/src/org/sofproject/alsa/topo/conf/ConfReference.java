@@ -39,19 +39,17 @@ import java.io.Writer;
  */
 public class ConfReference extends ConfAttribute {
 
-	private static final String TYPE_NAME = "reference";
-
 	/**
 	 * Reference to another element.
 	 */
 	private ConfElement value;
 
 	public ConfReference(String name) {
-		super(TYPE_NAME, name);
+		super(name);
 	}
 
 	public ConfReference(String name, ConfElement value) {
-		super(TYPE_NAME, name);
+		super(name);
 		this.value = value;
 	}
 

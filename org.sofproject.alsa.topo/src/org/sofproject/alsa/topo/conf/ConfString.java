@@ -31,12 +31,10 @@ package org.sofproject.alsa.topo.conf;
 
 public class ConfString extends ConfAttribute {
 
-	private static final String TYPE_NAME = "string";
-
 	private String value;
 
 	public ConfString(String name) {
-		super(TYPE_NAME, name);
+		super(name);
 	}
 
 	public ConfString(String name, String value) {

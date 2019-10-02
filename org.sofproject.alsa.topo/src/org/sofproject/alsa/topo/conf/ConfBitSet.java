@@ -31,13 +31,11 @@ package org.sofproject.alsa.topo.conf;
 
 public class ConfBitSet extends ConfAttribute {
 
-	private static final String TYPE_NAME = "bits";
-
 	private long value;
 	protected String[][] bitNames;
 
 	public ConfBitSet(String name, String[][] bitNames) {
-		super(TYPE_NAME, name);
+		super(name);
 		this.value = 0;
 		this.bitNames = bitNames;
 	}
