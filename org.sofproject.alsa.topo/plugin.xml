@@ -10,5 +10,15 @@
             file_extension="tplg">
       </factory>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.sofproject.topo.ui.editor.TopoEditor"
+            default="false"
+            extensions="tplg"
+            id="org.sofproject.alsa.topo.editor"
+            name="Alsa Topology Editor">
+      </editor>
+   </extension>
 
 </plugin>
