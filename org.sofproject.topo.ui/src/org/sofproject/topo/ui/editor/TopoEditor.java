@@ -112,12 +112,11 @@ public class TopoEditor extends AbstractFXEditor implements IBinFileEditor {
 						continue;
 					Object factory = cfg.createExecutableExtension("class");
 					if (factory instanceof ITopoFactory) {
-						topoModel = ((ITopoFactory) factory).read(fileInput.getName(),
-								fileInput.getFile().getContents().available(), fileInput.getFile().getContents());
+						topoModel = ((ITopoFactory) factory).read(fileInput.getFile());
 					}
 				}
 
-			} catch (CoreException | IOException e) {
+			} catch (CoreException |IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

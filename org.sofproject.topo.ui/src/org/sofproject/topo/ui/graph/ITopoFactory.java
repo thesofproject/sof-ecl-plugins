@@ -29,12 +29,15 @@
 
 package org.sofproject.topo.ui.graph;
 
-import java.io.InputStream;
+import java.io.IOException;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 
 /**
  * Topology graph factory, implemented by a specific topology binding.
  *
  */
 public interface ITopoFactory {
-	public ITopoGraph read(String fileName, int availableSize, InputStream inputStream);
+	public ITopoGraph read(IFile file) throws CoreException, IOException;
 }
