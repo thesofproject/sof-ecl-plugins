@@ -32,6 +32,8 @@ package org.sofproject.alsa.topo.model;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.sofproject.alsa.topo.binfile.BinTopoBlockFactory;
 import org.sofproject.core.binfile.BinFile;
 import org.sofproject.core.binfile.BinFileReader;
@@ -41,17 +43,12 @@ import org.sofproject.topo.ui.graph.ITopoGraph;
 public class AlsaTopoFactory implements ITopoFactory {
 
 	@Override
-	public ITopoGraph read(String fileName, int availableSize, InputStream inputStream) {
-		try {
-			BinFileReader reader = new BinFileReader(fileName, availableSize, inputStream);
-			BinFile tplg = reader.read(new BinTopoBlockFactory());
-			AlsaTopoGraph graph = new AlsaTopoGraph();
-			graph.setBinTopology(tplg);
-			return graph;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+	public ITopoGraph read(IFile file) throws CoreException, IOException {
+		InputStream is = file.getContents();
+		BinFileReader reader = new BinFileReader(file.getName(), is.available(), is);
+		BinFile tplg = reader.read(new BinTopoBlockFactory());
+		AlsaTopoGraph graph = new AlsaTopoGraph();
+		graph.setBinTopology(tplg);
+		return graph;
 	}
 }
