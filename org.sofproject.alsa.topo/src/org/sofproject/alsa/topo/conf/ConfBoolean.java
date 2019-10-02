@@ -31,12 +31,10 @@ package org.sofproject.alsa.topo.conf;
 
 public class ConfBoolean extends ConfAttribute {
 
-	private static final String TYPE_NAME = "boolean";
-
 	private boolean value = false;
 
 	public ConfBoolean(String name) {
-		super(TYPE_NAME, name);
+		super(name);
 	}
 
 	public void setBooleanValue(boolean value) {

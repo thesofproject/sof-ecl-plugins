@@ -31,13 +31,11 @@ package org.sofproject.alsa.topo.conf;
 
 public class ConfInteger extends ConfAttribute {
 
-	private static final String TYPE_NAME = "integer";
-
 	private int value;
 	private boolean alwaysChanged = false;
 
 	public ConfInteger(String name) {
-		super(TYPE_NAME, name);
+		super(name);
 	}
 
 	public ConfInteger(String name, boolean alwaysChanged) {

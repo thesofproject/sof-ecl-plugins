@@ -1,8 +1,3 @@
-package org.sofproject.alsa.topo.conf;
-
-import java.io.IOException;
-import java.io.Writer;
-
 /*
  * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
@@ -32,14 +27,17 @@ import java.io.Writer;
  *
  */
 
-public class ConfBytes extends ConfAttribute {
+package org.sofproject.alsa.topo.conf;
 
-	private static final String TYPE_NAME = "bytes";
+import java.io.IOException;
+import java.io.Writer;
+
+public class ConfBytes extends ConfAttribute {
 
 	private byte[] value;
 
 	public ConfBytes(String name) {
-		super(TYPE_NAME, name);
+		super(name);
 	}
 
 	@Override

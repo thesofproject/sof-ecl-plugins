@@ -41,15 +41,13 @@ import java.util.List;
  */
 public class ConfRefArray extends ConfAttribute {
 
-	private static final String TYPE_NAME = "reference[]";
-
 	/**
 	 * Array of references to another elements.
 	 */
 	private List<ConfElement> value = new ArrayList<>();
 
 	public ConfRefArray(String name) {
-		super(TYPE_NAME, name);
+		super(name);
 	}
 
 	public void addRefValue(ConfElement value) {

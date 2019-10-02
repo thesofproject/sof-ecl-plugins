@@ -37,12 +37,10 @@ import java.util.List;
 
 public class ConfArray<T extends ConfItem> extends ConfAttribute {
 
-	private static final String TYPE_NAME = "array";
-
 	private List<T> value = new ArrayList<>();
 
 	public ConfArray(String name) {
-		super(TYPE_NAME, name);
+		super(name);
 	}
 
 	@Override
