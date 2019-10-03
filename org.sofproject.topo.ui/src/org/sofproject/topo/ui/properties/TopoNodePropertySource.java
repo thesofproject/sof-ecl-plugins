@@ -75,7 +75,7 @@ public class TopoNodePropertySource implements IPropertySource, PropertyChangeLi
 		for (ITopoNodeAttribute attr : attributes) {
 			PropertyDescriptor pd = null;
 			if (attr.isReadOnly()) {
-				pd = new PropertyDescriptor(attr, attr.getName());
+				pd = new PropertyDescriptor(attr, String.format("[%s]", attr.getName()));
 			} else {
 				switch (attr.getNodeAtrributeType()) {
 				case NODE_A_STRING:
@@ -119,10 +119,15 @@ public class TopoNodePropertySource implements IPropertySource, PropertyChangeLi
 	public Object getPropertyValue(Object id) {
 		if (id instanceof ITopoNodeAttribute) {
 			ITopoNodeAttribute attr = (ITopoNodeAttribute) id;
-			if (attr.getNodeAtrributeType() == Type.NODE_A_BOOLEAN)
-				return (Boolean)attr.getValue() ? 1 : 0;
-			else
+			if (attr.getNodeAtrributeType() == Type.NODE_A_BOOLEAN) {
+				if (attr.isReadOnly()) {
+					return (Boolean) attr.getValue() ? "true" : "false";
+				} else {
+					return (Boolean)attr.getValue() ? 1 : 0;
+				}
+			} else {
 				return attr.getStringValue();
+			}
 		}
 		return null;
 	}
