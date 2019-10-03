@@ -47,7 +47,7 @@ public class AlsaTopoFactory implements ITopoFactory {
 		InputStream is = file.getContents();
 		BinFileReader reader = new BinFileReader(file.getName(), is.available(), is);
 		BinFile tplg = reader.read(new BinTopoBlockFactory());
-		AlsaTopoGraph graph = new AlsaTopoGraph();
+		AlsaTopoGraph graph = new AlsaTopoGraph(file);
 		graph.setBinTopology(tplg);
 		return graph;
 	}

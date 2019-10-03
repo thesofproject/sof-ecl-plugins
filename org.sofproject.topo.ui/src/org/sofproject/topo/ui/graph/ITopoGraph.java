@@ -31,9 +31,9 @@ package org.sofproject.topo.ui.graph;
 
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Collection;
 
+import org.eclipse.core.runtime.CoreException;
 import org.sofproject.core.binfile.BinFile;
 
 /**
@@ -67,5 +67,5 @@ public interface ITopoGraph {
 	// TODO: optional, move to a separate interface
 	public BinFile getBinTopology();
 
-	public void serialize(OutputStream outputStream) throws IOException;
+	public void serialize() throws CoreException, IOException;
 }

@@ -32,8 +32,9 @@ package org.sofproject.alsa.topo.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -43,6 +44,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.sofproject.alsa.topo.binfile.BinBlock;
 import org.sofproject.alsa.topo.binfile.BinEnumBlockType;
 import org.sofproject.alsa.topo.binfile.BinStructDapmGraph;
@@ -82,6 +86,8 @@ public class AlsaTopoGraph implements ITopoGraph {
 
 	private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
+	private IFile inputFile;
+
 	/**
 	 * All child nodes to be displayed in the main graph.
 	 */
@@ -117,6 +123,10 @@ public class AlsaTopoGraph implements ITopoGraph {
 	private BinFile binTplg;
 
 	private ConfTopology confTplg;
+
+	public AlsaTopoGraph(IFile file) {
+		this.inputFile = file;
+	}
 
 	/**
 	 * Topology read from a binary '.tplg' file is assigned and translated to the
@@ -475,8 +485,10 @@ public class AlsaTopoGraph implements ITopoGraph {
 	}
 
 	@Override
-	public void serialize(OutputStream outputStream) throws IOException {
-		Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+	public void serialize() throws CoreException, IOException {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+		Writer writer = new BufferedWriter(new OutputStreamWriter(os));
 		// tlv-s
 		tlvs.serialize(writer);
 
@@ -512,6 +524,16 @@ public class AlsaTopoGraph implements ITopoGraph {
 		interConnections.serialize(writer);
 
 		writer.close();
+		os.close();
+
+		IPath inputFilePath = inputFile.getProjectRelativePath();
+		IFile outputFile = inputFile.getProject().getFile(inputFilePath.addFileExtension("conf"));
+		if (outputFile.exists()) {
+			outputFile.setContents(new ByteArrayInputStream(os.toByteArray()), true, false, null);
+		} else {
+			outputFile.create(new ByteArrayInputStream(os.toByteArray()), false, null);
+		}
+		outputFile.getParent().refreshLocal(1, null);
 	}
 
 	@Override
