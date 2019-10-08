@@ -21,6 +21,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.gef.mvc.fx.ui;bundle-version="5.0.2";visibility:=reexport
 Export-Package: org.sofproject.ui.editor,
  org.sofproject.ui.graph,
+ org.sofproject.ui.ops,
  org.sofproject.ui.properties,
  org.sofproject.ui.resources
 Bundle-Vendor: Intel Corporation

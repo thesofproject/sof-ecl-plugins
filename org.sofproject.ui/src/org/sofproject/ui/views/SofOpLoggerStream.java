@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,14 +26,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+package org.sofproject.ui.views;
 
-package org.sofproject.core.connection;
+import java.io.OutputStream;
 
-import java.lang.reflect.InvocationTargetException;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PlatformUI;
+import org.sofproject.core.connection.SofNodeConnection;
 
-import org.eclipse.core.runtime.IProgressMonitor;
+public class SofOpLoggerStream {
 
-public interface SofOperation {
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
+	public static OutputStream create(SofNodeConnection conn) {
+		IViewPart vp = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+				.findView(SofLoggerViewPart.ID);
+		if (vp != null && vp instanceof SofLoggerViewPart) {
+			SofLoggerViewPart lvp = (SofLoggerViewPart) vp;
+			return lvp.getOutputStream(conn);
+		}
+		return null;
+	}
+
 }

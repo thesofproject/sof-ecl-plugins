@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,49 +27,51 @@
  *
  */
 
-package org.sofproject.core.connection;
+package org.sofproject.ui.ops;
 
-import java.lang.reflect.InvocationTargetException;
+import java.io.OutputStream;
 
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.sofproject.core.connection.SofNodeConnection;
+import org.sofproject.core.ops.IRemoteOp;
+import org.sofproject.core.ops.IRemoteOpsProvider;
+import org.sofproject.core.ops.SofSshImportOperation;
+import org.sofproject.core.ops.SofSshRunCmdOperation;
+import org.sofproject.ui.views.SofOpLoggerStream;
 
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
+public class SofRemoteOpsProvider implements IRemoteOpsProvider {
 
-public class SofSshRunCmdOperation extends SofRemoteOperation {
-	private String chType;
-	private String cmd;
+	public static final String OPEN_LOGGER_OP = "org.sofproject.ui.ops.openlogger";
+	public static final String IMPORT_SOF_FILES_OP = "org.sofproject.ui.ops.importsoffiles";
 
-	public SofSshRunCmdOperation(String chType, String cmd) {
-		this.chType = chType;
-		this.cmd = cmd;
+	public static final String[] OPS = { OPEN_LOGGER_OP, IMPORT_SOF_FILES_OP };
+
+	@Override
+	public String[] getRemoteOpsIds() {
+		return OPS;
 	}
 
-	// TODO: check monitor.isCanceled() and throw InterruptedException then...
 	@Override
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException {
+	public String getRemoteOpDisplayName(String opId) {
+		switch (opId) {
+		case OPEN_LOGGER_OP:
+			return "Open SOF logger";
+		case IMPORT_SOF_FILES_OP:
+			return "Import SOF files";
+		default:
+			return null;
+		}
+	}
 
-		try {
-			if (!conn.isConnected()) {
-				throw new InvocationTargetException(
-						new IllegalStateException("Node not connected"));
-			}
-			if (conn.hasChannelOpened(chType)) {
-				monitor.done();
-				return;
-			}
-			Session session = conn.getSession();
-			ChannelExec channel = (ChannelExec) session.openChannel("exec");
-			channel.setCommand(cmd);
-			channel.setInputStream(null);
-			channel.setOutputStream(os); // set to the super class before run()
-			channel.connect();
-
-			conn.setExecChannel(chType, channel); // store channel back
-		} catch (JSchException e) {
-			throw new InvocationTargetException(e);
+	@Override
+	public IRemoteOp createRemoteOp(String opId, SofNodeConnection conn) {
+		switch (opId) {
+		case OPEN_LOGGER_OP:
+			OutputStream os = SofOpLoggerStream.create(conn);
+			return new SofSshRunCmdOperation(conn, opId, "./run-logger.sh", os);
+		case IMPORT_SOF_FILES_OP:
+			return new SofSshImportOperation(conn);
+		default:
+			return null;
 		}
 	}
 

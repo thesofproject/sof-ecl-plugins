@@ -47,8 +47,6 @@ public class SofNodeConnection {
 	private SofNodeProject project;
 	private Session session = null;
 
-	public static final String DMESG_CH = "dmesg";
-	public static final String LOGGER_CH = "logger";
 	private Map<String, ChannelExec> channels = new HashMap<>();
 
 	public SofNodeConnection(SofNodeProject project) {
@@ -103,19 +101,6 @@ public class SofNodeConnection {
 	public boolean hasChannelOpened(String chType) {
 		ChannelExec ce = channels.get(chType);
 		return ce != null && ce.isConnected();
-	}
-
-	public static SofRemoteOperation createImportResourcesOp() {
-		return new SofSshImportOperation();
-	}
-
-	public static SofRemoteOperation createConnectDmesgOp() {
-		return new SofSshRunCmdOperation(DMESG_CH, "dmesg -w");
-	}
-
-	public static SofRemoteOperation createConnectLoggerOp() {
-		// TODO: run the logger from the default location
-		return new SofSshRunCmdOperation(LOGGER_CH, "./run-logger.sh");
 	}
 
 	public void close() {

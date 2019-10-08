@@ -27,7 +27,7 @@
  *
  */
 
-package org.sofproject.core.connection;
+package org.sofproject.core.ops;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
@@ -39,6 +39,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.sofproject.core.ISofNodeConst;
 import org.sofproject.core.SofNodeProject;
+import org.sofproject.core.connection.SofNodeConnection;
+import org.sofproject.core.connection.SofNodeDescriptor;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
@@ -46,12 +48,12 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
-public class SofSshImportOperation extends SofRemoteOperation {
+public class SofSshImportOperation extends SimpleRemoteOp {
 
-	public SofSshImportOperation() {
+	public SofSshImportOperation(SofNodeConnection conn) {
+		super(conn);
 	}
 
-	// TODO: check monitor.isCanceled() and throw InterruptedException then...
 	@Override
 	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		monitor.beginTask("Importing files", 1000);

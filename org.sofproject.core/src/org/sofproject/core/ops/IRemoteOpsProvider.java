@@ -27,48 +27,15 @@
  *
  */
 
-package org.sofproject.topo.ui.graph;
+package org.sofproject.core.ops;
 
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.util.Collection;
+import org.sofproject.core.connection.SofNodeConnection;
 
-import org.eclipse.core.runtime.CoreException;
-import org.sofproject.core.binfile.BinFile;
-import org.sofproject.core.ops.IRemoteOpsProvider;
+public interface IRemoteOpsProvider {
 
-/**
- * Topology graph, implemented by a specific topology binding.
- *
- */
-public interface ITopoGraph {
+	public String[] getRemoteOpsIds();
 
-	public Collection<? extends ITopoCollectionNode> getCollections();
+	public String getRemoteOpDisplayName(String opId);
 
-	public Collection<? extends ITopoNode> getNodes();
-
-	public ITopoNode createNode(String nodeId);
-
-	public void removeNode(ITopoNode node);
-
-	public Collection<? extends ITopoConnection> getConnections();
-
-	public ITopoConnection createConnection(ITopoNode source, ITopoNode target);
-
-	public void removeConnection(ITopoConnection connection);
-
-	public String[] getNodeTypeIds();
-
-	public String getNodeDisplayName(String nodeId);
-
-	public void addPropertyChangeListener(PropertyChangeListener listener);
-
-	public void removePropertyChangeListener(PropertyChangeListener listener);
-
-	// TODO: optional, move to a separate interface
-	public BinFile getBinTopology();
-
-	public void serialize() throws CoreException, IOException;
-
-	public IRemoteOpsProvider getRemoteOpsProvider();
+	public IRemoteOp createRemoteOp(String opId, SofNodeConnection conn);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,23 +27,26 @@
  *
  */
 
-package org.sofproject.core.connection;
+package org.sofproject.core.ops;
 
-import java.io.OutputStream;
+import org.sofproject.core.connection.SofNodeConnection;
 
-/**
- * Base for remote operations, ones that operate in context of 
- * a {@link SofNodeConnection}.
- */
-public abstract class SofRemoteOperation implements SofOperation {
+public abstract class SimpleRemoteOp implements IRemoteOp {
+
 	protected SofNodeConnection conn;
-	protected OutputStream os;
 
-	public void setConnection(SofNodeConnection conn) {
+	public SimpleRemoteOp(SofNodeConnection conn) {
 		this.conn = conn;
 	}
-	
-	public void setOutputStream(OutputStream os) {
-		this.os = os;
+
+	@Override
+	public boolean isCancelable() {
+		return false;
 	}
+
+	@Override
+	public SofNodeConnection getConnection() {
+		return conn;
+	}
+
 }

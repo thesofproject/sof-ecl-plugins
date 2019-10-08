@@ -27,48 +27,46 @@
  *
  */
 
-package org.sofproject.topo.ui.graph;
+package org.sofproject.ui.ops;
 
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.util.Collection;
-
-import org.eclipse.core.runtime.CoreException;
-import org.sofproject.core.binfile.BinFile;
+import org.eclipse.ui.console.MessageConsoleStream;
+import org.sofproject.core.connection.SofNodeConnection;
+import org.sofproject.core.ops.IRemoteOp;
 import org.sofproject.core.ops.IRemoteOpsProvider;
+import org.sofproject.core.ops.SofSshRunCmdOperation;
+import org.sofproject.ui.console.SofConsole;
 
-/**
- * Topology graph, implemented by a specific topology binding.
- *
- */
-public interface ITopoGraph {
+public class StdRemoteOpsProvider implements IRemoteOpsProvider {
 
-	public Collection<? extends ITopoCollectionNode> getCollections();
+	public static final String OPEN_DMESG_OP = "org.sofproject.ui.ops.opendmesg";
 
-	public Collection<? extends ITopoNode> getNodes();
+	public static final String[] OPS = { OPEN_DMESG_OP };
 
-	public ITopoNode createNode(String nodeId);
+	@Override
+	public String[] getRemoteOpsIds() {
+		return OPS;
+	}
 
-	public void removeNode(ITopoNode node);
+	@Override
+	public String getRemoteOpDisplayName(String opId) {
+		switch (opId) {
+		case OPEN_DMESG_OP:
+			return "Open Dmesg";
+		default:
+			return null;
+		}
+	}
 
-	public Collection<? extends ITopoConnection> getConnections();
+	@Override
+	public IRemoteOp createRemoteOp(String opId, SofNodeConnection conn) {
+		switch (opId) {
+		case OPEN_DMESG_OP:
+			MessageConsoleStream mcs = SofConsole.getConsoleStream(
+					conn.getProject().getProject().getName() + ".dmesg", SofConsole.TYPE_DMESG, conn.getProject());
+			return new SofSshRunCmdOperation(conn, opId, "dmesg -w", mcs);
+		default:
+			return null;
+		}
+	}
 
-	public ITopoConnection createConnection(ITopoNode source, ITopoNode target);
-
-	public void removeConnection(ITopoConnection connection);
-
-	public String[] getNodeTypeIds();
-
-	public String getNodeDisplayName(String nodeId);
-
-	public void addPropertyChangeListener(PropertyChangeListener listener);
-
-	public void removePropertyChangeListener(PropertyChangeListener listener);
-
-	// TODO: optional, move to a separate interface
-	public BinFile getBinTopology();
-
-	public void serialize() throws CoreException, IOException;
-
-	public IRemoteOpsProvider getRemoteOpsProvider();
 }
