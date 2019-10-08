@@ -29,25 +29,22 @@
 
 package org.sofproject.ui.views;
 
-import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -55,17 +52,17 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 import org.sofproject.core.connection.SofNodeConnection;
 import org.sofproject.core.connection.SofNodeConnectionManager;
-import org.sofproject.core.connection.SofRemoteOperation;
-import org.sofproject.ui.console.SofConsole;
-import org.sofproject.ui.handlers.SofNodeLoginDialog;
+import org.sofproject.core.ops.IRemoteOpsProvider;
+import org.sofproject.ui.ops.SofOpRunner;
+import org.sofproject.ui.ops.SofRemoteOpsProvider;
+import org.sofproject.ui.ops.StdRemoteOpsProvider;
 
 public class SofNodeConnectionsViewPart extends ViewPart {
 
 	private TableViewer viewer;
+	private List<IRemoteOpsProvider> opsProviders = new ArrayList<>();
 
 	// TODO: should re-pack the layout on change?
-
-	// TODO: connection is duplicated for the first time a first project is created?
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -129,40 +126,34 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 		viewer.getTable().setLinesVisible(true);
 
 		IActionBars actionBars = getViewSite().getActionBars();
-//		IMenuManager menuManager = actionBars.getMenuManager();
-		IToolBarManager toolbarManager = actionBars.getToolBarManager();
+		IMenuManager menuManager = actionBars.getMenuManager();
 
-		toolbarManager.add(new Action("Import Files") {
-			@Override
-			public void run() {
-				runOp(SofNodeConnection.createImportResourcesOp(), null);
-			}
-		});
+		opsProviders.add(new StdRemoteOpsProvider());
+		opsProviders.add(new SofRemoteOpsProvider());
 
-		toolbarManager.add(new Action("Open dmesg") {
-			@Override
-			public void run() {
-				// runOp(SofNodeConnection.createConnectDmesgOp(), "dmesg",
-				// SofConsole.TYPE_DMESG);
-				Object el = viewer.getStructuredSelection().getFirstElement();
-				if (el != null) {
-					SofNodeConnection conn = (SofNodeConnection) el;
-					runOp(SofNodeConnection.createConnectDmesgOp(),
-							new SofOpConsoleStreamProvider(conn, "dmesg", SofConsole.TYPE_DMESG));
+		for (IConfigurationElement cfg : Platform.getExtensionRegistry()
+				.getConfigurationElementsFor("org.sofproject.core.remoteopsproviders")) {
+			try {
+				Object provider = cfg.createExecutableExtension("class");
+				if (provider instanceof IRemoteOpsProvider) {
+					opsProviders.add((IRemoteOpsProvider) provider);
 				}
+			} catch (CoreException e) {
+				e.printStackTrace();
 			}
-		});
+		}
 
-		toolbarManager.add(new Action("Open logger") {
-			@Override
-			public void run() {
-				Object el = viewer.getStructuredSelection().getFirstElement();
-				if (el != null) {
-					SofNodeConnection conn = (SofNodeConnection) el;
-					runOp(SofNodeConnection.createConnectLoggerOp(), new SofOpLoggerStreamProvider(conn));
-				}
+
+		for (IRemoteOpsProvider prov : opsProviders) {
+			for (String opId : prov.getRemoteOpsIds()) {
+				menuManager.add(new Action(prov.getRemoteOpDisplayName(opId)) {
+					@Override
+					public void run() {
+						runOp(prov, opId);
+					}
+				});
 			}
-		});
+		}
 
 		SofNodeConnectionManager connMgr = SofNodeConnectionManager.getInstance();
 		viewer.setInput(connMgr.getConnections());
@@ -179,52 +170,13 @@ public class SofNodeConnectionsViewPart extends ViewPart {
 		});
 	}
 
-	private void runOp(SofRemoteOperation op, SofOpOutputStreamProvider strProv) {
+	private void runOp(IRemoteOpsProvider prov, String opId) {
 		Object el = viewer.getStructuredSelection().getFirstElement();
 		if (el != null) {
 			SofNodeConnection conn = (SofNodeConnection) el;
-			try {
-				connectNode(conn);
-				if (!conn.isConnected()) {
-					/* aborted or authentication failure */
-					return;
-				}
-				op.setConnection(conn);
-
-				// now, when the connection is established, let's create an output console
-				OutputStream os = null;
-				if (strProv != null) {
-					os = strProv.createOutputStream();
-				}
-
-				op.setOutputStream(os);
-
-				new ProgressMonitorDialog(null).run(true, false, new IRunnableWithProgress() {
-
-					@Override
-					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-						op.run(monitor);
-					}
-				});
-			} catch (CoreException | InvocationTargetException e) {
-				MessageDialog.openError(null, "Operation failed: ", e.getMessage());
-			} catch (InterruptedException e) {
-				MessageDialog.openInformation(null, "Operation canceled", "Operation canceled");
-			}
+			SofOpRunner.runOp(prov.createRemoteOp(opId, conn));
 			viewer.refresh();
 		}
-	}
-
-	private void connectNode(SofNodeConnection conn) throws CoreException {
-		if (conn.isConnected())
-			return;
-
-		SofNodeLoginDialog dlg = new SofNodeLoginDialog(null, conn.getProject().getProject().getName(),
-				conn.getNodeDescriptor().getAddr());
-		if (dlg.open() == Window.OK) {
-			conn.connect(dlg.getLogin(), dlg.getPass());
-		}
-		return;
 	}
 
 	@Override

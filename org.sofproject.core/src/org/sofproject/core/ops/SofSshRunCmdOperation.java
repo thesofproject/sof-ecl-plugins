@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Intel Corporation
+ * Copyright (c) 2018, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,31 +26,54 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package org.sofproject.ui.views;
+
+package org.sofproject.core.ops;
 
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.sofproject.core.connection.SofNodeConnection;
 
-public class SofOpLoggerStreamProvider implements SofOpOutputStreamProvider {
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 
-	private SofNodeConnection conn;
+public class SofSshRunCmdOperation extends SimpleRemoteOp {
 
-	public SofOpLoggerStreamProvider(SofNodeConnection conn) {
-		this.conn = conn;
+	private String chType;
+	private String cmd;
+	private OutputStream os;
+
+	public SofSshRunCmdOperation(SofNodeConnection conn, String chType, String cmd, OutputStream os) {
+		super(conn);
+		this.chType = chType;
+		this.cmd = cmd;
+		this.os = os;
 	}
 
 	@Override
-	public OutputStream createOutputStream() {
-		IViewPart vp = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-				.findView(SofLoggerViewPart.ID);
-		if (vp != null && vp instanceof SofLoggerViewPart) {
-			SofLoggerViewPart lvp = (SofLoggerViewPart) vp;
-			return lvp.getOutputStream(conn);
+	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+		try {
+			if (!conn.isConnected()) {
+				throw new InvocationTargetException(new IllegalStateException("Node not connected"));
+			}
+			if (conn.hasChannelOpened(chType)) {
+				monitor.done();
+				return;
+			}
+			Session session = conn.getSession();
+			ChannelExec channel = (ChannelExec) session.openChannel("exec");
+			channel.setCommand(cmd);
+			channel.setInputStream(null);
+			channel.setOutputStream(os); // set to the super class before run()
+			channel.connect();
+
+			conn.setExecChannel(chType, channel); // store channel back
+		} catch (JSchException e) {
+			throw new InvocationTargetException(e);
 		}
-		return null;
 	}
 
 }

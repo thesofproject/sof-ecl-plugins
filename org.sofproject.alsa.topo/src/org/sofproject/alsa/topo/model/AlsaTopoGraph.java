@@ -70,6 +70,7 @@ import org.sofproject.alsa.topo.conf.ConfWidget;
 import org.sofproject.alsa.topo.model.AlsaTopoConnection.Type;
 import org.sofproject.core.binfile.BinFile;
 import org.sofproject.core.binfile.BinItem;
+import org.sofproject.core.ops.IRemoteOpsProvider;
 import org.sofproject.topo.ui.graph.ITopoCollectionNode;
 import org.sofproject.topo.ui.graph.ITopoConnection;
 import org.sofproject.topo.ui.graph.ITopoGraph;
@@ -534,6 +535,11 @@ public class AlsaTopoGraph implements ITopoGraph {
 			outputFile.create(new ByteArrayInputStream(os.toByteArray()), false, null);
 		}
 		outputFile.getParent().refreshLocal(1, null);
+	}
+
+	@Override
+	public IRemoteOpsProvider getRemoteOpsProvider() {
+		return null; // no extra ops
 	}
 
 	@Override

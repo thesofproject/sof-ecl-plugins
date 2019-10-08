@@ -110,9 +110,18 @@ public class SofNodeConnectionManager extends Observable {
 		notifyObservers(null);
 		conn.close();
 	}
-	
+
 	public Collection<SofNodeConnection> getConnections() {
 		return connections.values();
+	}
+
+	public SofNodeConnection getConnection(IProject project) {
+		for (SofNodeProject snProj : connections.keySet()) {
+			if (snProj.getProject() == project) {
+				return connections.get(snProj);
+			}
+		}
+		return null;
 	}
 
 	public void shutdown() {

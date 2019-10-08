@@ -29,6 +29,9 @@
 
 package org.sofproject.topo.ui.editor.policies;
 
+import java.io.IOException;
+
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.gef.mvc.fx.handlers.AbstractHandler;
 import org.eclipse.gef.mvc.fx.handlers.IOnClickHandler;
 import org.eclipse.gef.mvc.fx.parts.IContentPart;
@@ -37,11 +40,15 @@ import org.eclipse.gef.mvc.fx.parts.IVisualPart;
 import org.eclipse.gef.mvc.fx.policies.CreationPolicy;
 import org.eclipse.gef.mvc.fx.viewer.IViewer;
 import org.eclipse.gef.mvc.fx.viewer.InfiniteCanvasViewer;
+import org.eclipse.swt.widgets.Display;
+import org.sofproject.core.ops.IRemoteOpsProvider;
 import org.sofproject.topo.ui.graph.GefTopoNode;
 import org.sofproject.topo.ui.graph.ITopoGraph;
+import org.sofproject.topo.ui.graph.ITopoNode;
 import org.sofproject.topo.ui.graph.TopoZestGraphBuilder;
 import org.sofproject.topo.ui.models.TopoItemCreationModel;
 import org.sofproject.topo.ui.parts.TopoGraphPart;
+import org.sofproject.ui.ops.SofOpRunner;
 
 import com.google.common.collect.HashMultimap;
 
@@ -74,19 +81,51 @@ public class TopoEditorOnClickHandler extends AbstractHandler implements IOnClic
 					mi.setOnAction(new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
-							creationModel.setType(TopoItemCreationModel.Type.Node);
-							creationModel.setObjectId(nodeId);
-							createNode(e);
+							Display.getDefault().asyncExec(new Runnable() {
+
+								@Override
+								public void run() {
+									creationModel.setType(TopoItemCreationModel.Type.Node);
+									creationModel.setObjectId(nodeId);
+									createNode(e);
+								}
+							});
 						}
 					});
 					menu.getItems().add(mi);
 				}
 				menu.getItems().add(new SeparatorMenuItem());
+
+				IRemoteOpsProvider opsProv = getGraphFromHost().getRemoteOpsProvider();
+				if (opsProv != null) {
+					for (String opId : opsProv.getRemoteOpsIds()) {
+						MenuItem mi = new MenuItem(opsProv.getRemoteOpDisplayName(opId));
+						mi.setOnAction(new EventHandler<ActionEvent>() {
+							@Override
+							public void handle(ActionEvent event) {
+								Display.getDefault().asyncExec(new Runnable() {
+
+									@Override
+									public void run() {
+										SofOpRunner.runOp(opsProv.createRemoteOp(opId, null));
+									}
+								});
+							}
+						});
+						menu.getItems().add(mi);
+					}
+					menu.getItems().add(new SeparatorMenuItem());
+				}
+
 				MenuItem miSerialize = new MenuItem("Serialize Topology");
 				miSerialize.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
-						System.out.println("TODO: Serializing topology here...");
+						try {
+							getGraphFromHost().serialize();
+						} catch (CoreException | IOException e) {
+							e.printStackTrace(); //TODO:
+						}
 					}
 				});
 				menu.getItems().add(miSerialize);
@@ -95,22 +134,33 @@ public class TopoEditorOnClickHandler extends AbstractHandler implements IOnClic
 		}
 	}
 
+	private ITopoGraph getGraphFromHost() {
+		IVisualPart<? extends Node> part = getHost().getRoot().getChildrenUnmodifiable().get(0);
+		if (part instanceof TopoGraphPart) {
+			return ((ITopoGraph) ((TopoGraphPart) part).getContent().getAttributes()
+					.get(TopoZestGraphBuilder.TOPO_MODEL_ATTR));
+		}
+		return null;
+	}
+
 	private void createNode(MouseEvent e) {
 		IViewer viewer = getHost().getRoot().getViewer();
 		TopoItemCreationModel creationModel = viewer.getAdapter(TopoItemCreationModel.class);
 
-		IVisualPart<? extends Node> part = getHost().getRoot().getChildrenUnmodifiable().get(0);
-		if (part instanceof TopoGraphPart) { //TODO: need to test it again?
-			ITopoGraph topoModel = ((ITopoGraph) ((TopoGraphPart) part).getContent().getAttributes()
-					.get(TopoZestGraphBuilder.TOPO_MODEL_ATTR));
-			GefTopoNode gefNode = new GefTopoNode(topoModel.createNode(creationModel.getObjectId()));
+		ITopoGraph topoModel = getGraphFromHost();
+		if (topoModel == null)
+			return; // TODO: throw sth?
+		ITopoNode modelNode = topoModel.createNode(creationModel.getObjectId());
+		if (modelNode == null)
+			return;
+		GefTopoNode gefNode = new GefTopoNode(modelNode);
 
-			IRootPart<? extends Node> root = getHost().getRoot();
-			CreationPolicy creationPolicy = root.getAdapter(CreationPolicy.class);
-			init(creationPolicy);
-			creationPolicy.create(gefNode, part, HashMultimap.<IContentPart<? extends Node>, String>create());
-			creationPolicy.commit();
-		}
+		IRootPart<? extends Node> root = getHost().getRoot();
+		CreationPolicy creationPolicy = root.getAdapter(CreationPolicy.class);
+		init(creationPolicy);
+		creationPolicy.create(gefNode, getHost().getRoot().getChildrenUnmodifiable().get(0),
+				HashMultimap.<IContentPart<? extends Node>, String>create());
+		creationPolicy.commit();
 		creationModel.setType(TopoItemCreationModel.Type.None);
 	}
 

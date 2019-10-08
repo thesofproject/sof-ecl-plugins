@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Intel Corporation
+ * Copyright (c) 2018, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,48 +27,22 @@
  *
  */
 
-package org.sofproject.topo.ui.graph;
+package org.sofproject.core.ops;
 
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.util.Collection;
+import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.runtime.CoreException;
-import org.sofproject.core.binfile.BinFile;
-import org.sofproject.core.ops.IRemoteOpsProvider;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.sofproject.core.connection.SofNodeConnection;
 
-/**
- * Topology graph, implemented by a specific topology binding.
- *
- */
-public interface ITopoGraph {
+public interface IRemoteOp {
 
-	public Collection<? extends ITopoCollectionNode> getCollections();
+	public boolean isCancelable();
 
-	public Collection<? extends ITopoNode> getNodes();
+	/**
+	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
+	 */
+	public SofNodeConnection getConnection();
 
-	public ITopoNode createNode(String nodeId);
-
-	public void removeNode(ITopoNode node);
-
-	public Collection<? extends ITopoConnection> getConnections();
-
-	public ITopoConnection createConnection(ITopoNode source, ITopoNode target);
-
-	public void removeConnection(ITopoConnection connection);
-
-	public String[] getNodeTypeIds();
-
-	public String getNodeDisplayName(String nodeId);
-
-	public void addPropertyChangeListener(PropertyChangeListener listener);
-
-	public void removePropertyChangeListener(PropertyChangeListener listener);
-
-	// TODO: optional, move to a separate interface
-	public BinFile getBinTopology();
-
-	public void serialize() throws CoreException, IOException;
-
-	public IRemoteOpsProvider getRemoteOpsProvider();
+	public void run(IProgressMonitor monitor)
+			throws InvocationTargetException, InterruptedException;
 }

@@ -26,29 +26,56 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package org.sofproject.ui.views;
 
-import java.io.OutputStream;
+package org.sofproject.ui.ops;
 
+import java.lang.reflect.InvocationTargetException;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.window.Window;
 import org.sofproject.core.connection.SofNodeConnection;
-import org.sofproject.ui.console.SofConsole;
+import org.sofproject.core.ops.IRemoteOp;
+import org.sofproject.ui.handlers.SofNodeLoginDialog;
 
-public class SofOpConsoleStreamProvider implements SofOpOutputStreamProvider {
+public class SofOpRunner {
 
-	private SofNodeConnection conn;
-	private String consNameExt;
-	private String consType;
-	
-	public SofOpConsoleStreamProvider(SofNodeConnection conn, String consNameExt, String consType) {
-		this.conn = conn;
-		this.consNameExt = consNameExt;
-		this.consType = consType;
+	public static void runOp(IRemoteOp op) {
+		try {
+			SofNodeConnection conn = op.getConnection();
+
+			if (!conn.isConnected()) {
+				SofNodeLoginDialog dlg = new SofNodeLoginDialog(null, conn.getProject().getProject().getName(),
+						conn.getNodeDescriptor().getAddr());
+				if (dlg.open() == Window.OK) {
+					conn.connect(dlg.getLogin(), dlg.getPass());
+				} else {
+					return;
+				}
+			}
+
+			// TODO: should refresh the viewer if present and method is called
+			// from outside
+
+			if (!conn.isConnected()) {
+				/* authentication failure ? */
+				return;
+			}
+			new ProgressMonitorDialog(null).run(true, op.isCancelable(), new IRunnableWithProgress() {
+
+				@Override
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					op.run(monitor);
+				}
+			});
+		} catch (CoreException | InvocationTargetException e) {
+			MessageDialog.openError(null, "Operation failed: ", e.getMessage());
+		} catch (InterruptedException e) {
+			MessageDialog.openInformation(null, "Operation canceled", "Operation canceled");
+		}
+
 	}
-	
-	@Override
-	public OutputStream createOutputStream() {
-		return SofConsole.getConsoleStream(conn.getProject().getProject().getName() + "." + consNameExt,
-				consType, conn.getProject());
-	}
-
 }
