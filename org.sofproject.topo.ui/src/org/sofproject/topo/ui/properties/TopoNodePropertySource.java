@@ -80,6 +80,7 @@ public class TopoNodePropertySource implements IPropertySource, PropertyChangeLi
 				switch (attr.getNodeAtrributeType()) {
 				case NODE_A_STRING:
 				case NODE_A_INTEGER:
+				case NODE_A_DOUBLE:
 					pd = new TextPropertyDescriptor(attr, attr.getName());
 					break;
 				case NODE_A_BOOLEAN:

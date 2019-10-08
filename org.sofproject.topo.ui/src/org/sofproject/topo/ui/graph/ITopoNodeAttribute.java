@@ -34,6 +34,7 @@ public interface ITopoNodeAttribute {
 		NODE_A_STRING,
 		NODE_A_INTEGER,
 		NODE_A_LONG,
+		NODE_A_DOUBLE,
 		NODE_A_BOOLEAN,
 		NODE_A_BITS,
 		NODE_A_REFERENCE,
@@ -62,4 +63,6 @@ public interface ITopoNodeAttribute {
 	 * @return true if attribute is read-only
 	 */
 	public boolean isReadOnly();
+
+	// TODO: reset to default value
 }
