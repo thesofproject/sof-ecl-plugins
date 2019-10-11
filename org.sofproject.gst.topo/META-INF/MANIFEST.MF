@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SOF Project - GStreamer Topology
+Bundle-SymbolicName: org.sofproject.gst.topo;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: org.sofproject.gst.topo
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-Vendor: Intel Corporation
+Require-Bundle: org.sofproject.core,
+ org.sofproject.topo.ui,
+ com.jcraft.jsch
