@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="org.sofproject.gst.topo.provider"
+         name="GStreamer Topology Provider"
+         point="org.sofproject.topo.providers">
+      <factory
+            class="org.sofproject.gst.topo.model.GstTopoFactory"
+            file_extension="gstr">
+      </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.sofproject.topo.ui.editor.TopoEditor"
+            default="false"
+            extensions="gstr"
+            id="org.sofproject.gst.topo.editor"
+            name="GStreamer Topology Editor">
+      </editor>
+   </extension>
+   <extension
+         id="org.sofproject.gst.remoteopsprovider"
+         name="GStreamer Remote Ops Provider"
+         point="org.sofproject.core.remoteopsproviders">
+      <provider
+            class="org.sofproject.gst.topo.ops.GstOpsProvider">
+      </provider>
+   </extension>
+</plugin>
