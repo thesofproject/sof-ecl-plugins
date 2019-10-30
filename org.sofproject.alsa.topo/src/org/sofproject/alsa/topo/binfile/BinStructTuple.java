@@ -29,6 +29,7 @@
 
 package org.sofproject.alsa.topo.binfile;
 
+import org.sofproject.core.binfile.BinInteger;
 import org.sofproject.core.binfile.BinItem;
 import org.sofproject.core.binfile.BinStruct;
 
@@ -39,7 +40,7 @@ public class BinStructTuple extends BinStruct {
 	public BinStructTuple(String name, BinEnumTupleType.Type type, BinItem valueHolder) {
 		super(name);
 		this.type = type;
-		addChildItem(new BinEnumTupleTokenId("tkn_id"));
+		addChildItem(new BinInteger("tkn_id"));
 		addChildItem(valueHolder);
 	}
 
