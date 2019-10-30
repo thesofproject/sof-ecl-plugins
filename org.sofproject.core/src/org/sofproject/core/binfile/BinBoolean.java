@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,70 +27,38 @@
  *
  */
 
-package org.sofproject.alsa.topo.binfile;
+package org.sofproject.core.binfile;
 
 import java.nio.ByteBuffer;
 
-import org.sofproject.core.binfile.BinBoolean;
-import org.sofproject.core.binfile.BinInteger;
-import org.sofproject.core.binfile.BinIntegerArray;
-import org.sofproject.core.binfile.BinItem;
-import org.sofproject.core.binfile.BinString;
-import org.sofproject.core.binfile.BinStruct;
+public class BinBoolean extends BinItem {
 
-public class BinStructTupleArray extends BinStruct {
+	private boolean value;
 
-	public BinStructTupleArray(String name) {
+	public BinBoolean(String name) {
 		super(name);
-		addChildItem(new BinInteger("size"));
-		addChildItem(new BinEnumTupleType("type"));
-		addChildItem(new BinInteger("count"));
 	}
 
 	@Override
 	public BinItem read(ByteBuffer bb) {
 		super.read(bb);
-
-		for (int i = 0; i < (Integer) getChildValue("count"); i++) {
-			BinEnumTupleType.Type tupleType = (BinEnumTupleType.Type) getChildValue("type");
-			BinItem tuple = null;
-			switch (tupleType) {
-			case UUID:
-				tuple = new BinStructTuple("tuple", tupleType,
-						new BinIntegerArray("value", 4));
-				break;
-			case STRING:
-				// 4 dwords before the string content (size, type, count, tkn id)
-				tuple = new BinStructTuple("tuple", tupleType,
-						new BinString("value", (Integer) getChildValue("size") - 16));
-				break;
-			case BOOL:
-				tuple = new BinStructTuple("tuple", tupleType, new BinBoolean("value"));
-				break;
-			case BYTE:
-				break;
-			case WORD:
-				tuple = new BinStructTuple("tuple", tupleType, new BinInteger("value"));
-				break;
-			case SHORT:
-				// note: short is stored using 32-bit integer
-				tuple = new BinStructTuple("tuple", tupleType, new BinInteger("value"));
-				break;
-			default:
-				break;
-			}
-			if (tuple == null)
-				throw new RuntimeException("Unhandled tuple type " + tupleType);
-			tuple.read(bb);
-			addChildItem(tuple);
-		}
-
+		value = bb.getInt() != 0;
 		return this;
 	}
 
 	@Override
+	public Boolean getValue() {
+		return new Boolean(value);
+	}
+
+	@Override
 	public String getValueString() {
-		return String.format("[%d]", (Integer) getChildValue("count"));
+		return getValue().toString();
+	}
+
+	@Override
+	public String toString() {
+		return String.format("bool %s : %s", getName(), getValueString());
 	}
 
 }
