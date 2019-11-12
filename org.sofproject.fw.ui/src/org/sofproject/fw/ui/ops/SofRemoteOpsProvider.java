@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,22 +27,51 @@
  *
  */
 
-package org.sofproject.core.ops;
+package org.sofproject.fw.ui.ops;
 
-import java.lang.reflect.InvocationTargetException;
+import java.io.OutputStream;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.sofproject.core.connection.AudioDevNodeConnection;
+import org.sofproject.core.ops.IRemoteOp;
+import org.sofproject.core.ops.IRemoteOpsProvider;
+import org.sofproject.fw.ui.views.SofOpLoggerStream;
+import org.sofproject.core.ops.AudioDevSshRunCmdOperation;
 
-public interface IRemoteOp {
+public class SofRemoteOpsProvider implements IRemoteOpsProvider {
 
-	public boolean isCancelable();
+	public static final String OPEN_LOGGER_OP = "org.sofproject.ui.ops.openlogger";
+	public static final String IMPORT_SOF_FILES_OP = "org.sofproject.ui.ops.importsoffiles";
 
-	/**
-	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
-	 */
-	public AudioDevNodeConnection getConnection();
+	public static final String[] OPS = { OPEN_LOGGER_OP, IMPORT_SOF_FILES_OP };
 
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
+	@Override
+	public String[] getRemoteOpsIds() {
+		return OPS;
+	}
+
+	@Override
+	public String getRemoteOpDisplayName(String opId) {
+		switch (opId) {
+		case OPEN_LOGGER_OP:
+			return "Open SOF logger";
+		case IMPORT_SOF_FILES_OP:
+			return "Import SOF files";
+		default:
+			return null;
+		}
+	}
+
+	@Override
+	public IRemoteOp createRemoteOp(String opId, AudioDevNodeConnection conn) {
+		switch (opId) {
+		case OPEN_LOGGER_OP:
+			OutputStream os = SofOpLoggerStream.create(conn);
+			return new AudioDevSshRunCmdOperation(conn, opId, "./run-logger.sh", os);
+		case IMPORT_SOF_FILES_OP:
+			return new SofSshImportOperation(conn);
+		default:
+			return null;
+		}
+	}
+
 }

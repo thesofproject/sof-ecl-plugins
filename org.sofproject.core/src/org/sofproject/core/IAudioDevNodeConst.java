@@ -27,22 +27,24 @@
  *
  */
 
-package org.sofproject.core.ops;
+package org.sofproject.core;
 
-import java.lang.reflect.InvocationTargetException;
-
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.sofproject.core.connection.AudioDevNodeConnection;
-
-public interface IRemoteOp {
-
-	public boolean isCancelable();
+public interface IAudioDevNodeConst {
 
 	/**
-	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
+	 * ID of the 'audio-dev-node' project.
 	 */
-	public AudioDevNodeConnection getConnection();
+	String AUDIO_DEV_NODE_CORE_ID = "org.sofproject.core";
 
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
+	/**
+	 * ID of the 'sof-node' project nature.
+	 */
+	String AUDIO_DEV_NODE_NATURE_ID = AUDIO_DEV_NODE_CORE_ID + ".audiodevnature";
+
+	/**
+	 * Custom project property to store address of the node.
+	 */
+	String AUDIO_DEV_PROJ_PROP_NODE_ADDRESS = "nodeAddress";
+
+	String AUDIO_DEV_PROJ_PROP_NODE_PORT = "nodePort";
 }

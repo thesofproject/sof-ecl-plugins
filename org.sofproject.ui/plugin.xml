@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="org.sofproject.ui.newnodepageproviders" name="New Node Page Providers" schema="schema/newnodepageproviders.exsd"/>
    <extension
          point="org.eclipse.ui.newWizards">
          <category
 				id = "org.sofproject.ui.new"
-				name = "Sound Open Firmware">
+				name = "Audio Development">
          </category>
          <wizard
                category="org.sofproject.ui.new"
-               class="org.sofproject.ui.wizards.NewDutWizard"
-               icon="icons/sof-icon.png"
+               class="org.sofproject.ui.wizards.NewAudioDevNodeWizard"
+               icon="icons/audio-dev-icon.png"
                id="org.sofproject.ui.new.dut"
-               name="New DUT"
+               name="New Audio Dev Node"
                project="true">
-         	<description>Create new Device Under Test</description>
-         	<selection class="org.eclipse.core.resources.IResource"/>
+            <description>Create new Audio Development Node</description>
+            <selection class="org.eclipse.core.resources.IResource"/>
          </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.views">
       <category
             id="org.sofproject.ui.views"
-            name="Sound Open Firmware">
+            name="Audio Development">
       </category>
       <view
             category="org.sofproject.ui.views"
@@ -33,35 +34,19 @@
       </view>
       <view
             category="org.sofproject.ui.views"
-            class="org.sofproject.ui.views.SofNodeConnectionsViewPart"
-            id="org.sofproject.ui.views.SofNodeConnectionsView"
-            name="Sof Node Connections"
-            restorable="true">
-      </view>
-      <view
-            category="org.sofproject.ui.views"
-            class="org.sofproject.ui.views.SofLoggerViewPart"
-            id="org.sofproject.ui.views.SofLoggerView"
-            name="SOF log"
+            class="org.sofproject.ui.views.AudioDevNodeConnectionsViewPart"
+            id="org.sofproject.ui.views.AudioDevNodeConnectionsView"
+            name="Audio Development Node Connections"
             restorable="true">
       </view>
    </extension>
    <extension
          point="org.eclipse.ui.ide.projectNatureImages">
       <image
-            icon="icons/sof-logo-18x18.png"
+            icon="icons/audio-dev-icon-18x18.png"
             id="org.sofproject.ui.projectNature"
-            natureId="org.sofproject.core.sofnature">
+            natureId="org.sofproject.core.audiodevnature">
       </image>
-   </extension>
-   <extension
-         point="org.eclipse.ui.console.consolePatternMatchListeners">
-      <consolePatternMatchListener
-            class="org.sofproject.ui.console.LogSourceMatcher"
-            id="org.sofproject.ui.console.LogSourceMatcher"
-            regex=".*:\d{1,}.*">
-         <enablement><test property="org.eclipse.ui.console.consoleTypeTest" value="sofconsole.log"/></enablement>
-      </consolePatternMatchListener>
    </extension>
    <extension
          point="org.eclipse.ui.commands">

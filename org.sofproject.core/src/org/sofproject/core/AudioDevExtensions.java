@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,22 +27,43 @@
  *
  */
 
-package org.sofproject.core.ops;
+package org.sofproject.core;
 
-import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.sofproject.core.connection.AudioDevNodeConnection;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
 
-public interface IRemoteOp {
+public class AudioDevExtensions {
 
-	public boolean isCancelable();
+	private static AudioDevExtensions instance;
+	private List<IAudioDevExtensionProvider> providers = new ArrayList<>();
 
-	/**
-	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
-	 */
-	public AudioDevNodeConnection getConnection();
+	public static AudioDevExtensions getInstance() {
+		if (instance == null) {
+			instance = new AudioDevExtensions();
+		}
+		return instance;
+	}
 
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
+	private AudioDevExtensions() {
+		for (IConfigurationElement cfg : Platform.getExtensionRegistry()
+				.getConfigurationElementsFor("org.sofproject.core.audiodevextensionproviders")) {
+			try {
+				Object provider = cfg.createExecutableExtension("class");
+				if (provider instanceof IAudioDevExtensionProvider) {
+					providers.add((IAudioDevExtensionProvider) provider);
+				}
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public Collection<IAudioDevExtensionProvider> getProviders() {
+		return providers;
+	}
 }

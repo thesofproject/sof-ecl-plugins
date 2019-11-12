@@ -43,8 +43,8 @@ import org.sofproject.fw.model.FwBinGraph;
 import org.sofproject.fw.model.FwBinItem;
 import org.sofproject.fw.model.FwMemoryMap;
 import org.sofproject.fw.ui.parts.FwBinNodePart;
+import org.sofproject.fw.ui.resources.SofResources;
 import org.sofproject.ui.editor.IBinStructHolder;
-import org.sofproject.ui.resources.SofResources;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;

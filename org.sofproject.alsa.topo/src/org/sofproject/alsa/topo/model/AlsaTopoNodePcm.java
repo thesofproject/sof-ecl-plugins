@@ -30,7 +30,7 @@
 package org.sofproject.alsa.topo.model;
 
 import org.sofproject.alsa.topo.conf.ConfPcm;
-import org.sofproject.ui.resources.SofResources;
+import org.sofproject.alsa.topo.resources.AlsaTopoResources;
 
 import javafx.scene.paint.Color;
 
@@ -75,7 +75,7 @@ public class AlsaTopoNodePcm extends AlsaTopoNode {
 
 	@Override
 	public Color getColor() {
-		return SofResources.SOF_YELLOW;
+		return AlsaTopoResources.SOF_YELLOW;
 	}
 
 	@Override

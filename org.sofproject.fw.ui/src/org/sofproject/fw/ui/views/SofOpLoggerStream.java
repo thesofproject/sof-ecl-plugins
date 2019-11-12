@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,23 +26,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+package org.sofproject.fw.ui.views;
 
-package org.sofproject.core.ops;
+import java.io.OutputStream;
 
-import java.lang.reflect.InvocationTargetException;
-
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PlatformUI;
 import org.sofproject.core.connection.AudioDevNodeConnection;
 
-public interface IRemoteOp {
+public class SofOpLoggerStream {
 
-	public boolean isCancelable();
+	public static OutputStream create(AudioDevNodeConnection conn) {
+		IViewPart vp = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+				.findView(SofLoggerViewPart.ID);
+		if (vp != null && vp instanceof SofLoggerViewPart) {
+			SofLoggerViewPart lvp = (SofLoggerViewPart) vp;
+			return lvp.getOutputStream(conn);
+		}
+		return null;
+	}
 
-	/**
-	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
-	 */
-	public AudioDevNodeConnection getConnection();
-
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
 }

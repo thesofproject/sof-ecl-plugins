@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,22 +27,46 @@
  *
  */
 
-package org.sofproject.core.ops;
+package org.sofproject.ui.ops;
 
-import java.lang.reflect.InvocationTargetException;
-
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ui.console.MessageConsoleStream;
 import org.sofproject.core.connection.AudioDevNodeConnection;
+import org.sofproject.core.ops.IRemoteOp;
+import org.sofproject.core.ops.IRemoteOpsProvider;
+import org.sofproject.core.ops.AudioDevSshRunCmdOperation;
+import org.sofproject.ui.console.AudioDevNodeConsole;
 
-public interface IRemoteOp {
+public class AudioDevRemoteOpsProvider implements IRemoteOpsProvider {
 
-	public boolean isCancelable();
+	public static final String OPEN_DMESG_OP = "org.sofproject.ui.ops.opendmesg";
 
-	/**
-	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
-	 */
-	public AudioDevNodeConnection getConnection();
+	public static final String[] OPS = { OPEN_DMESG_OP };
 
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
+	@Override
+	public String[] getRemoteOpsIds() {
+		return OPS;
+	}
+
+	@Override
+	public String getRemoteOpDisplayName(String opId) {
+		switch (opId) {
+		case OPEN_DMESG_OP:
+			return "Open Dmesg";
+		default:
+			return null;
+		}
+	}
+
+	@Override
+	public IRemoteOp createRemoteOp(String opId, AudioDevNodeConnection conn) {
+		switch (opId) {
+		case OPEN_DMESG_OP:
+			MessageConsoleStream mcs = AudioDevNodeConsole.getConsoleStream(
+					conn.getProject().getProject().getName() + ".dmesg", AudioDevNodeConsole.TYPE_DMESG, conn.getProject());
+			return new AudioDevSshRunCmdOperation(conn, opId, "dmesg -w", mcs);
+		default:
+			return null;
+		}
+	}
+
 }

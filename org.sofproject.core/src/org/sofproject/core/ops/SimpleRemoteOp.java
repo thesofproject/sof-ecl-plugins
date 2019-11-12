@@ -29,13 +29,13 @@
 
 package org.sofproject.core.ops;
 
-import org.sofproject.core.connection.SofNodeConnection;
+import org.sofproject.core.connection.AudioDevNodeConnection;
 
 public abstract class SimpleRemoteOp implements IRemoteOp {
 
-	protected SofNodeConnection conn;
+	protected AudioDevNodeConnection conn;
 
-	public SimpleRemoteOp(SofNodeConnection conn) {
+	public SimpleRemoteOp(AudioDevNodeConnection conn) {
 		this.conn = conn;
 	}
 
@@ -45,7 +45,7 @@ public abstract class SimpleRemoteOp implements IRemoteOp {
 	}
 
 	@Override
-	public SofNodeConnection getConnection() {
+	public AudioDevNodeConnection getConnection() {
 		return conn;
 	}
 

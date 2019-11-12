@@ -27,22 +27,25 @@
  *
  */
 
-package org.sofproject.core.ops;
+package org.sofproject.core.connection;
 
-import java.lang.reflect.InvocationTargetException;
+public class AudioDevNodeDescriptor {
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.sofproject.core.connection.AudioDevNodeConnection;
+	public static int DEFAULT_PORT = 22;
 
-public interface IRemoteOp {
+	private String addr;
+	private int port;
 
-	public boolean isCancelable();
+	public AudioDevNodeDescriptor(String addr, int port) {
+		this.addr = addr;
+		this.port = port;
+	}
 
-	/**
-	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
-	 */
-	public AudioDevNodeConnection getConnection();
+	public String getAddr() {
+		return addr;
+	}
 
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
+	public int getPort() {
+		return port;
+	}
 }

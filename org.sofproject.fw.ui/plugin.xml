@@ -21,4 +21,30 @@
          </adapter>
       </factory>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.sofproject.fw.ui.views"
+            name="Sound Open Firmware">
+      </category>
+      <view
+            category="org.sofproject.fw.ui.views"
+            class="org.sofproject.fw.ui.views.SofLoggerViewPart"
+            id="org.sofproject.fw.ui.views.SofLoggerView"
+            name="SOF log"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.sofproject.ui.newnodepageproviders">
+      <provider
+            class="org.sofproject.fw.ui.wizards.SofNodeNewPageProvider">
+      </provider>
+   </extension>
+   <extension
+         point="org.sofproject.core.remoteopsproviders">
+      <provider
+            class="org.sofproject.fw.ui.ops.SofRemoteOpsProvider">
+      </provider>
+   </extension>
 </plugin>

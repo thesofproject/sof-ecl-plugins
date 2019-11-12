@@ -41,13 +41,13 @@ import java.util.List;
 import org.sofproject.alsa.topo.conf.ConfAttribute;
 import org.sofproject.alsa.topo.conf.ConfElement;
 import org.sofproject.alsa.topo.conf.ConfItem;
+import org.sofproject.alsa.topo.resources.AlsaTopoResources;
 import org.sofproject.core.binfile.BinStruct;
 import org.sofproject.topo.ui.graph.ITopoCollectionNode;
 import org.sofproject.topo.ui.graph.ITopoElement;
 import org.sofproject.topo.ui.graph.ITopoGraph;
 import org.sofproject.topo.ui.graph.ITopoNode;
 import org.sofproject.topo.ui.graph.ITopoNodeAttribute;
-import org.sofproject.ui.resources.SofResources;
 
 import javafx.scene.paint.Color;
 
@@ -215,12 +215,12 @@ public class AlsaTopoNode implements ITopoNode {
 
 	@Override
 	public Color getColor() {
-		return SofResources.SOF_GREY;
+		return AlsaTopoResources.SOF_GREY;
 	}
 
 	@Override
 	public Color getBorderColor() {
-		return SofResources.SOF_GREY;
+		return AlsaTopoResources.SOF_GREY;
 	}
 
 	@Override
