@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,22 +27,58 @@
  *
  */
 
-package org.sofproject.core.ops;
+package org.sofproject.fw;
 
-import java.lang.reflect.InvocationTargetException;
-
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.sofproject.core.connection.AudioDevNodeConnection;
-
-public interface IRemoteOp {
-
-	public boolean isCancelable();
+public interface ISofNodeConst {
 
 	/**
-	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
+	 * ID of the 'sof-node' project.
 	 */
-	public AudioDevNodeConnection getConnection();
+	String SOF_NODE_CORE_ID = "org.sofproject.fw";
 
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
+	/**
+	 * ID of the 'sof-node' project natue.
+	 */
+	String SOF_NODE_EXTENSION_ID = SOF_NODE_CORE_ID + ".sofextension";
+
+	/**
+	 * Default name for local project directory to keep a copy of fw binary files.
+	 */
+	String BIN_FOLDER = "fw-bin";
+
+	/**
+	 * Default name for local project directory to keep a copy of topology binary
+	 * files.
+	 */
+	String TPLG_FOLDER = "topology";
+
+	/**
+	 * Extension used to distinguish remote fw binary files.
+	 */
+	String FW_BIN_FILE_EXT = "bin";
+
+	/**
+	 * Extension used to distinguish remote topology binary files.
+	 */
+	String TPLG_FILE_EXT = "tplg";
+
+	/**
+	 * Custom project property to store path to the remote files.
+	 */
+	String SOF_PROJ_PROP_REMOTE_RES_PATH = "remoteResPath";
+
+	/**
+	 * Default path to the remote files.
+	 */
+	String SOF_PROJ_DEFAULT_REMOTE_PATH = "/lib/firmware/intel";
+
+	/**
+	 * Custom project property to store name of the project with source code.
+	 */
+	String SOF_PROJ_PROP_SRC_PROJ_NAME = "srcProjName";
+
+	/**
+	 * Default name of the project with source code.
+	 */
+	String SOF_PROJ_DEFAULT_SRC_PROJ = "sof";
 }

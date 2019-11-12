@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,22 +27,36 @@
  *
  */
 
-package org.sofproject.core.ops;
+package org.sofproject.alsa.topo.resources;
 
-import java.lang.reflect.InvocationTargetException;
+import javafx.scene.paint.Color;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.sofproject.core.connection.AudioDevNodeConnection;
-
-public interface IRemoteOp {
-
-	public boolean isCancelable();
+public class AlsaTopoResources {
+	public static final Color SOF_GREY = Color.rgb(214, 214, 222);
+	public static final Color SOF_LIGHT_GREY = Color.rgb(235, 235, 235);
+	public static final Color SOF_YELLOW = Color.rgb(246, 237, 128);
+	public static final Color SOF_RED = Color.rgb(240, 87, 114);
+	public static final Color SOF_LIGHT_RED = Color.rgb(250, 199, 207);
 
 	/**
-	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
+	 * Used to fill rectangles/blocks.
 	 */
-	public AudioDevNodeConnection getConnection();
+	public static final Color SOF_BLUE = Color.rgb(111, 204, 221);
 
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
+	/**
+	 * Lighter blue.
+	 */
+	public static final Color SOF_LIGHT_BLUE = Color.rgb(183, 229, 238);
+
+	/**
+	 * Darker blue for rectangle/block borders.
+	 */
+	public static final Color SOF_DARK_BLUE = Color.rgb(80, 149, 162);
+
+	/**
+	 * Used for main lines and labels.
+	 */
+	public static final Color SOF_DARK_VIOLET = Color.rgb(51, 51, 91);
+
+	public static final Color SOF_GREEN = Color.rgb(146, 208, 80);
 }

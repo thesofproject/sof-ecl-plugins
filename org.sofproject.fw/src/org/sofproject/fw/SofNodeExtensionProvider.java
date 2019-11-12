@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,22 +27,27 @@
  *
  */
 
-package org.sofproject.core.ops;
+package org.sofproject.fw;
 
-import java.lang.reflect.InvocationTargetException;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.sofproject.core.IAudioDevExtension;
+import org.sofproject.core.IAudioDevExtensionProvider;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.sofproject.core.connection.AudioDevNodeConnection;
+public class SofNodeExtensionProvider implements IAudioDevExtensionProvider {
 
-public interface IRemoteOp {
+	@Override
+	public String getExtensionId() {
+		return ISofNodeConst.SOF_NODE_EXTENSION_ID;
+	}
 
-	public boolean isCancelable();
+	@Override
+	public IAudioDevExtension createExtension() {
+		return new SofNodeExtension();
+	}
 
-	/**
-	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
-	 */
-	public AudioDevNodeConnection getConnection();
-
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
+	@Override
+	public IAudioDevExtension readFromProject(IProject project) throws CoreException {
+		return new SofNodeExtension(project);
+	}
 }

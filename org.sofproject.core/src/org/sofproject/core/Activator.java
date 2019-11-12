@@ -31,17 +31,17 @@ package org.sofproject.core;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
-import org.sofproject.core.connection.SofNodeConnectionManager;
+import org.sofproject.core.connection.AudioDevNodeConnectionManager;
 
 public class Activator extends Plugin {
 
-	public static final String PLUGIN_ID = ISofNodeConst.SOF_NODE_CORE_ID;
+	public static final String PLUGIN_ID = IAudioDevNodeConst.AUDIO_DEV_NODE_CORE_ID;
 	private static Activator plugin;
 
 	/**
 	 * Singleton to manage connections established by sof-projects.
 	 */
-	private SofNodeConnectionManager connectionMgr;
+	private AudioDevNodeConnectionManager connectionMgr;
 	
 	public Activator() {
 		plugin = this;
@@ -49,7 +49,7 @@ public class Activator extends Plugin {
 
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		connectionMgr = SofNodeConnectionManager.getInstance();
+		connectionMgr = AudioDevNodeConnectionManager.getInstance();
 	}
 
 	public void stop(BundleContext context) throws Exception {

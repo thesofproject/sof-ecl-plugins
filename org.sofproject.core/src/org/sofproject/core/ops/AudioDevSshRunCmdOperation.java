@@ -29,20 +29,51 @@
 
 package org.sofproject.core.ops;
 
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.sofproject.core.connection.AudioDevNodeConnection;
 
-public interface IRemoteOp {
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 
-	public boolean isCancelable();
+public class AudioDevSshRunCmdOperation extends SimpleRemoteOp {
 
-	/**
-	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
-	 */
-	public AudioDevNodeConnection getConnection();
+	private String chType;
+	private String cmd;
+	private OutputStream os;
 
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
+	public AudioDevSshRunCmdOperation(AudioDevNodeConnection conn, String chType, String cmd, OutputStream os) {
+		super(conn);
+		this.chType = chType;
+		this.cmd = cmd;
+		this.os = os;
+	}
+
+	@Override
+	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+		try {
+			if (!conn.isConnected()) {
+				throw new InvocationTargetException(new IllegalStateException("Node not connected"));
+			}
+			if (conn.hasChannelOpened(chType)) {
+				monitor.done();
+				return;
+			}
+			Session session = conn.getSession();
+			ChannelExec channel = (ChannelExec) session.openChannel("exec");
+			channel.setCommand(cmd);
+			channel.setInputStream(null);
+			channel.setOutputStream(os); // set to the super class before run()
+			channel.connect();
+
+			conn.setExecChannel(chType, channel); // store channel back
+		} catch (JSchException e) {
+			throw new InvocationTargetException(e);
+		}
+	}
+
 }

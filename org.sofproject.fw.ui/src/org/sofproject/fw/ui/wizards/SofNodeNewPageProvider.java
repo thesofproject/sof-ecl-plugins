@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,22 +27,27 @@
  *
  */
 
-package org.sofproject.core.ops;
+package org.sofproject.fw.ui.wizards;
 
-import java.lang.reflect.InvocationTargetException;
+import org.sofproject.core.IAudioDevExtension;
+import org.sofproject.fw.ISofNodeConst;
+import org.sofproject.fw.SofNodeExtension;
+import org.sofproject.ui.wizards.INewNodeExtensionPage;
+import org.sofproject.ui.wizards.INewNodeExtensionPageProvider;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.sofproject.core.connection.AudioDevNodeConnection;
+public class SofNodeNewPageProvider implements INewNodeExtensionPageProvider {
 
-public interface IRemoteOp {
+	@Override
+	public String getExtensionId() {
+		return ISofNodeConst.SOF_NODE_EXTENSION_ID;
+	}
 
-	public boolean isCancelable();
+	@Override
+	public INewNodeExtensionPage createNewPage(IAudioDevExtension ext) {
+		if (ext instanceof SofNodeExtension) {
+			return new SofNodeNewPage((SofNodeExtension)ext);
+		}
+		return null;
+	}
 
-	/**
-	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
-	 */
-	public AudioDevNodeConnection getConnection();
-
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
 }

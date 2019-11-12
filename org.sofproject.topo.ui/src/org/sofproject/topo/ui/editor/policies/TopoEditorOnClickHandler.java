@@ -48,7 +48,7 @@ import org.sofproject.topo.ui.graph.ITopoNode;
 import org.sofproject.topo.ui.graph.TopoZestGraphBuilder;
 import org.sofproject.topo.ui.models.TopoItemCreationModel;
 import org.sofproject.topo.ui.parts.TopoGraphPart;
-import org.sofproject.ui.ops.SofOpRunner;
+import org.sofproject.ui.ops.AudioDevNodeOpRunner;
 
 import com.google.common.collect.HashMultimap;
 
@@ -107,7 +107,7 @@ public class TopoEditorOnClickHandler extends AbstractHandler implements IOnClic
 
 									@Override
 									public void run() {
-										SofOpRunner.runOp(opsProv.createRemoteOp(opId, null));
+										AudioDevNodeOpRunner.runOp(opsProv.createRemoteOp(opId, null));
 									}
 								});
 							}

@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="org.sofproject.core.remoteopsproviders" name="Remote Ops Providers" schema="schema/opsproviders.exsd"/>
+   <extension-point id="org.sofproject.core.audiodevextensionproviders" name="Audio Dev Extension Providers" schema="schema/audiodevextensionproviders.exsd"/>
+   <extension-point id="org.sofproject.core.remoteopsproviders" name="Remote Ops Providers" schema="schema/remoteopsproviders.exsd"/>
    <extension
-         id="sofnature"
-         name="SOF Node Nature"
+         id="audiodevnature"
+         name="Audio Dev Node Nature"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.sofproject.core.SofNodeProjectNature">
+               class="org.sofproject.core.AudioDevNodeProjectNature">
          </run>
       </runtime>
    </extension>

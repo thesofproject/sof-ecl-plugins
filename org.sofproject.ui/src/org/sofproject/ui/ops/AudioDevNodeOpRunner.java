@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,22 +27,57 @@
  *
  */
 
-package org.sofproject.core.ops;
+package org.sofproject.ui.ops;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.window.Window;
+import org.sofproject.core.AudioDevNodeProject;
 import org.sofproject.core.connection.AudioDevNodeConnection;
+import org.sofproject.core.ops.IRemoteOp;
+import org.sofproject.ui.handlers.AudioDevNodeLoginDialog;
 
-public interface IRemoteOp {
+public class AudioDevNodeOpRunner {
 
-	public boolean isCancelable();
+	public static void runOp(IRemoteOp op) {
+		try {
+			AudioDevNodeConnection conn = op.getConnection();
+			AudioDevNodeProject proj = conn.getProject();
 
-	/**
-	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
-	 */
-	public AudioDevNodeConnection getConnection();
+			if (!conn.isConnected()) {
+				AudioDevNodeLoginDialog dlg = new AudioDevNodeLoginDialog(null, proj.getProject().getName(),
+						proj.getAddress());
+				if (dlg.open() == Window.OK) {
+					conn.connect(dlg.getLogin(), dlg.getPass());
+				} else {
+					return;
+				}
+			}
 
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
+			// TODO: should refresh the viewer if present and method is called
+			// from outside
+
+			if (!conn.isConnected()) {
+				/* authentication failure ? */
+				return;
+			}
+			new ProgressMonitorDialog(null).run(true, op.isCancelable(), new IRunnableWithProgress() {
+
+				@Override
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					op.run(monitor);
+				}
+			});
+		} catch (CoreException | InvocationTargetException e) {
+			MessageDialog.openError(null, "Operation failed: ", e.getMessage());
+		} catch (InterruptedException e) {
+			MessageDialog.openInformation(null, "Operation canceled", "Operation canceled");
+		}
+
+	}
 }

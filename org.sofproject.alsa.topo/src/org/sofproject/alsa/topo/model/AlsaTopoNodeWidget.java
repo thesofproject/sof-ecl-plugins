@@ -30,7 +30,7 @@
 package org.sofproject.alsa.topo.model;
 
 import org.sofproject.alsa.topo.conf.ConfWidget;
-import org.sofproject.ui.resources.SofResources;
+import org.sofproject.alsa.topo.resources.AlsaTopoResources;
 
 import javafx.scene.paint.Color;
 
@@ -57,13 +57,13 @@ public class AlsaTopoNodeWidget extends AlsaTopoNode {
 	public Color getColor() {
 		switch (getTypeName()) {
 		case "aif_in":
-			return SofResources.SOF_BLUE;
+			return AlsaTopoResources.SOF_BLUE;
 		case "aif_out":
-			return SofResources.SOF_LIGHT_BLUE;
+			return AlsaTopoResources.SOF_LIGHT_BLUE;
 		case "buffer":
-			return SofResources.SOF_GREEN;
+			return AlsaTopoResources.SOF_GREEN;
 		case "scheduler":
-			return SofResources.SOF_LIGHT_GREY;
+			return AlsaTopoResources.SOF_LIGHT_GREY;
 		}
 		return super.getColor();
 	}
@@ -72,7 +72,7 @@ public class AlsaTopoNodeWidget extends AlsaTopoNode {
 	public Color getBorderColor() {
 		switch (getTypeName()) {
 		case "scheduler":
-			return SofResources.SOF_GREY;
+			return AlsaTopoResources.SOF_GREY;
 		}
 		return super.getBorderColor();
 	}

@@ -29,7 +29,7 @@
 
 package org.sofproject.core.ops;
 
-import org.sofproject.core.connection.SofNodeConnection;
+import org.sofproject.core.connection.AudioDevNodeConnection;
 
 public interface IRemoteOpsProvider {
 
@@ -37,5 +37,5 @@ public interface IRemoteOpsProvider {
 
 	public String getRemoteOpDisplayName(String opId);
 
-	public IRemoteOp createRemoteOp(String opId, SofNodeConnection conn);
+	public IRemoteOp createRemoteOp(String opId, AudioDevNodeConnection conn);
 }

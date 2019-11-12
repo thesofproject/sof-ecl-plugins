@@ -27,22 +27,53 @@
  *
  */
 
-package org.sofproject.core.ops;
+package org.sofproject.fw.ui.resources;
 
-import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.sofproject.core.connection.AudioDevNodeConnection;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
-public interface IRemoteOp {
+import javafx.scene.paint.Color;
 
-	public boolean isCancelable();
+/**
+ * Colors used by other SOF resources (the documentation for example).
+ */
+public class SofResources {
+	public static final Color SOF_GREY = Color.rgb(214, 214, 222);
+	public static final Color SOF_LIGHT_GREY = Color.rgb(235, 235, 235);
+	public static final Color SOF_YELLOW = Color.rgb(246, 237, 128);
+	public static final Color SOF_RED = Color.rgb(240, 87, 114);
+	public static final Color SOF_LIGHT_RED = Color.rgb(250, 199, 207);
 
 	/**
-	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
+	 * Used to fill rectangles/blocks.
 	 */
-	public AudioDevNodeConnection getConnection();
+	public static final Color SOF_BLUE = Color.rgb(111, 204, 221);
 
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
+	/**
+	 * Lighter blue.
+	 */
+	public static final Color SOF_LIGHT_BLUE = Color.rgb(183, 229, 238);
+
+	/**
+	 * Darker blue for rectangle/block borders.
+	 */
+	public static final Color SOF_DARK_BLUE = Color.rgb(80, 149, 162);
+
+	/**
+	 * Used for main lines and labels.
+	 */
+	public static final Color SOF_DARK_VIOLET = Color.rgb(51, 51, 91);
+
+	public static final Color SOF_GREEN = Color.rgb(146, 208, 80);
+
+	public static ImageDescriptor getSofIcon() {
+		Bundle bundle = FrameworkUtil.getBundle(SofResources.class);
+		URL url = FileLocator.find(bundle, new Path("icons/sof-icon.png"));
+		return ImageDescriptor.createFromURL(url);
+	}
 }
