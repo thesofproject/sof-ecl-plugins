@@ -34,8 +34,11 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.sofproject.core.AudioDevNodeProject;
 import org.sofproject.core.connection.AudioDevNodeConnection;
 import org.sofproject.core.ops.SimpleRemoteOp;
+import org.sofproject.gst.topo.GstNodeExtension;
+import org.sofproject.gst.topo.IGstNodeConst;
 import org.sofproject.gst.topo.model.GstTopoGraph;
 
 import com.jcraft.jsch.ChannelExec;
@@ -65,6 +68,9 @@ public class GstTopoTestOperation extends SimpleRemoteOp {
 				throw new InvocationTargetException(new IllegalStateException("Node not connected"));
 			}
 
+			AudioDevNodeProject proj = conn.getProject();
+			GstNodeExtension gstNode = (GstNodeExtension) proj.getExtension(IGstNodeConst.GST_NODE_EXTENSION_ID);
+
 			String pplString = graph.getPipelineString();
 			monitor.subTask("Running: " + pplString);
 
@@ -72,7 +78,7 @@ public class GstTopoTestOperation extends SimpleRemoteOp {
 			ChannelExec channel = (ChannelExec) session.openChannel("exec");
 
 			channel.setPty(true); // for ctrl+c sending
-			channel.setCommand("gst-launch-1.0 " + pplString);
+			channel.setCommand(gstNode.getGstLaunchToolCmd() + " " + pplString);
 
 			channel.setInputStream(null);
 			OutputStream os = channel.getOutputStream();
