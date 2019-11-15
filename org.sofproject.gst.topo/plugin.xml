@@ -21,6 +21,18 @@
       </editor>
    </extension>
    <extension
+         point="org.sofproject.core.audiodevextensionproviders">
+      <provider
+            class="org.sofproject.gst.topo.GstNodeExtensionProvider">
+      </provider>
+   </extension>
+   <extension
+         point="org.sofproject.ui.newnodepageproviders">
+      <provider
+            class="org.sofproject.gst.topo.ui.wizards.GstNodeNewPageProvider">
+      </provider>
+   </extension>
+   <extension
          id="org.sofproject.gst.remoteopsprovider"
          name="GStreamer Remote Ops Provider"
          point="org.sofproject.core.remoteopsproviders">
