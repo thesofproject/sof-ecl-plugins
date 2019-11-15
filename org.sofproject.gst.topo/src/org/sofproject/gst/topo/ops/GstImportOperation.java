@@ -43,6 +43,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.sofproject.core.AudioDevNodeProject;
 import org.sofproject.core.connection.AudioDevNodeConnection;
 import org.sofproject.core.ops.SimpleRemoteOp;
+import org.sofproject.gst.topo.GstNodeExtension;
+import org.sofproject.gst.topo.IGstNodeConst;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
@@ -64,10 +66,11 @@ public class GstImportOperation extends SimpleRemoteOp {
 			}
 
 			AudioDevNodeProject proj = conn.getProject();
+			GstNodeExtension gstNode = (GstNodeExtension) proj.getExtension(IGstNodeConst.GST_NODE_EXTENSION_ID);
 
 			Session session = conn.getSession();
 			ChannelExec channel = (ChannelExec) session.openChannel("exec");
-			channel.setCommand("gst-inspect-1.0 --plugin"); //TODO: cmds should be configurable via project properties
+			channel.setCommand(gstNode.getGstInspectToolCmd() + " --plugin");
 
 			channel.setInputStream(null);
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -84,8 +87,7 @@ public class GstImportOperation extends SimpleRemoteOp {
 			}
 
 			ByteArrayInputStream bais = new ByteArrayInputStream(os.toByteArray());
-			BufferedReader reader = new BufferedReader(
-					new InputStreamReader(bais));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(bais));
 
 			int remainingWork = bais.available();
 			monitor.beginTask("Importing GStreamer plugins description", remainingWork);
@@ -123,7 +125,7 @@ public class GstImportOperation extends SimpleRemoteOp {
 					// TODO: possible to re-use channel?
 
 					ChannelExec chPlgInfo = (ChannelExec) session.openChannel("exec");
-					chPlgInfo.setCommand("gst-inspect-1.0 --plugin " + lastPlugin);
+					chPlgInfo.setCommand(gstNode.getGstInspectToolCmd() + " --plugin " + lastPlugin);
 					ByteArrayOutputStream plgInfoOs = new ByteArrayOutputStream();
 					chPlgInfo.setOutputStream(plgInfoOs);
 					chPlgInfo.connect();
@@ -144,7 +146,7 @@ public class GstImportOperation extends SimpleRemoteOp {
 				}
 				String lastElem = tok[1].trim();
 				ChannelExec chElemInfo = (ChannelExec) session.openChannel("exec");
-				chElemInfo.setCommand("gst-inspect-1.0 " + lastElem);
+				chElemInfo.setCommand(gstNode.getGstInspectToolCmd() + " " + lastElem);
 				ByteArrayOutputStream elemInfoOs = new ByteArrayOutputStream();
 				chElemInfo.setOutputStream(elemInfoOs);
 				chElemInfo.connect();

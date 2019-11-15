@@ -7,5 +7,6 @@ Automatic-Module-Name: org.sofproject.gst.topo
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: Intel Corporation
 Require-Bundle: org.sofproject.core,
+ org.sofproject.ui,
  org.sofproject.topo.ui,
  com.jcraft.jsch
