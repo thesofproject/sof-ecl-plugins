@@ -92,4 +92,13 @@
             sequence="Ctrl+1">
       </key>
    </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.sofproject.ui.AudioDevPerspectiveFactory"
+            icon="icons/audio-dev-icon-18x18.png"
+            id="org.sofproject.ui.AudioDev"
+            name="Audio Development">
+      </perspective>
+   </extension>
 </plugin>
