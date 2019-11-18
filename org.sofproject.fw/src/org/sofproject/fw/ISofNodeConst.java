@@ -53,9 +53,9 @@ public interface ISofNodeConst {
 	String TPLG_FOLDER = "topology";
 
 	/**
-	 * Extension used to distinguish remote fw binary files.
+	 * Extension used to distinguish remote fw binary files (keep it sorted).
 	 */
-	String FW_BIN_FILE_EXT = "bin";
+	String[] FW_BIN_FILE_EXTS = {"bin", "ri"};
 
 	/**
 	 * Extension used to distinguish remote topology binary files.
