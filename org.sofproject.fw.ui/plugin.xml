@@ -47,4 +47,21 @@
             class="org.sofproject.fw.ui.ops.SofRemoteOpsProvider">
       </provider>
    </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.sofproject.ui.AudioDev">
+         <showInPart
+               id="org.sofproject.fw.ui.views.SofLoggerView">
+         </showInPart>
+         <view
+               id="org.sofproject.fw.ui.views.SofLoggerView"
+               minimized="false"
+               ratio="0.6"
+               relationship="stack"
+               relative="org.eclipse.ui.console.ConsoleView"
+               visible="true">
+         </view>
+      </perspectiveExtension>
+   </extension>
 </plugin>
