@@ -30,6 +30,7 @@
 package org.sofproject.fw.ui.ops;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
@@ -88,7 +89,7 @@ public class SofSshImportOperation extends SimpleRemoteOp {
 					IFile localFile = null;
 					if (remotePath.getFileExtension() == null)
 						continue;
-					if (remotePath.getFileExtension().equals(ISofNodeConst.FW_BIN_FILE_EXT)) {
+					if (Arrays.binarySearch(ISofNodeConst.FW_BIN_FILE_EXTS, remotePath.getFileExtension()) >= 0) {
 						localFile = sofNode.getBinFolder().getFile(entry.getFilename());
 					} else if (remotePath.getFileExtension().equals(ISofNodeConst.TPLG_FILE_EXT)) {
 						localFile = sofNode.getTplgFolder().getFile(entry.getFilename());
