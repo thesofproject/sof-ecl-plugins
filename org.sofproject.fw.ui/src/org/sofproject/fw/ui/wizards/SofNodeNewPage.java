@@ -44,7 +44,10 @@ import org.sofproject.ui.wizards.INewNodeExtensionPage;
 
 public class SofNodeNewPage extends WizardPage implements INewNodeExtensionPage {
 
-	private Text remoteResPath;
+	private Text remoteResPathFw;
+	private Text remoteResPathTplg;
+	private Text remoteResPathLogger;
+	private Text remoteResPathFwLdc;
 	private Text srcProjName; // name of the project with the source code
 
 	private SofNodeExtension sofNode;
@@ -70,40 +73,52 @@ public class SofNodeNewPage extends WizardPage implements INewNodeExtensionPage 
         control.setLayout(new GridLayout());
         control.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		Composite pathGroup = new Composite(control, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		pathGroup.setLayout(layout);
-		pathGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		new Label(pathGroup, SWT.NONE).setText("Remote Resource Path");
-		GridData data = new GridData(GridData.FILL_HORIZONTAL);
-		data.grabExcessHorizontalSpace = true;
-		remoteResPath = new Text(pathGroup, SWT.BORDER);
-		remoteResPath.setLayoutData(data);
-		remoteResPath.setText(sofNode.getResPath());
-		remoteResPath.addListener(SWT.Modify, confModifyListener);
+		remoteResPathFw = createTextField(control, "Remote Path to Fw Binaries", sofNode.getResPathFw());
+		remoteResPathTplg = createTextField(control, "Remote Path to Topology Files", sofNode.getResPathTplg());
+		remoteResPathLogger = createTextField(control, "Remote Path to Logger", sofNode.getResPathLogger());
+		remoteResPathFwLdc = createTextField(control, "Remote Path to FW .ldc", sofNode.getResPathFwLdc());
 
-		Composite srcProjGroup = new Composite(control, SWT.NONE);
-		layout = new GridLayout();
-		layout.numColumns = 2;
-		srcProjGroup.setLayout(layout);
-		srcProjGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		new Label(srcProjGroup, SWT.NONE).setText("Source Code Project Name");
-		data = new GridData(GridData.FILL_HORIZONTAL);
-		data.grabExcessHorizontalSpace = true;
-		srcProjName = new Text(srcProjGroup, SWT.BORDER);
-		srcProjName.setLayoutData(data);
-		srcProjName.setText(sofNode.getSrcProjName());
-		srcProjName.addListener(SWT.Modify, confModifyListener);
+		srcProjName = createTextField(control, "Name of project with fw sources", sofNode.getSrcProjName());
 
 		setControl(control);
         Dialog.applyDialogFont(control);
 	}
 
+	private Text createTextField(Composite parent, String label, String initVal) {
+		Composite textGroup = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		textGroup.setLayout(layout);
+		textGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		new Label(textGroup, SWT.NONE).setText(label);
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.grabExcessHorizontalSpace = true;
+		Text text = new Text(textGroup, SWT.BORDER);
+		text.setLayoutData(data);
+		text.setText(initVal);
+		text.addListener(SWT.Modify, confModifyListener);
+		return text;
+	}
+
 	protected boolean validatePage() {
-		if (getRemoteResPath().equals("")) {
+		if (getRemoteResPathFw().equals("")) {
 			setErrorMessage(null);
-			setMessage("Remote resource path cannot be empty");
+			setMessage("Remote path to fw binaries cannot be empty");
+			return false;
+		}
+		if (getRemoteResPathTplg().equals("")) {
+			setErrorMessage(null);
+			setMessage("Remote path to topology files cannot be empty");
+			return false;
+		}
+		if (getRemoteResPathLogger().equals("")) {
+			setErrorMessage(null);
+			setMessage("Remote path to logger cannot be empty");
+			return false;
+		}
+		if (getRemoteResPathFwLdc().equals("")) {
+			setErrorMessage(null);
+			setMessage("Remote path to fw .ldc cannot be empty");
 			return false;
 		}
 		if (getSrcProjName().equals("")) {
@@ -115,10 +130,28 @@ public class SofNodeNewPage extends WizardPage implements INewNodeExtensionPage 
 		return true;
 	}
 
-	public String getRemoteResPath() {
-		if (remoteResPath == null)
+	public String getRemoteResPathFw() {
+		if (remoteResPathFw == null)
 			return "";
-		return remoteResPath.getText().trim();
+		return remoteResPathFw.getText().trim();
+	}
+
+	public String getRemoteResPathTplg() {
+		if (remoteResPathTplg == null)
+			return "";
+		return remoteResPathTplg.getText().trim();
+	}
+
+	public String getRemoteResPathLogger() {
+		if (remoteResPathLogger == null)
+			return "";
+		return remoteResPathLogger.getText().trim();
+	}
+
+	public String getRemoteResPathFwLdc() {
+		if (remoteResPathFwLdc == null)
+			return "";
+		return remoteResPathFwLdc.getText().trim();
 	}
 
 	public String getSrcProjName() {
@@ -129,7 +162,10 @@ public class SofNodeNewPage extends WizardPage implements INewNodeExtensionPage 
 
 	@Override
 	public void commitSettings() {
-		sofNode.setResPath(getRemoteResPath());
+		sofNode.setResPathFw(getRemoteResPathFw());
+		sofNode.setResPathTplg(getRemoteResPathTplg());
+		sofNode.setResPathLogger(getRemoteResPathLogger());
+		sofNode.setResPathFwLdc(getRemoteResPathFwLdc());
 		sofNode.setSrcProjName(getSrcProjName());
 	}
 }
