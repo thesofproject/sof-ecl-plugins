@@ -32,10 +32,12 @@ package org.sofproject.fw.ui.ops;
 import java.io.OutputStream;
 
 import org.sofproject.core.connection.AudioDevNodeConnection;
+import org.sofproject.core.ops.AudioDevSshRunCmdOperation;
 import org.sofproject.core.ops.IRemoteOp;
 import org.sofproject.core.ops.IRemoteOpsProvider;
+import org.sofproject.fw.ISofNodeConst;
+import org.sofproject.fw.SofNodeExtension;
 import org.sofproject.fw.ui.views.SofOpLoggerStream;
-import org.sofproject.core.ops.AudioDevSshRunCmdOperation;
 
 public class SofRemoteOpsProvider implements IRemoteOpsProvider {
 
@@ -66,7 +68,12 @@ public class SofRemoteOpsProvider implements IRemoteOpsProvider {
 		switch (opId) {
 		case OPEN_LOGGER_OP:
 			OutputStream os = SofOpLoggerStream.create(conn);
-			return new AudioDevSshRunCmdOperation(conn, opId, "./run-logger.sh", os);
+			SofNodeExtension sofNode = (SofNodeExtension) conn.getProject()
+					.getExtension(ISofNodeConst.SOF_NODE_EXTENSION_ID);
+			AudioDevSshRunCmdOperation op = new AudioDevSshRunCmdOperation(conn, opId,
+					String.format("%s -r -t -l %s", sofNode.getResPathLogger(), sofNode.getResPathFwLdc()), os);
+			op.setNeedsSudo(true);
+			return op;
 		case IMPORT_SOF_FILES_OP:
 			return new SofSshImportOperation(conn);
 		default:

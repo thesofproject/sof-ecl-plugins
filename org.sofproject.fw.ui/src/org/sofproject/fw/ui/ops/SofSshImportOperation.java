@@ -34,11 +34,11 @@ import java.util.Arrays;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.sofproject.core.AudioDevNodeProject;
 import org.sofproject.core.connection.AudioDevNodeConnection;
 import org.sofproject.core.ops.SimpleRemoteOp;
 import org.sofproject.fw.ISofNodeConst;
@@ -52,8 +52,11 @@ import com.jcraft.jsch.SftpException;
 
 public class SofSshImportOperation extends SimpleRemoteOp {
 
+	private SofNodeExtension sofNode;
+
 	public SofSshImportOperation(AudioDevNodeConnection conn) {
 		super(conn);
+		sofNode = (SofNodeExtension) conn.getProject().getExtension(ISofNodeConst.SOF_NODE_EXTENSION_ID);
 	}
 
 	@Override
@@ -65,9 +68,6 @@ public class SofSshImportOperation extends SimpleRemoteOp {
 				throw new InvocationTargetException(new IllegalStateException("Node not connected"));
 			}
 
-			AudioDevNodeProject proj = conn.getProject();
-			SofNodeExtension sofNode = (SofNodeExtension) proj.getExtension(ISofNodeConst.SOF_NODE_EXTENSION_ID);
-
 			monitor.worked(100);
 
 			Session session = conn.getSession();
@@ -75,45 +75,48 @@ public class SofSshImportOperation extends SimpleRemoteOp {
 			channel.connect();
 			ChannelSftp c = (ChannelSftp) channel;
 
-			monitor.subTask("Listing files");
-			Vector<?> remoteFiles = c.ls(sofNode.getResPath());
-
-			for (int i = 0; i < remoteFiles.size(); i++) {
-				Object en = remoteFiles.elementAt(i);
-				if (en instanceof ChannelSftp.LsEntry) {
-					ChannelSftp.LsEntry entry = (ChannelSftp.LsEntry) en;
-					if (entry.getAttrs().isDir())
-						continue;
-					Path remotePath = new Path(entry.getFilename());
-					// filter out files other than fw binaries and topology files
-					IFile localFile = null;
-					if (remotePath.getFileExtension() == null)
-						continue;
-					if (Arrays.binarySearch(ISofNodeConst.FW_BIN_FILE_EXTS, remotePath.getFileExtension()) >= 0) {
-						localFile = sofNode.getBinFolder().getFile(entry.getFilename());
-					} else if (remotePath.getFileExtension().equals(ISofNodeConst.TPLG_FILE_EXT)) {
-						localFile = sofNode.getTplgFolder().getFile(entry.getFilename());
-					}
-					if (localFile != null) {
-						monitor.subTask("Downloading " + entry.getFilename());
-						if (localFile.exists()) {
-							localFile.setContents(c.get(sofNode.getResPath() + "/" + entry.getFilename()), true, false,
-									null);
-						} else {
-							localFile.create(c.get(sofNode.getResPath() + "/" + entry.getFilename()), false, null);
-						}
-					}
-				}
-				monitor.worked(900 / remoteFiles.size());
-			}
+			monitor.subTask("Listing files from " + sofNode.getResPathFw());
+			downloadFiles(c, sofNode.getResPathFw(), sofNode.getBinFolder(), ISofNodeConst.FW_BIN_FILE_EXTS, monitor);
+			downloadFiles(c, sofNode.getResPathTplg(), sofNode.getTplgFolder(), ISofNodeConst.TPLG_FILE_EXTS, monitor);
 
 			channel.disconnect();
 
-			proj.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+			conn.getProject().getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (JSchException | SftpException | CoreException e) {
 			throw new InvocationTargetException(e);
 		}
 
 		monitor.done();
+	}
+
+	private void downloadFiles(ChannelSftp ch, String remotePath, IFolder localFolder, String[] extFilter, IProgressMonitor monitor) throws CoreException, SftpException {
+		Vector<?> remoteFiles = ch.ls(remotePath);
+
+		for (int i = 0; i < remoteFiles.size(); i++) {
+			Object en = remoteFiles.elementAt(i);
+			if (en instanceof ChannelSftp.LsEntry) {
+				ChannelSftp.LsEntry entry = (ChannelSftp.LsEntry) en;
+				if (entry.getAttrs().isDir())
+					continue;
+				Path remoteFilePath = new Path(entry.getFilename());
+				// filter out files other than fw binaries and topology files
+				IFile localFile = null;
+				if (remoteFilePath.getFileExtension() == null)
+					continue;
+				if (Arrays.binarySearch(extFilter, remoteFilePath.getFileExtension()) >= 0) {
+					localFile = localFolder.getFile(entry.getFilename());
+				}
+				if (localFile != null) {
+					monitor.subTask("Downloading " + entry.getFilename());
+					if (localFile.exists()) {
+						localFile.setContents(ch.get(remotePath + "/" + entry.getFilename()), true, false,
+								null);
+					} else {
+						localFile.create(ch.get(remotePath + "/" + entry.getFilename()), false, null);
+					}
+				}
+			}
+			monitor.worked((900/2) / remoteFiles.size());
+		}
 	}
 }

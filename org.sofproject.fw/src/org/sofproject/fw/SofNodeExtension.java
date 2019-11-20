@@ -53,9 +53,18 @@ public class SofNodeExtension implements IAudioDevExtension {
 	private String srcProjName;
 
 	/**
-	 * Path to the fw (binaries, topologies) resources at the remote node.
+	 * Path to the fw binaries at the remote node.
 	 */
-	private String resPath;
+	private String resPathFw;
+
+	/**
+	 * Path to the fw topologies at the remote node.
+	 */
+	private String resPathTplg;
+
+	private String resPathLogger;
+
+	private String resPathFwLdc;
 
 	/**
 	 * 'bin' folder inside the project, containing fw binaries.
@@ -72,7 +81,10 @@ public class SofNodeExtension implements IAudioDevExtension {
 	 */
 	public SofNodeExtension() {
 		srcProjName = ISofNodeConst.SOF_PROJ_DEFAULT_SRC_PROJ;
-		resPath = ISofNodeConst.SOF_PROJ_DEFAULT_REMOTE_PATH;
+		resPathFw = ISofNodeConst.SOF_PROJ_DEFAULT_REMOTE_PATH_FW;
+		resPathTplg = ISofNodeConst.SOF_PROJ_DEFAULT_REMOTE_PATH_TPLG;
+		resPathLogger = ISofNodeConst.SOF_PROJ_DEFAULT_REMOTE_PATH_LOGGER;
+		resPathFwLdc = ISofNodeConst.SOF_PROJ_DEFAULT_REMOTE_PATH_FW_LDC;
 	}
 
 	/**
@@ -87,8 +99,14 @@ public class SofNodeExtension implements IAudioDevExtension {
 				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_SRC_PROJ_NAME));
 		if (srcProjName == null) // extension might not be fully created
 			throw new CoreException(new Status(IStatus.ERROR, ISofNodeConst.SOF_NODE_CORE_ID, "Properties not set"));
-		resPath = project.getPersistentProperty(
-				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_REMOTE_RES_PATH));
+		resPathFw = project.getPersistentProperty(
+				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_REMOTE_RES_PATH_FW));
+		resPathTplg = project.getPersistentProperty(
+				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_REMOTE_RES_PATH_TPLG));
+		resPathLogger = project.getPersistentProperty(
+				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_REMOTE_RES_PATH_LOGGER));
+		resPathFwLdc = project.getPersistentProperty(
+				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_REMOTE_RES_PATH_FW_LDC));
 	}
 
 	public IProject getProject() {
@@ -103,12 +121,36 @@ public class SofNodeExtension implements IAudioDevExtension {
 		this.srcProjName = srcProjName;
 	}
 
-	public String getResPath() {
-		return resPath;
+	public String getResPathFw() {
+		return resPathFw;
 	}
 
-	public void setResPath(String resPath) {
-		this.resPath = resPath;
+	public void setResPathFw(String resPathFw) {
+		this.resPathFw = resPathFw;
+	}
+
+	public String getResPathTplg() {
+		return resPathTplg;
+	}
+
+	public void setResPathTplg(String resPathTplg) {
+		this.resPathTplg = resPathTplg;
+	}
+
+	public String getResPathLogger() {
+		return resPathLogger;
+	}
+
+	public void setResPathLogger(String resPathLogger) {
+		this.resPathLogger = resPathLogger;
+	}
+
+	public String getResPathFwLdc() {
+		return resPathFwLdc;
+	}
+
+	public void setResPathFwLdc(String resPathFwLdc) {
+		this.resPathFwLdc = resPathFwLdc;
 	}
 
 	public IFolder getBinFolder() {
@@ -132,8 +174,17 @@ public class SofNodeExtension implements IAudioDevExtension {
 				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_SRC_PROJ_NAME),
 				srcProjName);
 		project.setPersistentProperty(
-				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_REMOTE_RES_PATH),
-				resPath);
+				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_REMOTE_RES_PATH_FW),
+				resPathFw);
+		project.setPersistentProperty(
+				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_REMOTE_RES_PATH_TPLG),
+				resPathTplg);
+		project.setPersistentProperty(
+				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_REMOTE_RES_PATH_LOGGER),
+				resPathLogger);
+		project.setPersistentProperty(
+				new QualifiedName(ISofNodeConst.SOF_NODE_CORE_ID, ISofNodeConst.SOF_PROJ_PROP_REMOTE_RES_PATH_FW_LDC),
+				resPathFwLdc);
 
 		binFolder = project.getFolder(ISofNodeConst.BIN_FOLDER);
 		if (!binFolder.exists()) {
