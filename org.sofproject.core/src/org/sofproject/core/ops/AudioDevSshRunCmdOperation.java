@@ -29,6 +29,7 @@
 
 package org.sofproject.core.ops;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 
@@ -65,10 +66,23 @@ public class AudioDevSshRunCmdOperation extends SimpleRemoteOp {
 			}
 			Session session = conn.getSession();
 			ChannelExec channel = (ChannelExec) session.openChannel("exec");
-			channel.setCommand(cmd);
 			channel.setInputStream(null);
-			channel.setOutputStream(os); // set to the super class before run()
-			channel.connect();
+			if (needsSudo()) {
+				channel.setCommand("sudo -S -p '' " + cmd);
+				try
+				{
+					OutputStream oos = channel.getOutputStream();
+					channel.connect();
+					oos.write((getSudoPassword() + "\n").getBytes());
+					oos.flush();
+					channel.setOutputStream(os);
+				} catch (IOException e) {
+				}
+			} else {
+				channel.setOutputStream(os);
+				channel.setCommand(cmd);
+				channel.connect();
+			}
 
 			conn.setExecChannel(chType, channel); // store channel back
 		} catch (JSchException e) {
