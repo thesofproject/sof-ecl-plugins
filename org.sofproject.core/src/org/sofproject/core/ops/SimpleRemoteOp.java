@@ -34,6 +34,8 @@ import org.sofproject.core.connection.AudioDevNodeConnection;
 public abstract class SimpleRemoteOp implements IRemoteOp {
 
 	protected AudioDevNodeConnection conn;
+	private boolean needsSudo = false;
+	private String sudoPassword;
 
 	public SimpleRemoteOp(AudioDevNodeConnection conn) {
 		this.conn = conn;
@@ -42,6 +44,28 @@ public abstract class SimpleRemoteOp implements IRemoteOp {
 	@Override
 	public boolean isCancelable() {
 		return false;
+	}
+
+	@Override
+	public boolean needsSudo() {
+		return needsSudo;
+	}
+
+	@Override
+	public void setNeedsSudo(boolean needsSudo) {
+		this.needsSudo = needsSudo;
+	}
+
+	@Override
+	public void setSudoPassword(String password) {
+		this.sudoPassword = password;
+	}
+
+	@Override
+	public String getSudoPassword() {
+		String sp = this.sudoPassword;
+		this.sudoPassword = null;
+		return sp;
 	}
 
 	@Override

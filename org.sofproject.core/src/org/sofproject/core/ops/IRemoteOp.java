@@ -43,6 +43,14 @@ public interface IRemoteOp {
 	 */
 	public AudioDevNodeConnection getConnection();
 
+	public boolean needsSudo();
+
+	public void setNeedsSudo(boolean needsSudo);
+
+	public void setSudoPassword(String password);
+
+	public String getSudoPassword();
+
 	public void run(IProgressMonitor monitor)
 			throws InvocationTargetException, InterruptedException;
 }

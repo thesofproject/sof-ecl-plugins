@@ -31,9 +31,9 @@ package org.sofproject.ui.ops;
 
 import org.eclipse.ui.console.MessageConsoleStream;
 import org.sofproject.core.connection.AudioDevNodeConnection;
+import org.sofproject.core.ops.AudioDevSshRunCmdOperation;
 import org.sofproject.core.ops.IRemoteOp;
 import org.sofproject.core.ops.IRemoteOpsProvider;
-import org.sofproject.core.ops.AudioDevSshRunCmdOperation;
 import org.sofproject.ui.console.AudioDevNodeConsole;
 
 public class AudioDevRemoteOpsProvider implements IRemoteOpsProvider {
