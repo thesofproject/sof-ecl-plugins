@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.sofproject.gst.topo.IGstNodeConst;
 import org.sofproject.gst.topo.plugins.GstPluginDb;
 import org.sofproject.topo.ui.graph.ITopoFactory;
 import org.sofproject.topo.ui.graph.ITopoGraph;
@@ -58,7 +59,7 @@ public class GstTopoFactory implements ITopoFactory {
 				}
 			});
 		} catch (InvocationTargetException | InterruptedException e) {
-			throw new CoreException(new Status(IStatus.ERROR, null, e.getMessage()));
+			throw new CoreException(new Status(IStatus.ERROR, IGstNodeConst.GST_NODE_CORE_ID, e.getMessage()));
 		}
 		GstTopoGraph graph = new GstTopoGraph(file, pdb);
 		new GstTopoReader().read(graph, file.getContents());
