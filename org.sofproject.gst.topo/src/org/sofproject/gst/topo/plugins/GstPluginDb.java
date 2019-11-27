@@ -151,6 +151,8 @@ public class GstPluginDb {
 //			System.out.println("Got property " + propName + " | " + propDesc);
 
 			String flagsLine = in.readLine();
+			if (flagsLine == null)
+				throw new RuntimeException("flags expected");
 			boolean readOnly = !flagsLine.contains("writable");
 
 			// TODO: caps
@@ -166,7 +168,10 @@ public class GstPluginDb {
 				continue;
 			}
 
-			String typeLine = in.readLine().trim();
+			String typeLine = in.readLine();
+			if (typeLine == null)
+				throw new RuntimeException("type expected");
+			typeLine = typeLine.trim();
 			String[] typeTok = typeLine.split(" ");
 			if (typeTok[0].equals("String.")) {
 				String defVal = "null";
@@ -224,22 +229,27 @@ public class GstPluginDb {
 		GstElement elem = new GstElement(name, plg);
 
 //		System.out.println("Reading from " + plg.getName() + "." + elem.getName());
+		try {
+			in.readLine(); // skip "Factory Details:"
+			in.readLine(); // skip "Rank"
+			elem.setLongName(in.readLine().substring(PROP_VALUE_OFFSET));
+			elem.setKlass(in.readLine().substring(PROP_VALUE_OFFSET));
+			elem.setDescription(in.readLine().substring(PROP_VALUE_OFFSET));
 
-		in.readLine(); // skip "Factory Details:"
-		in.readLine(); // skip "Rank"
-		elem.setLongName(in.readLine().substring(PROP_VALUE_OFFSET));
-		elem.setKlass(in.readLine().substring(PROP_VALUE_OFFSET));
-		elem.setDescription(in.readLine().substring(PROP_VALUE_OFFSET));
-
-		String nextLine = in.readLine();
-		while (nextLine != null) {
-			if (nextLine.equals("Element Properties:")) {
-				readElementProperties(elem, in);
-				break;
+			String nextLine = in.readLine();
+			while (nextLine != null) {
+				if (nextLine.equals("Element Properties:")) {
+					readElementProperties(elem, in);
+					break;
+				}
+				nextLine = in.readLine();
 			}
-			nextLine = in.readLine();
-		}
 
-		plg.addElement(elem);
+			plg.addElement(elem);
+		} catch (RuntimeException e) {
+//			e.printStackTrace();
+		} finally {
+			in.close();
+		}
 	}
 }
