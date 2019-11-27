@@ -36,12 +36,18 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.sofproject.gst.topo.plugins.GstElement;
 import org.sofproject.gst.topo.plugins.GstPluginDb;
 
@@ -49,7 +55,29 @@ public class GstNewElementDialog extends TrayDialog {
 
 	private GstPluginDb plgDb;
 	private TableViewer viewer;
+	private Text grepText;
+	private GstElementFilter filter;
 	private GstElement selectedElement;
+
+	private class GstElementFilter extends ViewerFilter {
+		private String filter;
+
+		public void setFilterText(String filter) {
+			this.filter = ".*" + filter + ".*";
+		}
+
+		@Override
+		public boolean select(Viewer viewer, Object parentElement, Object element) {
+			if (filter == null || filter.isEmpty()) {
+				return true;
+			}
+			GstElement entry = (GstElement) element;
+			if (entry.getName().matches(filter)) {
+				return true;
+			}
+			return false;
+		}
+	}
 
 	public GstNewElementDialog(Shell parentShell, GstPluginDb plgDb) {
 		super(parentShell);
@@ -70,14 +98,18 @@ public class GstNewElementDialog extends TrayDialog {
 	protected Control createDialogArea(Composite parent) {
 		Composite container = (Composite) super.createDialogArea(parent);
 		Composite mainGroup = new Composite(container, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 1;
+		GridLayout layout = new GridLayout(2, false);
 		mainGroup.setLayout(layout);
-		mainGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		Label grepLabel = new Label(mainGroup, SWT.NONE);
+		grepLabel.setText("Search Element: ");
+		grepText = new Text(mainGroup, SWT.BORDER | SWT.SEARCH);
+		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		grepText.setLayoutData(gridData);
 
 		viewer = new TableViewer(mainGroup, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 
-		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gridData.horizontalSpan = 2;
 		gridData.heightHint = 15 * viewer.getTable().getItemHeight();
 		viewer.getTable().setLayoutData(gridData);
 
@@ -109,12 +141,23 @@ public class GstNewElementDialog extends TrayDialog {
 
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
-					buttonPressed(OK);
+				buttonPressed(OK);
 			}
 		});
 
+		grepText.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent ke) {
+				filter.setFilterText(grepText.getText().trim());
+				viewer.refresh();
+			}
+		});
+		filter = new GstElementFilter();
+		viewer.addFilter(filter);
+
 		viewer.setInput(plgDb.getAllElements());
-		viewer.getControl().setFocus();
+
+		grepText.setFocus();
 
 		return container;
 	}
