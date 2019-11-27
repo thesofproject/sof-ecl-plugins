@@ -32,6 +32,8 @@ package org.sofproject.gst.topo.ui.handlers;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -102,6 +104,14 @@ public class GstNewElementDialog extends TrayDialog {
 		viewer.setContentProvider(new ArrayContentProvider());
 		viewer.getTable().setHeaderVisible(true);
 		viewer.getTable().setLinesVisible(true);
+
+		viewer.addDoubleClickListener(new IDoubleClickListener() {
+
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+					buttonPressed(OK);
+			}
+		});
 
 		viewer.setInput(plgDb.getAllElements());
 		viewer.getControl().setFocus();
