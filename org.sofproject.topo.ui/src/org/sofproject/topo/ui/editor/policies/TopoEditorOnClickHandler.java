@@ -29,6 +29,7 @@
 
 package org.sofproject.topo.ui.editor.policies;
 
+import java.awt.Frame;
 import java.io.IOException;
 
 import org.eclipse.core.runtime.CoreException;
@@ -42,6 +43,7 @@ import org.eclipse.gef.mvc.fx.viewer.IViewer;
 import org.eclipse.gef.mvc.fx.viewer.InfiniteCanvasViewer;
 import org.eclipse.swt.widgets.Display;
 import org.sofproject.core.ops.IRemoteOpsProvider;
+import org.sofproject.gst.json.JsonCustomOptionPane;
 import org.sofproject.topo.ui.graph.GefTopoNode;
 import org.sofproject.topo.ui.graph.ITopoGraph;
 import org.sofproject.topo.ui.graph.ITopoNode;
@@ -129,6 +131,18 @@ public class TopoEditorOnClickHandler extends AbstractHandler implements IOnClic
 					}
 				});
 				menu.getItems().add(miSerialize);
+				
+				MenuItem miSerializeJson = new MenuItem("Serialize Topology to Json");
+				miSerializeJson.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						
+						menu.hide();
+						new JsonCustomOptionPane(Display.getCurrent(), getGraphFromHost());
+					}
+				});
+				menu.getItems().add(miSerializeJson);
+				
 				menu.show(((InfiniteCanvasViewer) viewer).getScene().getWindow(), e.getScreenX(), e.getScreenY());
 			}
 		}

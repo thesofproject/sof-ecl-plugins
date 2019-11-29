@@ -71,7 +71,7 @@ public class GstTopoTestOperation extends SimpleRemoteOp {
 			AudioDevNodeProject proj = conn.getProject();
 			GstNodeExtension gstNode = (GstNodeExtension) proj.getExtension(IGstNodeConst.GST_NODE_EXTENSION_ID);
 
-			String pplString = graph.getPipelineString();
+			String pplString = graph.getPipelinesString();
 			monitor.subTask("Running: " + pplString);
 
 			Session session = conn.getSession();

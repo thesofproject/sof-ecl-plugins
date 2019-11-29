@@ -36,6 +36,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -535,6 +536,11 @@ public class AlsaTopoGraph implements ITopoGraph {
 			outputFile.create(new ByteArrayInputStream(os.toByteArray()), false, null);
 		}
 		outputFile.getParent().refreshLocal(1, null);
+	}
+	
+	@Override
+	public String getPipelinesString() {
+		return null;
 	}
 
 	@Override

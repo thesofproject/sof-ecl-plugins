@@ -10,3 +10,8 @@ Require-Bundle: org.sofproject.core,
  org.sofproject.ui,
  org.sofproject.topo.ui,
  com.jcraft.jsch
+Bundle-ClassPath: lib/jackson-annotations-2.10.1.jar,
+ lib/jackson-core-2.10.1.jar,
+ lib/jackson-databind-2.10.1.jar,
+ .
+Export-Package: org.sofproject.gst.json
