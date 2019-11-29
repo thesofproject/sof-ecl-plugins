@@ -10,3 +10,4 @@ Export-Package: org.sofproject.alsa.topo.conf,
 Require-Bundle: org.sofproject.core,
  org.sofproject.topo.ui
 Bundle-Vendor: Intel Corporation
+Import-Package: org.sofproject.gst.json

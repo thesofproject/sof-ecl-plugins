@@ -27,51 +27,44 @@
  *
  */
 
-package org.sofproject.topo.ui.graph;
+package org.sofproject.gst.json;
 
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.util.Collection;
+public class JsonProperty {
 
-import org.eclipse.core.runtime.CoreException;
-import org.sofproject.core.binfile.BinFile;
-import org.sofproject.core.ops.IRemoteOpsProvider;
-import org.sofproject.gst.json.JsonProperty;
+	private String name;
+	private String description;
+	private String version;
+	private String type;
+	private String template;
 
-/**
- * Topology graph, implemented by a specific topology binding.
- *
- */
-public interface ITopoGraph {
+	public JsonProperty(String name, String description, String version, String type) {
+		this.name = name;
+		this.description = description;
+		this.version = version;
+		this.type = type;
+	}
 
-	public Collection<? extends ITopoCollectionNode> getCollections();
+	public String getName() {
+		return name;
+	}
 
-	public Collection<? extends ITopoNode> getNodes();
+	public String getDescription() {
+		return description;
+	}
 
-	public ITopoNode createNode(String nodeId);
+	public String getVersion() {
+		return version;
+	}
 
-	public void removeNode(ITopoNode node);
+	public String getType() {
+		return type;
+	}
 
-	public Collection<? extends ITopoConnection> getConnections();
+	public String getTemplate() {
+		return template;
+	}
 
-	public ITopoConnection createConnection(ITopoNode source, ITopoNode target);
-
-	public void removeConnection(ITopoConnection connection);
-
-	public String[] getNodeTypeIds();
-
-	public String getNodeDisplayName(String nodeId);
-
-	public void addPropertyChangeListener(PropertyChangeListener listener);
-
-	public void removePropertyChangeListener(PropertyChangeListener listener);
-
-	// TODO: optional, move to a separate interface
-	public BinFile getBinTopology();
-
-	public void serialize() throws CoreException, IOException;
-	
-	public String getPipelineString();
-	
-	public IRemoteOpsProvider getRemoteOpsProvider();
+	public void setTemplate(String newTemplate) {
+		this.template = newTemplate;
+	}
 }

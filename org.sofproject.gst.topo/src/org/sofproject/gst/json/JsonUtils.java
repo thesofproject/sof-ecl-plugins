@@ -27,51 +27,31 @@
  *
  */
 
-package org.sofproject.topo.ui.graph;
+package org.sofproject.gst.json;
 
-import java.beans.PropertyChangeListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
 
 import org.eclipse.core.runtime.CoreException;
-import org.sofproject.core.binfile.BinFile;
-import org.sofproject.core.ops.IRemoteOpsProvider;
-import org.sofproject.gst.json.JsonProperty;
 
-/**
- * Topology graph, implemented by a specific topology binding.
- *
- */
-public interface ITopoGraph {
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-	public Collection<? extends ITopoCollectionNode> getCollections();
+public class JsonUtils {
 
-	public Collection<? extends ITopoNode> getNodes();
+	public void serializeJson(JsonProperty jsonProperty, String pipelineString) throws CoreException, IOException {
+		try {
+			File file = new File(jsonProperty.getName() + ".json");
+			jsonProperty.setTemplate(pipelineString);
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			ObjectMapper obj = new ObjectMapper();
+			obj.writeValue(writer, jsonProperty);
+			writer.close();
 
-	public ITopoNode createNode(String nodeId);
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+	}
 
-	public void removeNode(ITopoNode node);
-
-	public Collection<? extends ITopoConnection> getConnections();
-
-	public ITopoConnection createConnection(ITopoNode source, ITopoNode target);
-
-	public void removeConnection(ITopoConnection connection);
-
-	public String[] getNodeTypeIds();
-
-	public String getNodeDisplayName(String nodeId);
-
-	public void addPropertyChangeListener(PropertyChangeListener listener);
-
-	public void removePropertyChangeListener(PropertyChangeListener listener);
-
-	// TODO: optional, move to a separate interface
-	public BinFile getBinTopology();
-
-	public void serialize() throws CoreException, IOException;
-	
-	public String getPipelineString();
-	
-	public IRemoteOpsProvider getRemoteOpsProvider();
 }
