@@ -100,8 +100,8 @@ public class GstTopoNode implements ITopoNode {
 	public void serialize(Writer writer) throws IOException {
 		writer.write(elem.getName());
 		for (GstProperty prop : properties.values()) {
-			if (!prop.isChanged())
-				continue;
+			//if (!prop.isChanged())
+			//	continue;
 			writer.write(" ");
 			prop.serialize(writer);
 		}
