@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,30 +27,25 @@
  *
  */
 
-package org.sofproject.core.ops;
+package org.sofproject.ui;
 
-import java.lang.reflect.InvocationTargetException;
+import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IPerspectiveFactory;
+import org.eclipse.ui.console.IConsoleConstants;
+import org.sofproject.ui.views.AudioDevNodeConnectionsViewPart;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.sofproject.core.connection.AudioDevNodeConnection;
+public class AudioDevPerspectiveFactory implements IPerspectiveFactory {
 
-public interface IRemoteOp {
+	@Override
+	public void createInitialLayout(IPageLayout layout) {
+		layout.addView(IPageLayout.ID_PROJECT_EXPLORER, IPageLayout.LEFT, 0.2f, layout.getEditorArea());
 
-	public boolean isCancelable();
+		layout.addView(AudioDevNodeConnectionsViewPart.VIEW_ID, IPageLayout.BOTTOM, 0.5f,
+				IPageLayout.ID_PROJECT_EXPLORER);
 
-	/**
-	 * @return Connection passed to IRemoteOpsProvider.createRemoteOp()
-	 */
-	public AudioDevNodeConnection getConnection();
+		layout.addView(IPageLayout.ID_OUTLINE, IPageLayout.RIGHT, 0.7f, layout.getEditorArea());
+		layout.addView(IPageLayout.ID_PROP_SHEET, IPageLayout.BOTTOM, 0.5f, IPageLayout.ID_OUTLINE);
 
-	public boolean needsSudo();
-
-	public void setNeedsSudo(boolean needsSudo);
-
-	public void setSudoPassword(String password);
-
-	public String getSudoPassword();
-
-	public void run(IProgressMonitor monitor)
-			throws InvocationTargetException, InterruptedException;
+		layout.addView(IConsoleConstants.ID_CONSOLE_VIEW, IPageLayout.BOTTOM, 0.7f, layout.getEditorArea());
+	}
 }

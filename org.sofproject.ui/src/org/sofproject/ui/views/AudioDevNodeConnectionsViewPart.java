@@ -58,6 +58,8 @@ import org.sofproject.ui.ops.AudioDevRemoteOpsProvider;
 
 public class AudioDevNodeConnectionsViewPart extends ViewPart {
 
+	public static final String VIEW_ID = "org.sofproject.ui.views.AudioDevNodeConnectionsView";
+
 	private TableViewer viewer;
 	private List<IRemoteOpsProvider> opsProviders = new ArrayList<>();
 

@@ -34,11 +34,8 @@ import java.beans.PropertyChangeSupport;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,7 +48,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.window.Window;
 import org.sofproject.core.binfile.BinFile;
 import org.sofproject.core.ops.IRemoteOpsProvider;
-import org.sofproject.gst.json.JsonProperty;
 import org.sofproject.gst.topo.ops.GstGraphOpsProvider;
 import org.sofproject.gst.topo.plugins.GstElement;
 import org.sofproject.gst.topo.plugins.GstPlugin;
@@ -61,9 +57,6 @@ import org.sofproject.topo.ui.graph.ITopoCollectionNode;
 import org.sofproject.topo.ui.graph.ITopoConnection;
 import org.sofproject.topo.ui.graph.ITopoGraph;
 import org.sofproject.topo.ui.graph.ITopoNode;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 
 public class GstTopoGraph implements ITopoGraph {
 
@@ -197,21 +190,6 @@ public class GstTopoGraph implements ITopoGraph {
 		os.close();
 
 		fileInput.setContents(new ByteArrayInputStream(os.toByteArray()), true, false, null);
-	}
-	
-	@Override
-	public void serializeJson(JsonProperty jsonProperty) throws CoreException, IOException {
-		try {
-			File file = new File(jsonProperty.getName()+".json");
-			jsonProperty.setTemplate(getPipelineString());
-			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-			ObjectMapper obj = new ObjectMapper();
-			obj.writeValue(writer, jsonProperty);
-			writer.close();
-			
-		}catch(Exception e) {
-			System.out.println(e.toString());
-		}
 	}
 
 	public String getPipelineString() {

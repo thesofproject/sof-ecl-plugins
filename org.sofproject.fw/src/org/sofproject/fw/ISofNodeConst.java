@@ -53,24 +53,33 @@ public interface ISofNodeConst {
 	String TPLG_FOLDER = "topology";
 
 	/**
-	 * Extension used to distinguish remote fw binary files.
+	 * Extension used to distinguish remote fw binary files (keep it sorted).
 	 */
-	String FW_BIN_FILE_EXT = "bin";
+	String[] FW_BIN_FILE_EXTS = {"bin", "ri"};
 
 	/**
 	 * Extension used to distinguish remote topology binary files.
 	 */
-	String TPLG_FILE_EXT = "tplg";
+	String[] TPLG_FILE_EXTS = {"tplg"};
 
 	/**
 	 * Custom project property to store path to the remote files.
 	 */
-	String SOF_PROJ_PROP_REMOTE_RES_PATH = "remoteResPath";
+	String SOF_PROJ_PROP_REMOTE_RES_PATH_FW = "remoteResPathFw";
+	String SOF_PROJ_PROP_REMOTE_RES_PATH_TPLG = "remoteResPathTplg";
+	String SOF_PROJ_PROP_REMOTE_RES_PATH_LOGGER = "remoteResPathLogger";
+	String SOF_PROJ_PROP_REMOTE_RES_PATH_FW_LDC = "remoteResPathFwLdc";
 
 	/**
 	 * Default path to the remote files.
 	 */
-	String SOF_PROJ_DEFAULT_REMOTE_PATH = "/lib/firmware/intel";
+	String SOF_PROJ_DEFAULT_REMOTE_PATH_FW = "/lib/firmware/intel/sof";
+
+	String SOF_PROJ_DEFAULT_REMOTE_PATH_TPLG = "/lib/firmware/intel/sof-tplg";
+
+	String SOF_PROJ_DEFAULT_REMOTE_PATH_LOGGER = "sof-logger";
+
+	String SOF_PROJ_DEFAULT_REMOTE_PATH_FW_LDC = "sof.ldc";
 
 	/**
 	 * Custom project property to store name of the project with source code.

@@ -53,9 +53,22 @@ public class AudioDevNodeOpRunner {
 				AudioDevNodeLoginDialog dlg = new AudioDevNodeLoginDialog(null, proj.getProject().getName(),
 						proj.getAddress());
 				if (dlg.open() == Window.OK) {
-					conn.connect(dlg.getLogin(), dlg.getPass());
+					String pass = dlg.getPass();
+					conn.connect(dlg.getLogin(), pass);
+					if (op.needsSudo()) {
+						op.setSudoPassword(pass);
+					}
 				} else {
 					return;
+				}
+			} else {
+				if (op.needsSudo()) {
+					// TODO: need to prompt for the pass for this command again.
+					AudioDevNodeLoginDialog dlg = new AudioDevNodeLoginDialog(null, proj.getProject().getName(),
+							proj.getAddress());
+					if (dlg.open() == Window.OK) {
+						op.setSudoPassword(dlg.getPass());
+					}
 				}
 			}
 

@@ -180,12 +180,12 @@ public class GstTopoNode implements ITopoNode {
 
 	@Override
 	public Color getColor() {
-		return Color.rgb(249, 220, 48);
+		return Color.rgb(202, 247, 181);
 	}
 
 	@Override
 	public Color getBorderColor() {
-		return Color.rgb(3, 130, 199);
+		return Color.rgb(52, 130, 15);
 	}
 
 	@Override

@@ -54,7 +54,7 @@ public class GstNodeExtension implements IAudioDevExtension {
 		if (gstInspectToolCmd == null) // extension might not be fully created
 			throw new CoreException(new Status(IStatus.ERROR, IGstNodeConst.GST_NODE_CORE_ID, "Properties not set"));
 		gstLaunchToolCmd = project.getPersistentProperty(
-				new QualifiedName(IGstNodeConst.GST_NODE_CORE_ID, IGstNodeConst.GST_PROJ_PROP_GST_INSPECT_TOOL_CMD));
+				new QualifiedName(IGstNodeConst.GST_NODE_CORE_ID, IGstNodeConst.GST_PROJ_PROP_GST_LAUNCH_TOOL_CMD));
 	}
 
 	public IProject getProject() {
@@ -83,7 +83,7 @@ public class GstNodeExtension implements IAudioDevExtension {
 				new QualifiedName(IGstNodeConst.GST_NODE_CORE_ID, IGstNodeConst.GST_PROJ_PROP_GST_INSPECT_TOOL_CMD),
 				gstInspectToolCmd);
 		project.setPersistentProperty(
-				new QualifiedName(IGstNodeConst.GST_NODE_CORE_ID, IGstNodeConst.GST_PROJ_PROP_GST_INSPECT_TOOL_CMD),
+				new QualifiedName(IGstNodeConst.GST_NODE_CORE_ID, IGstNodeConst.GST_PROJ_PROP_GST_LAUNCH_TOOL_CMD),
 				gstLaunchToolCmd);
 	}
 
