@@ -29,15 +29,8 @@
 
 package org.sofproject.topo.ui.editor.policies;
 
-import java.awt.GridLayout;
+import java.awt.Frame;
 import java.io.IOException;
-import java.util.Arrays;
-
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.gef.mvc.fx.handlers.AbstractHandler;
@@ -50,7 +43,7 @@ import org.eclipse.gef.mvc.fx.viewer.IViewer;
 import org.eclipse.gef.mvc.fx.viewer.InfiniteCanvasViewer;
 import org.eclipse.swt.widgets.Display;
 import org.sofproject.core.ops.IRemoteOpsProvider;
-import org.sofproject.gst.json.JsonProperty;
+import org.sofproject.gst.json.JsonCustomOptionPane;
 import org.sofproject.topo.ui.graph.GefTopoNode;
 import org.sofproject.topo.ui.graph.ITopoGraph;
 import org.sofproject.topo.ui.graph.ITopoNode;
@@ -143,37 +136,10 @@ public class TopoEditorOnClickHandler extends AbstractHandler implements IOnClic
 				miSerializeJson.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
-						JPanel panel = new JPanel(new GridLayout(0, 1));
-				        JTextField name = new JTextField("");
-						panel.add(new JLabel("Name:"));
-				        panel.add(name);
-				        
-				        JTextField version = new JTextField("");
-						panel.add(new JLabel("Version:"));
-				        panel.add(version);
-				        
-				        JTextField description = new JTextField("");
-						panel.add(new JLabel("Description:"));
-				        panel.add(description);
-				        
-				        String[] items = {"Gstreamer", "Ffmpeg"};
-				        JComboBox<String> type = new JComboBox<>(items);
-				        panel.add(new JLabel("Type:"));
-				        panel.add(type);
-
-				        int result = JOptionPane.showConfirmDialog(null, panel, "Serialize Json",
-				                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-				                
-			            if (result == JOptionPane.OK_OPTION) {
-			            	try {
-			            		JsonProperty jsonProperty = new JsonProperty(name.getText(), description.getText(), version.getText(), type.getSelectedItem().toString());
-								getGraphFromHost().serializeJson(jsonProperty);
-							} catch (CoreException | IOException e) {
-								e.printStackTrace(); //TODO:
-							}
-			            } else {
-			                System.out.println("Json serialize cancelled");
-			            }
+						
+						menu.hide();
+						JsonCustomOptionPane pane = new JsonCustomOptionPane(null, getGraphFromHost());
+						pane.setVisible(true);
 					}
 				});
 				menu.getItems().add(miSerializeJson);
