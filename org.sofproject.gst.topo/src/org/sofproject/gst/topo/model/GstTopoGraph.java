@@ -51,7 +51,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.window.Window;
 import org.sofproject.core.binfile.BinFile;
 import org.sofproject.core.ops.IRemoteOpsProvider;
-import org.sofproject.gst.json.JsonProperty;
 import org.sofproject.gst.topo.ops.GstGraphOpsProvider;
 import org.sofproject.gst.topo.plugins.GstElement;
 import org.sofproject.gst.topo.plugins.GstPlugin;
@@ -61,8 +60,6 @@ import org.sofproject.topo.ui.graph.ITopoCollectionNode;
 import org.sofproject.topo.ui.graph.ITopoConnection;
 import org.sofproject.topo.ui.graph.ITopoGraph;
 import org.sofproject.topo.ui.graph.ITopoNode;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class GstTopoGraph implements ITopoGraph {
 
