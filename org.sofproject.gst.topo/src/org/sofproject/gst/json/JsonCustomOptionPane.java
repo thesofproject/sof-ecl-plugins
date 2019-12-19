@@ -29,9 +29,6 @@
 
 package org.sofproject.gst.json;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import org.eclipse.core.runtime.CoreException;
@@ -51,9 +48,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.sofproject.topo.ui.graph.ITopoGraph;
 import org.sofproject.gst.json.JsonUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.sofproject.gst.topo.model.GstTopoGraph;
 
 public class JsonCustomOptionPane {
 

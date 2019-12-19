@@ -33,8 +33,17 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,7 +51,15 @@ public class JsonUtils {
 
 	public void serializeJson(JsonProperty jsonProperty, String pipelineString) throws CoreException, IOException {
 		try {
-			File file = new File(jsonProperty.getName() + ".json");
+			String projectPath = getProjectPath();
+			File file;
+			if (projectPath != null) {
+				String path = Paths.get(projectPath, jsonProperty.getName(), jsonProperty.getVersion()).toString();
+				new File(path).mkdirs();
+				file = new File(Paths.get(path, "pipeline.json").toString());
+			} else {
+				file = new File(jsonProperty.getName() + ".json");
+			}
 			jsonProperty.setTemplate(pipelineString);
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			ObjectMapper obj = new ObjectMapper();
@@ -52,6 +69,29 @@ public class JsonUtils {
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
+	}
+
+	public String getProjectPath() {
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		IWorkbenchPage activePage = window.getActivePage();
+
+		IEditorPart activeEditor = activePage.getActiveEditor();
+
+		if (activeEditor != null) {
+			IEditorInput input = activeEditor.getEditorInput();
+
+			IProject project = input.getAdapter(IProject.class);
+			if (project == null) {
+				IResource resource = input.getAdapter(IResource.class);
+				if (resource != null) {
+					project = resource.getProject();
+					IPath path = project.getLocation();
+					return path.toString();
+				}
+			}
+		}
+
+		return null;
 	}
 
 }
