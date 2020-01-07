@@ -6,12 +6,6 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="lib/jackson-annotations-2.10.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jackson-core-2.10.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jackson-databind-2.10.1.jar"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/Users/edominia/Downloads/jackson-annotations-2.10.1.jar" sourcepath="C:/Users/edominia/Downloads/jackson-annotations-master.zip"/>
-	<classpathentry kind="lib" path="C:/Users/edominia/Downloads/jackson-core-2.10.1.jar" sourcepath="C:/Users/edominia/Downloads/jackson-core-master.zip"/>
-	<classpathentry kind="lib" path="C:/Users/edominia/Downloads/jackson-databind-2.10.1.jar" sourcepath="C:/Users/edominia/Downloads/jackson-databind-master.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

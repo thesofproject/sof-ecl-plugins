@@ -27,7 +27,7 @@
  *
  */
 
-package org.sofproject.gst.json;
+package org.sofproject.topo.ui.json;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -44,23 +44,29 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.sofproject.core.ops.IRemoteOpsProvider;
+import org.sofproject.gst.topo.ops.GstDockerOpsProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonUtils {
+
+	JsonProperty jsonProperty_;
 
 	public void serializeJson(JsonProperty jsonProperty, String pipelineString) throws CoreException, IOException {
 		try {
 			String projectPath = getProjectPath();
 			File file;
 			if (projectPath != null) {
-				String path = Paths.get(projectPath, jsonProperty.getName(), jsonProperty.getVersion()).toString();
+				String path = Paths.get(projectPath, jsonProperty.getType().toLowerCase(), jsonProperty.getName(),
+						jsonProperty.getVersion()).toString();
 				new File(path).mkdirs();
 				file = new File(Paths.get(path, "pipeline.json").toString());
 			} else {
 				file = new File(jsonProperty.getName() + ".json");
 			}
 			jsonProperty.setTemplate(pipelineString);
+			jsonProperty_ = jsonProperty;
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			ObjectMapper obj = new ObjectMapper();
 			obj.writeValue(writer, jsonProperty);
@@ -92,6 +98,14 @@ public class JsonUtils {
 		}
 
 		return null;
+	}
+
+	public IRemoteOpsProvider getDockerOpsProvider() {
+		return new GstDockerOpsProvider(this);
+	}
+
+	public JsonProperty getJsonProperty() {
+		return jsonProperty_;
 	}
 
 }

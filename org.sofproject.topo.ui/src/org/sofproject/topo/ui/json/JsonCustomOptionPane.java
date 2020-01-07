@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Intel Corporation
+ * Copyright (c) 2019, Intel Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
  *
  */
 
-package org.sofproject.gst.json;
+package org.sofproject.topo.ui.json;
 
 import java.io.IOException;
 
@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.sofproject.topo.ui.graph.ITopoGraph;
-import org.sofproject.gst.json.JsonUtils;
+import org.sofproject.topo.ui.json.JsonUtils;
 
 public class JsonCustomOptionPane {
 
@@ -64,7 +64,7 @@ public class JsonCustomOptionPane {
 		return true;
 	}
 
-	public JsonCustomOptionPane(Display display, ITopoGraph graph) {
+	public JsonCustomOptionPane(Display display, ITopoGraph graph, JsonUtils jsonUtils) {
 		this.graph = graph;
 		Shell shell = new Shell(display, SWT.CLOSE | SWT.TITLE | SWT.MIN);
 
@@ -72,7 +72,7 @@ public class JsonCustomOptionPane {
 
 		GridLayout gridLayout = new GridLayout(4, false);
 		gridLayout.verticalSpacing = 8;
-		shell.setLayout(gridLayout);
+		shell.setLayout( gridLayout);
 
 		new Label(shell, SWT.NULL).setText("Name:");
 		Text nameText = new Text(shell, SWT.SINGLE | SWT.BORDER);
@@ -97,7 +97,7 @@ public class JsonCustomOptionPane {
 		new Label(shell, SWT.NULL).setText("Type:");
 		Combo typeCombo = new Combo(shell, SWT.READ_ONLY);
 		typeCombo.setBounds(50, 50, 200, 65);
-		String items[] = { "Gstreamer", "Ffmpeg" };
+		String items[] = { "GStreamer", "Ffmpeg" };
 		typeCombo.setItems(items);
 		typeCombo.setText(items[0]);
 		GridData typeGridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
@@ -124,7 +124,7 @@ public class JsonCustomOptionPane {
 					try {
 						JsonProperty jsonProperty = new JsonProperty(nameText.getText(), descriptionText.getText(),
 								versionText.getText(), typeCombo.getItem(typeCombo.getSelectionIndex()));
-						new JsonUtils().serializeJson(jsonProperty, graph.getPipelineString());
+						jsonUtils.serializeJson(jsonProperty, graph.getPipelineString());
 						shell.close();
 					} catch (CoreException | IOException error) {
 						error.printStackTrace(); // TODO:

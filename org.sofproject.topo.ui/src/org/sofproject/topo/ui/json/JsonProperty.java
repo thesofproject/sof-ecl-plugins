@@ -27,8 +27,11 @@
  *
  */
 
-package org.sofproject.gst.json;
+package org.sofproject.topo.ui.json;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+@JsonSerialize
 public class JsonProperty {
 
 	private String name;
@@ -36,12 +39,16 @@ public class JsonProperty {
 	private String version;
 	private String type;
 	private String template;
+	private Parameters parameters;
 
 	public JsonProperty(String name, String description, String version, String type) {
 		this.name = name;
 		this.description = description;
 		this.version = version;
 		this.type = type;
+
+		// set default parameters
+		this.parameters = new Parameters("object", new Properties());
 	}
 
 	public String getName() {
@@ -64,7 +71,40 @@ public class JsonProperty {
 		return template;
 	}
 
+	public Parameters getParameters() {
+		return parameters;
+	}
+
 	public void setTemplate(String newTemplate) {
 		this.template = newTemplate;
+	}
+
+	public void setParameters(Parameters parameters) {
+		this.parameters = parameters;
+	}
+}
+
+@JsonSerialize
+class Parameters {
+	private String type;
+	private Properties properties;
+
+	public Parameters(String type, Properties properties) {
+		this.type = type;
+		this.properties = properties;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public Properties getProperties() {
+		return properties;
+	}
+}
+
+@JsonSerialize
+class Properties {
+	public Properties() {
 	}
 }

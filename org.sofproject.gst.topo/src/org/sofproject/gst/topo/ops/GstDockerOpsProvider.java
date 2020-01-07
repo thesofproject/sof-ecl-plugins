@@ -27,51 +27,48 @@
  *
  */
 
-package org.sofproject.topo.ui.graph;
+package org.sofproject.gst.topo.ops;
 
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.util.Collection;
-
-import org.eclipse.core.runtime.CoreException;
-import org.sofproject.core.binfile.BinFile;
+import org.sofproject.core.connection.AudioDevNodeConnection;
+import org.sofproject.core.ops.IRemoteOp;
 import org.sofproject.core.ops.IRemoteOpsProvider;
-import org.sofproject.topo.ui.json.JsonProperty;
+import org.sofproject.topo.ui.json.JsonUtils;
 
-/**
- * Topology graph, implemented by a specific topology binding.
- *
- */
-public interface ITopoGraph {
+public class GstDockerOpsProvider implements IRemoteOpsProvider {
 
-	public Collection<? extends ITopoCollectionNode> getCollections();
+	public static final String SEND_DOCKER = "org.sofproject.gst.topo.ops.senddocker";
 
-	public Collection<? extends ITopoNode> getNodes();
+	public static final String[] OPS = { SEND_DOCKER };
 
-	public ITopoNode createNode(String nodeId);
+	JsonUtils jsonUtils;
 
-	public void removeNode(ITopoNode node);
+	public GstDockerOpsProvider(JsonUtils jsonUtils) {
+		this.jsonUtils = jsonUtils;
+	}
 
-	public Collection<? extends ITopoConnection> getConnections();
+	@Override
+	public String[] getRemoteOpsIds() {
+		return OPS;
+	}
 
-	public ITopoConnection createConnection(ITopoNode source, ITopoNode target);
+	@Override
+	public String getRemoteOpDisplayName(String opId) {
+		switch (opId) {
+		case SEND_DOCKER:
+			return "Serialize Topology to Json & send to Docker";
+		default:
+			return null;
+		}
+	}
 
-	public void removeConnection(ITopoConnection connection);
+	@Override
+	public IRemoteOp createRemoteOp(String opId, AudioDevNodeConnection conn) {
+		switch (opId) {
+		case SEND_DOCKER:
+			return new GstDockerOperation(conn, jsonUtils);
+		default:
+			return null;
+		}
+	}
 
-	public String[] getNodeTypeIds();
-
-	public String getNodeDisplayName(String nodeId);
-
-	public void addPropertyChangeListener(PropertyChangeListener listener);
-
-	public void removePropertyChangeListener(PropertyChangeListener listener);
-
-	// TODO: optional, move to a separate interface
-	public BinFile getBinTopology();
-
-	public void serialize() throws CoreException, IOException;
-	
-	public String getPipelineString();
-	
-	public IRemoteOpsProvider getRemoteOpsProvider();
 }
