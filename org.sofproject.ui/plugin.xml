@@ -101,4 +101,11 @@
             name="Audio Development">
       </perspective>
    </extension>
+      <extension
+      point = "org.eclipse.ui.preferencePages">
+       <page id="org.sofproject.ui.preferences.connectionpreferences"
+	    class="org.sofproject.ui.preferences.ConnectionPreferences"
+            name="Connection">
+       </page>
+   </extension>
 </plugin>

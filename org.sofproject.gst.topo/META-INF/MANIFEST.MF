@@ -10,3 +10,4 @@ Require-Bundle: org.sofproject.core,
  org.sofproject.ui,
  org.sofproject.topo.ui,
  com.jcraft.jsch
+Export-Package: org.sofproject.gst.topo

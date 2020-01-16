@@ -29,6 +29,7 @@
 
 package org.sofproject.ui.handlers;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -38,6 +39,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.sofproject.gst.topo.IGstNodeConst;
 
 public class AudioDevNodeLoginDialog extends TrayDialog {
 
@@ -89,13 +91,14 @@ public class AudioDevNodeLoginDialog extends TrayDialog {
 		data.grabExcessHorizontalSpace = true;
 		loginField = new Text(loginGroup, SWT.BORDER);
 		loginField.setLayoutData(data);
+		loginField.setText(Platform.getPreferencesService().getString(IGstNodeConst.GST_NODE_PREFERENCES_ID,
+				IGstNodeConst.CONN_USERNAME_PREF_NAME, "", null));
 
 		new Label(loginGroup, SWT.NONE).setText("Password");
 		data = new GridData(GridData.FILL_HORIZONTAL);
 		data.grabExcessHorizontalSpace = true;
 		passField = new Text(loginGroup, SWT.PASSWORD | SWT.BORDER);
 		passField.setLayoutData(data);
-
 		loginField.setFocus();
 
 		return container;
