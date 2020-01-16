@@ -31,6 +31,8 @@ package org.sofproject.gst.topo;
 
 public interface IGstNodeConst {
 	String GST_NODE_CORE_ID = "org.sofproject.gst.topo";
+	String GST_NODE_PREFERENCES_ID = "org.sofproject.ui.preferences";
+	
 	String GST_NODE_EXTENSION_ID = GST_NODE_CORE_ID + ".gstextension";
 
 	String GST_PROJ_DEFAULT_GST_INSPECT_TOOL_CMD = "gst-inspect-1.0";
@@ -38,4 +40,7 @@ public interface IGstNodeConst {
 
 	String GST_PROJ_PROP_GST_INSPECT_TOOL_CMD = "gstInspectToolCmd";
 	String GST_PROJ_PROP_GST_LAUNCH_TOOL_CMD = "gstLaunchToolCmd";
+		
+	String GST_LAUNCH_PREF_NAME = "gstLaunch";
+	String GST_INSPECT_PREF_NAME = "gstInspect";
 }

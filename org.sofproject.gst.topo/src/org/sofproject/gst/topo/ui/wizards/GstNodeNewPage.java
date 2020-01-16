@@ -29,6 +29,7 @@
 
 package org.sofproject.gst.topo.ui.wizards;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -39,6 +40,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.sofproject.gst.topo.GstNodeExtension;
+import org.sofproject.gst.topo.IGstNodeConst;
 import org.sofproject.ui.wizards.INewNodeExtensionPage;
 
 public class GstNodeNewPage extends WizardPage implements INewNodeExtensionPage {
@@ -78,7 +80,8 @@ public class GstNodeNewPage extends WizardPage implements INewNodeExtensionPage 
 		data.grabExcessHorizontalSpace = true;
 		gstInspectToolCmd = new Text(inspectGroup, SWT.BORDER);
 		gstInspectToolCmd.setLayoutData(data);
-		gstInspectToolCmd.setText(gstNode.getGstInspectToolCmd());
+		gstInspectToolCmd.setText(Platform.getPreferencesService().getString(IGstNodeConst.GST_NODE_PREFERENCES_ID,
+				IGstNodeConst.GST_INSPECT_PREF_NAME, gstNode.getGstInspectToolCmd(), null));
 		gstInspectToolCmd.addListener(SWT.Modify, confModifyListener);
 
 		Composite launchGroup = new Composite(control, SWT.NONE);
@@ -91,7 +94,8 @@ public class GstNodeNewPage extends WizardPage implements INewNodeExtensionPage 
 		data.grabExcessHorizontalSpace = true;
 		gstLaunchToolCmd = new Text(launchGroup, SWT.BORDER);
 		gstLaunchToolCmd.setLayoutData(data);
-		gstLaunchToolCmd.setText(gstNode.getGstLaunchToolCmd());
+		gstLaunchToolCmd.setText(Platform.getPreferencesService().getString(IGstNodeConst.GST_NODE_PREFERENCES_ID,
+				IGstNodeConst.GST_LAUNCH_PREF_NAME, gstNode.getGstLaunchToolCmd(), null));
 		gstLaunchToolCmd.addListener(SWT.Modify, confModifyListener);
 
 		setControl(control);
