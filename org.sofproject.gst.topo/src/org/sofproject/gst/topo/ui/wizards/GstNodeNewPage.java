@@ -64,22 +64,22 @@ public class GstNodeNewPage extends WizardPage implements INewNodeExtensionPage 
 	@Override
 	public void createControl(Composite parent) {
 		Composite control = new Composite(parent, SWT.NULL);
-        initializeDialogUnits(parent);
-        control.setLayout(new GridLayout());
-        control.setLayoutData(new GridData(GridData.FILL_BOTH));
+		initializeDialogUnits(parent);
+		control.setLayout(new GridLayout());
+		control.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Composite inspectGroup = new Composite(control, SWT.NONE);
-        GridLayout layout = new GridLayout();
-        layout.numColumns = 2;
-        inspectGroup.setLayout(layout);
-        inspectGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        new Label(inspectGroup, SWT.NONE).setText("gst-inspect command");
-        GridData data = new GridData(GridData.FILL_HORIZONTAL);
-        data.grabExcessHorizontalSpace = true;
-        gstInspectToolCmd = new Text(inspectGroup, SWT.BORDER);
-        gstInspectToolCmd.setLayoutData(data);
-        gstInspectToolCmd.setText(gstNode.getGstInspectToolCmd());
-        gstInspectToolCmd.addListener(SWT.Modify, confModifyListener);
+		Composite inspectGroup = new Composite(control, SWT.NONE);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		inspectGroup.setLayout(layout);
+		inspectGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		new Label(inspectGroup, SWT.NONE).setText("gst-inspect command");
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.grabExcessHorizontalSpace = true;
+		gstInspectToolCmd = new Text(inspectGroup, SWT.BORDER);
+		gstInspectToolCmd.setLayoutData(data);
+		gstInspectToolCmd.setText(gstNode.getGstInspectToolCmd());
+		gstInspectToolCmd.addListener(SWT.Modify, confModifyListener);
 
 		Composite launchGroup = new Composite(control, SWT.NONE);
 		layout = new GridLayout();
@@ -95,7 +95,7 @@ public class GstNodeNewPage extends WizardPage implements INewNodeExtensionPage 
 		gstLaunchToolCmd.addListener(SWT.Modify, confModifyListener);
 
 		setControl(control);
-        Dialog.applyDialogFont(control);
+		Dialog.applyDialogFont(control);
 	}
 
 	protected boolean validatePage() {
