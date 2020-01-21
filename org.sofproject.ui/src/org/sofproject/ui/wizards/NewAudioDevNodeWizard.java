@@ -59,8 +59,8 @@ public class NewAudioDevNodeWizard extends Wizard implements INewWizard {
 
 		super.addPages();
 		connPage = new NewAudioDevNodeCreationPage("NewConnection", audioDevNodeProject);
-		connPage.setTitle("New Connection");
-		connPage.setDescription("Create new connection to Audio Development node");
+		connPage.setTitle("New Configuration");
+		connPage.setDescription("Create new configuration to Audio Development node");
 		connPage.setImageDescriptor(ImageDescriptor.createFromFile(getClass(), "/icons/audio-dev-icon.png"));
 		addPage(connPage);
 		connPage.init(selection);
