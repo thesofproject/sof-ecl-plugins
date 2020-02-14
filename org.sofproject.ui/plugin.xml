@@ -101,4 +101,11 @@
             name="Audio Development">
       </perspective>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+	   <page id="org.sofproject.ui.preferences.gstcommandspreferences"
+	        class="org.sofproject.ui.preferences.GstCommandsPreferences"
+            name="GStreamer commands">
+       </page>
+   </extension>
 </plugin>
