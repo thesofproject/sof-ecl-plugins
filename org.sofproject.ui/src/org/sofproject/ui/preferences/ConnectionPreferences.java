@@ -27,20 +27,40 @@
  *
  */
 
-package org.sofproject.gst.topo;
+package org.sofproject.ui.preferences;
 
-public interface IGstNodeConst {
-	String GST_NODE_CORE_ID = "org.sofproject.gst.topo";
-	String GST_NODE_PREFERENCES_ID = "org.sofproject.ui.preferences";
-	
-	String GST_NODE_EXTENSION_ID = GST_NODE_CORE_ID + ".gstextension";
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.sofproject.gst.topo.IGstNodeConst;
 
-	String GST_PROJ_DEFAULT_GST_INSPECT_TOOL_CMD = "gst-inspect-1.0";
-	String GST_PROJ_DEFAULT_GST_LAUNCH_TOOL_CMD = "gst-launch-1.0";
+public class ConnectionPreferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	String GST_PROJ_PROP_GST_INSPECT_TOOL_CMD = "gstInspectToolCmd";
-	String GST_PROJ_PROP_GST_LAUNCH_TOOL_CMD = "gstLaunchToolCmd";
-	
-	String CONN_ADDR_PREF_NAME = "connAddress";
-	String CONN_USERNAME_PREF_NAME = "connUsername";
+	private StringFieldEditor ipFieldEditor;
+	private StringFieldEditor userFieldEditor;
+
+	@Override
+	public void init(IWorkbench workbench) {
+		IPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE,
+				IGstNodeConst.GST_NODE_PREFERENCES_ID);
+		setPreferenceStore(store);
+
+	}
+
+	@Override
+	protected void createFieldEditors() {
+		ipFieldEditor = new StringFieldEditor(IGstNodeConst.CONN_ADDR_PREF_NAME, "Last address for Dev projects ",
+				getFieldEditorParent());
+		addField(ipFieldEditor);
+
+		userFieldEditor = new StringFieldEditor(IGstNodeConst.CONN_USERNAME_PREF_NAME, "Last login name for Dev projects: ",
+				getFieldEditorParent());
+		addField(userFieldEditor);
+
+	}
+
 }

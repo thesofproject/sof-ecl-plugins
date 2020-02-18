@@ -29,6 +29,7 @@
 
 package org.sofproject.ui.wizards;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -39,6 +40,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.sofproject.core.AudioDevNodeProject;
+import org.sofproject.gst.topo.IGstNodeConst;
 
 public class NewAudioDevNodeCreationPage extends WizardNewProjectCreationPage {
 
@@ -75,6 +77,8 @@ public class NewAudioDevNodeCreationPage extends WizardNewProjectCreationPage {
 		addr = new Text(addrGroup, SWT.BORDER);
 		addr.setLayoutData(data);
 		addr.addListener(SWT.Modify, confModifyListener);
+		addr.setText(Platform.getPreferencesService().getString(IGstNodeConst.GST_NODE_PREFERENCES_ID,
+				IGstNodeConst.CONN_ADDR_PREF_NAME, "", null));
 	}
 
 	@Override
