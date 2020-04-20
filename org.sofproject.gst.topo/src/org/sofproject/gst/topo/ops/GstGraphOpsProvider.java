@@ -67,7 +67,7 @@ public class GstGraphOpsProvider implements IRemoteOpsProvider {
 		switch (opId) {
 		case TEST_TOPO:
 			if (conn == null) {
-				conn = AudioDevNodeConnectionManager.getInstance().getConnection(graph.getFileInput().getProject());;
+				conn = AudioDevNodeConnectionManager.getInstance().getConnection(graph.getFileInput().getProject());
 			}
 			return new GstTopoTestOperation(graph, conn);
 		default:

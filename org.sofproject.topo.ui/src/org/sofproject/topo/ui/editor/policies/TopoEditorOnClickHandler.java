@@ -31,6 +31,8 @@ package org.sofproject.topo.ui.editor.policies;
 
 import java.io.IOException;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.gef.mvc.fx.handlers.AbstractHandler;
 import org.eclipse.gef.mvc.fx.handlers.IOnClickHandler;
@@ -41,11 +43,17 @@ import org.eclipse.gef.mvc.fx.policies.CreationPolicy;
 import org.eclipse.gef.mvc.fx.viewer.IViewer;
 import org.eclipse.gef.mvc.fx.viewer.InfiniteCanvasViewer;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.sofproject.core.connection.AudioDevNodeConnectionManager;
 import org.sofproject.core.ops.IRemoteOpsProvider;
 import org.sofproject.topo.ui.graph.GefTopoNode;
 import org.sofproject.topo.ui.graph.ITopoGraph;
 import org.sofproject.topo.ui.graph.ITopoNode;
 import org.sofproject.topo.ui.graph.TopoZestGraphBuilder;
+import org.sofproject.topo.ui.json.JsonCustomOptionPane;
+import org.sofproject.topo.ui.json.JsonUtils;
 import org.sofproject.topo.ui.models.TopoItemCreationModel;
 import org.sofproject.topo.ui.parts.TopoGraphPart;
 import org.sofproject.ui.ops.AudioDevNodeOpRunner;
@@ -124,14 +132,65 @@ public class TopoEditorOnClickHandler extends AbstractHandler implements IOnClic
 						try {
 							getGraphFromHost().serialize();
 						} catch (CoreException | IOException e) {
-							e.printStackTrace(); //TODO:
+							e.printStackTrace(); // TODO:
 						}
 					}
 				});
 				menu.getItems().add(miSerialize);
+
+				menu.getItems().add(new SeparatorMenuItem());
+
+				MenuItem miSerializeJson = new MenuItem("Serialize Topology to Json");
+				miSerializeJson.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						menu.hide();
+						new JsonCustomOptionPane(Display.getCurrent(), getGraphFromHost(), new JsonUtils());
+					}
+				});
+				menu.getItems().add(miSerializeJson);
+
+				MenuItem miSendJson = new MenuItem("Serialize Topology to Json & send to Docker");
+				JsonUtils jsonUtils = new JsonUtils();
+				IRemoteOpsProvider dockerOpsProv = jsonUtils.getDockerOpsProvider();
+
+				if (dockerOpsProv != null) {
+					for (String opId : dockerOpsProv.getRemoteOpsIds()) {
+						miSendJson.setOnAction(new EventHandler<ActionEvent>() {
+							@Override
+							public void handle(ActionEvent event) {
+								menu.hide();
+								new JsonCustomOptionPane(Display.getCurrent(), getGraphFromHost(), jsonUtils);
+
+								Display.getDefault().asyncExec(new Runnable() {
+
+									@Override
+									public void run() {
+										AudioDevNodeOpRunner
+												.runOp(dockerOpsProv.createRemoteOp(opId, AudioDevNodeConnectionManager
+														.getInstance().getConnection(getProject())));
+									}
+								});
+							}
+						});
+					}
+				}
+				menu.getItems().add(miSendJson);
+
 				menu.show(((InfiniteCanvasViewer) viewer).getScene().getWindow(), e.getScreenX(), e.getScreenY());
 			}
 		}
+	}
+
+	private IProject getProject() {
+		IProject activeProject = null;
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		if (page.getActiveEditor().getEditorInput() instanceof IFileEditorInput) {
+			IFileEditorInput input = (IFileEditorInput) page.getActiveEditor().getEditorInput();
+			IFile file = input.getFile();
+			activeProject = file.getProject();
+		}
+		return activeProject;
 	}
 
 	private ITopoGraph getGraphFromHost() {

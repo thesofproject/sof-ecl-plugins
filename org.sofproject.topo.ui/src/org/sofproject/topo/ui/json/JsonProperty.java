@@ -27,51 +27,84 @@
  *
  */
 
-package org.sofproject.topo.ui.graph;
+package org.sofproject.topo.ui.json;
 
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.util.Collection;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import org.eclipse.core.runtime.CoreException;
-import org.sofproject.core.binfile.BinFile;
-import org.sofproject.core.ops.IRemoteOpsProvider;
-import org.sofproject.topo.ui.json.JsonProperty;
+@JsonSerialize
+public class JsonProperty {
 
-/**
- * Topology graph, implemented by a specific topology binding.
- *
- */
-public interface ITopoGraph {
+	private String name;
+	private String description;
+	private String version;
+	private String type;
+	private String template;
+	private Parameters parameters;
 
-	public Collection<? extends ITopoCollectionNode> getCollections();
+	public JsonProperty(String name, String description, String version, String type) {
+		this.name = name;
+		this.description = description;
+		this.version = version;
+		this.type = type;
 
-	public Collection<? extends ITopoNode> getNodes();
+		// set default parameters
+		this.parameters = new Parameters("object", new Properties());
+	}
 
-	public ITopoNode createNode(String nodeId);
+	public String getName() {
+		return name;
+	}
 
-	public void removeNode(ITopoNode node);
+	public String getDescription() {
+		return description;
+	}
 
-	public Collection<? extends ITopoConnection> getConnections();
+	public String getVersion() {
+		return version;
+	}
 
-	public ITopoConnection createConnection(ITopoNode source, ITopoNode target);
+	public String getType() {
+		return type;
+	}
 
-	public void removeConnection(ITopoConnection connection);
+	public String getTemplate() {
+		return template;
+	}
 
-	public String[] getNodeTypeIds();
+	public Parameters getParameters() {
+		return parameters;
+	}
 
-	public String getNodeDisplayName(String nodeId);
+	public void setTemplate(String newTemplate) {
+		this.template = newTemplate;
+	}
 
-	public void addPropertyChangeListener(PropertyChangeListener listener);
+	public void setParameters(Parameters parameters) {
+		this.parameters = parameters;
+	}
+}
 
-	public void removePropertyChangeListener(PropertyChangeListener listener);
+@JsonSerialize
+class Parameters {
+	private String type;
+	private Properties properties;
 
-	// TODO: optional, move to a separate interface
-	public BinFile getBinTopology();
+	public Parameters(String type, Properties properties) {
+		this.type = type;
+		this.properties = properties;
+	}
 
-	public void serialize() throws CoreException, IOException;
-	
-	public String getPipelineString();
-	
-	public IRemoteOpsProvider getRemoteOpsProvider();
+	public String getType() {
+		return type;
+	}
+
+	public Properties getProperties() {
+		return properties;
+	}
+}
+
+@JsonSerialize
+class Properties {
+	public Properties() {
+	}
 }

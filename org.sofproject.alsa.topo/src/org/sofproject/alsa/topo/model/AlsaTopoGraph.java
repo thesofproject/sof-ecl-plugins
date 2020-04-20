@@ -536,7 +536,56 @@ public class AlsaTopoGraph implements ITopoGraph {
 		}
 		outputFile.getParent().refreshLocal(1, null);
 	}
+	
+	@Override
+	public String getPipelineString() {
+		try {
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			Writer writer = new BufferedWriter(new OutputStreamWriter(os));
+			// tlv-s
+			tlvs.serialize(writer);
 
+			// vendor tokens
+			vTokensIndex.serialize(writer);
+
+			// vendor tuples
+			vTuplesIndex.serialize(writer);
+
+			// data
+			dataIndex.serialize(writer);
+
+			// control bytes
+			controlBytes.serialize(writer);
+
+			// control mixers
+			controlMixers.serialize(writer);
+
+			// pcm capabilities
+			pcmCapsIndex.serialize(writer);
+
+			// pcm-s
+			pcms.serialize(writer);
+
+			// be-s
+			beIndex.serialize(writer);
+
+			// hw-configs
+			hwConfigs.serialize(writer);
+
+			// pipelines (widgets + graphs)
+			pipelines.serialize(writer);
+			interConnections.serialize(writer);
+			
+			writer.close();
+			os.close();
+
+			return os.toString();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	@Override
 	public IRemoteOpsProvider getRemoteOpsProvider() {
 		return null; // no extra ops

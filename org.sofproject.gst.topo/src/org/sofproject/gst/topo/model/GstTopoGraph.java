@@ -34,8 +34,11 @@ import java.beans.PropertyChangeSupport;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -192,6 +195,7 @@ public class GstTopoGraph implements ITopoGraph {
 		fileInput.setContents(new ByteArrayInputStream(os.toByteArray()), true, false, null);
 	}
 
+	@Override
 	public String getPipelineString() {
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
